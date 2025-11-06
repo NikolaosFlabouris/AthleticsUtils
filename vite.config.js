@@ -3,7 +3,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { resolve } from 'path';
 
 export default defineConfig({
-  base: '/',
+  base: '/AthleticsUtils/',
   plugins: [
     VitePWA({
       registerType: 'autoUpdate',
@@ -15,16 +15,16 @@ export default defineConfig({
         theme_color: '#1a73e8',
         background_color: '#ffffff',
         display: 'standalone',
-        start_url: '/',
+        start_url: '/AthleticsUtils/',
         icons: [
           {
-            src: '/icons/icon-192.png',
+            src: '/AthleticsUtils/icons/icon-192.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any maskable'
           },
           {
-            src: '/icons/icon-512.png',
+            src: '/AthleticsUtils/icons/icon-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
