@@ -49,10 +49,20 @@
           </div>
 
           <div class="form-group">
-            <label for="event-select">Event</label>
-            <select id="event-select" class="form-select" disabled>
-              <option value="">Select event...</option>
-            </select>
+            <label for="event-input">Event</label>
+            <div class="event-selector">
+              <input
+                type="text"
+                id="event-input"
+                class="form-input"
+                placeholder="Type to search events..."
+                autocomplete="off"
+                disabled
+              >
+              <div id="event-dropdown" class="event-dropdown hidden">
+                <!-- Filtered events will appear here -->
+              </div>
+            </div>
           </div>
 
           <div class="form-group">

@@ -119,7 +119,8 @@ class PerformanceCalculator extends BaseCalculator {
 // Initialize when DOM is ready
 const calculator = new PerformanceCalculator({
   genderSelect: '#gender-select',
-  eventSelect: '#event-select',
+  eventInput: '#event-input',
+  eventDropdown: '#event-dropdown',
   performanceInput: '#performance-input',
   calculateBtn: '#calculate-btn',
   resultsContainer: '#results-container',
