@@ -1,0 +1,919 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "description": "World Athletics Events Configuration - Human-readable event information and calculator attributes",
+  "events": {
+    "50m": {
+      "displayName": "50 Metres",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": 0.24,
+      "category": "sprints",
+      "distance": 50,
+      "unit": "metres"
+    },
+    "50m h": {
+      "displayName": "50 Metres Hurdles",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": 0.24,
+      "category": "sprints",
+      "distance": 50,
+      "unit": "metres",
+      "modifier": "hurdles"
+    },
+    "55m": {
+      "displayName": "55 Metres",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": 0.24,
+      "category": "sprints",
+      "distance": 55,
+      "unit": "metres"
+    },
+    "55m h": {
+      "displayName": "55 Metres Hurdles",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": 0.24,
+      "category": "sprints",
+      "distance": 55,
+      "unit": "metres",
+      "modifier": "hurdles"
+    },
+    "60m": {
+      "displayName": "60 Metres",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": 0.24,
+      "category": "sprints",
+      "distance": 60,
+      "unit": "metres"
+    },
+    "60m h": {
+      "displayName": "60 Metres Hurdles",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": 0.24,
+      "category": "sprints",
+      "distance": 60,
+      "unit": "metres",
+      "modifier": "hurdles"
+    },
+    "100m": {
+      "displayName": "100 Metres",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": 0.24,
+      "category": "sprints",
+      "distance": 100,
+      "unit": "metres"
+    },
+    "100m h": {
+      "displayName": "100 Metres Hurdles",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": 0.24,
+      "category": "sprints",
+      "distance": 100,
+      "unit": "metres",
+      "modifier": "hurdles"
+    },
+    "110m h": {
+      "displayName": "110 Metres Hurdles",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": 0.24,
+      "category": "sprints",
+      "distance": 110,
+      "unit": "metres",
+      "modifier": "hurdles"
+    },
+    "200m": {
+      "displayName": "200 Metres",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": 0.24,
+      "category": "sprints",
+      "distance": 200,
+      "unit": "metres"
+    },
+    "200m sh": {
+      "displayName": "200 Metres (Short Track)",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": 0.24,
+      "category": "sprints",
+      "distance": 200,
+      "unit": "metres",
+      "modifier": "short_track"
+    },
+    "200m h": {
+      "displayName": "200 Metres Hurdles",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": 0.24,
+      "category": "sprints",
+      "distance": 200,
+      "unit": "metres",
+      "modifier": "hurdles"
+    },
+    "300m": {
+      "displayName": "300 Metres",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": 0.24,
+      "category": "sprints",
+      "distance": 300,
+      "unit": "metres"
+    },
+    "300m sh": {
+      "displayName": "300 Metres (Short Track)",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": 0.24,
+      "category": "sprints",
+      "distance": 300,
+      "unit": "metres",
+      "modifier": "short_track"
+    },
+    "300m h": {
+      "displayName": "300 Metres Hurdles",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": 0.24,
+      "category": "sprints",
+      "distance": 300,
+      "unit": "metres",
+      "modifier": "hurdles"
+    },
+    "400m": {
+      "displayName": "400 Metres",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": 0.24,
+      "category": "sprints",
+      "distance": 400,
+      "unit": "metres"
+    },
+    "400m sh": {
+      "displayName": "400 Metres (Short Track)",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": 0.24,
+      "category": "sprints",
+      "distance": 400,
+      "unit": "metres",
+      "modifier": "short_track"
+    },
+    "400m h": {
+      "displayName": "400 Metres Hurdles",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": 0.24,
+      "category": "sprints",
+      "distance": 400,
+      "unit": "metres",
+      "modifier": "hurdles"
+    },
+    "500m": {
+      "displayName": "500 Metres",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "sprints",
+      "distance": 500,
+      "unit": "metres"
+    },
+    "500m sh": {
+      "displayName": "500 Metres (Short Track)",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": null,
+      "category": "sprints",
+      "distance": 500,
+      "unit": "metres",
+      "modifier": "short_track"
+    },
+    "600m": {
+      "displayName": "600 Metres",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "middle_distance",
+      "distance": 600,
+      "unit": "metres"
+    },
+    "600m sh": {
+      "displayName": "600 Metres (Short Track)",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": null,
+      "category": "middle_distance",
+      "distance": 600,
+      "unit": "metres",
+      "modifier": "short_track"
+    },
+    "800m": {
+      "displayName": "800 Metres",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "middle_distance",
+      "distance": 800,
+      "unit": "metres"
+    },
+    "800m sh": {
+      "displayName": "800 Metres (Short Track)",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": null,
+      "category": "middle_distance",
+      "distance": 800,
+      "unit": "metres",
+      "modifier": "short_track"
+    },
+    "1000m": {
+      "displayName": "1000 Metres",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "middle_distance",
+      "distance": 1000,
+      "unit": "metres"
+    },
+    "1000m sh": {
+      "displayName": "1000 Metres (Short Track)",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": null,
+      "category": "middle_distance",
+      "distance": 1000,
+      "unit": "metres",
+      "modifier": "short_track"
+    },
+    "1500m": {
+      "displayName": "1500 Metres",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "middle_distance",
+      "distance": 1500,
+      "unit": "metres"
+    },
+    "1500m sh": {
+      "displayName": "1500 Metres (Short Track)",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": null,
+      "category": "middle_distance",
+      "distance": 1500,
+      "unit": "metres",
+      "modifier": "short_track"
+    },
+    "1mile": {
+      "displayName": "1 Mile",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "middle_distance",
+      "distance": 1,
+      "unit": "miles"
+    },
+    "1mile sh": {
+      "displayName": "1 Mile (Short Track)",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": null,
+      "category": "middle_distance",
+      "distance": 1,
+      "unit": "miles",
+      "modifier": "short_track"
+    },
+    "2000m": {
+      "displayName": "2000 Metres",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "middle_distance",
+      "distance": 2000,
+      "unit": "metres"
+    },
+    "2000m sh": {
+      "displayName": "2000 Metres (Short Track)",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": null,
+      "category": "middle_distance",
+      "distance": 2000,
+      "unit": "metres",
+      "modifier": "short_track"
+    },
+    "2000m sc": {
+      "displayName": "2000 Metres Steeplechase",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "middle_distance",
+      "distance": 2000,
+      "unit": "metres",
+      "modifier": "steeplechase"
+    },
+    "2mile": {
+      "displayName": "2 Miles",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "long_distance",
+      "distance": 2,
+      "unit": "miles"
+    },
+    "2mile sh": {
+      "displayName": "2 Miles (Short Track)",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": null,
+      "category": "long_distance",
+      "distance": 2,
+      "unit": "miles",
+      "modifier": "short_track"
+    },
+    "3000m": {
+      "displayName": "3000 Metres",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "long_distance",
+      "distance": 3000,
+      "unit": "metres"
+    },
+    "3000m sh": {
+      "displayName": "3000 Metres (Short Track)",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": null,
+      "category": "long_distance",
+      "distance": 3000,
+      "unit": "metres",
+      "modifier": "short_track"
+    },
+    "3000m sc": {
+      "displayName": "3000 Metres Steeplechase",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "long_distance",
+      "distance": 3000,
+      "unit": "metres",
+      "modifier": "steeplechase"
+    },
+    "5000m": {
+      "displayName": "5000 Metres",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "long_distance",
+      "distance": 5000,
+      "unit": "metres"
+    },
+    "5000m sh": {
+      "displayName": "5000 Metres (Short Track)",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": null,
+      "category": "long_distance",
+      "distance": 5000,
+      "unit": "metres",
+      "modifier": "short_track"
+    },
+    "10000m": {
+      "displayName": "10000 Metres",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "long_distance",
+      "distance": 10000,
+      "unit": "metres"
+    },
+    "5km": {
+      "displayName": "5 Kilometres",
+      "eventType": "track_timed",
+      "venue": "out_of_stadia",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "long_distance",
+      "distance": 5,
+      "unit": "kilometres"
+    },
+    "10km": {
+      "displayName": "10 Kilometres",
+      "eventType": "track_timed",
+      "venue": "out_of_stadia",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "long_distance",
+      "distance": 10,
+      "unit": "kilometres"
+    },
+    "10mile": {
+      "displayName": "10 Miles",
+      "eventType": "track_timed",
+      "venue": "out_of_stadia",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "long_distance",
+      "distance": 10,
+      "unit": "miles"
+    },
+    "15km": {
+      "displayName": "15 Kilometres",
+      "eventType": "track_timed",
+      "venue": "out_of_stadia",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "long_distance",
+      "distance": 15,
+      "unit": "kilometres"
+    },
+    "20km": {
+      "displayName": "20 Kilometres",
+      "eventType": "track_timed",
+      "venue": "out_of_stadia",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "long_distance",
+      "distance": 20,
+      "unit": "kilometres"
+    },
+    "25km": {
+      "displayName": "25 Kilometres",
+      "eventType": "track_timed",
+      "venue": "out_of_stadia",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "long_distance",
+      "distance": 25,
+      "unit": "kilometres"
+    },
+    "30km": {
+      "displayName": "30 Kilometres",
+      "eventType": "track_timed",
+      "venue": "out_of_stadia",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "long_distance",
+      "distance": 30,
+      "unit": "kilometres"
+    },
+    "hm": {
+      "displayName": "Half Marathon",
+      "eventType": "track_timed",
+      "venue": "out_of_stadia",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "long_distance",
+      "distance": 21.0975,
+      "unit": "kilometres"
+    },
+    "marathon": {
+      "displayName": "Marathon",
+      "eventType": "track_timed",
+      "venue": "out_of_stadia",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "long_distance",
+      "distance": 42.195,
+      "unit": "kilometres"
+    },
+    "100km": {
+      "displayName": "100 Kilometres",
+      "eventType": "track_timed",
+      "venue": "out_of_stadia",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "long_distance",
+      "distance": 100,
+      "unit": "kilometres"
+    },
+    "3km w": {
+      "displayName": "3 Kilometres Race Walk",
+      "eventType": "race_walk",
+      "venue": "both",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "race_walk",
+      "distance": 3,
+      "unit": "kilometres"
+    },
+    "3000m w": {
+      "displayName": "3000 Metres Race Walk",
+      "eventType": "race_walk",
+      "venue": "both",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "race_walk",
+      "distance": 3000,
+      "unit": "metres"
+    },
+    "5km w": {
+      "displayName": "5 Kilometres Race Walk",
+      "eventType": "race_walk",
+      "venue": "both",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "race_walk",
+      "distance": 5,
+      "unit": "kilometres"
+    },
+    "5000m w": {
+      "displayName": "5000 Metres Race Walk",
+      "eventType": "race_walk",
+      "venue": "both",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "race_walk",
+      "distance": 5000,
+      "unit": "metres"
+    },
+    "10km w": {
+      "displayName": "10 Kilometres Race Walk",
+      "eventType": "race_walk",
+      "venue": "both",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "race_walk",
+      "distance": 10,
+      "unit": "kilometres"
+    },
+    "10,000mW": {
+      "displayName": "10000 Metres Race Walk",
+      "eventType": "race_walk",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "race_walk",
+      "distance": 10000,
+      "unit": "metres"
+    },
+    "15km w": {
+      "displayName": "15 Kilometres Race Walk",
+      "eventType": "race_walk",
+      "venue": "out_of_stadia",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "race_walk",
+      "distance": 15,
+      "unit": "kilometres"
+    },
+    "15,000mW": {
+      "displayName": "15000 Metres Race Walk",
+      "eventType": "race_walk",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "race_walk",
+      "distance": 15000,
+      "unit": "metres"
+    },
+    "20km w": {
+      "displayName": "20 Kilometres Race Walk",
+      "eventType": "race_walk",
+      "venue": "out_of_stadia",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "race_walk",
+      "distance": 20,
+      "unit": "kilometres"
+    },
+    "20,000mW": {
+      "displayName": "20000 Metres Race Walk",
+      "eventType": "race_walk",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "race_walk",
+      "distance": 20000,
+      "unit": "metres"
+    },
+    "30km w": {
+      "displayName": "30 Kilometres Race Walk",
+      "eventType": "race_walk",
+      "venue": "out_of_stadia",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "race_walk",
+      "distance": 30,
+      "unit": "kilometres"
+    },
+    "30,000mW": {
+      "displayName": "30000 Metres Race Walk",
+      "eventType": "race_walk",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "race_walk",
+      "distance": 30000,
+      "unit": "metres"
+    },
+    "35km w": {
+      "displayName": "35 Kilometres Race Walk",
+      "eventType": "race_walk",
+      "venue": "out_of_stadia",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "race_walk",
+      "distance": 35,
+      "unit": "kilometres"
+    },
+    "35,000mW": {
+      "displayName": "35000 Metres Race Walk",
+      "eventType": "race_walk",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "race_walk",
+      "distance": 35000,
+      "unit": "metres"
+    },
+    "50km w": {
+      "displayName": "50 Kilometres Race Walk",
+      "eventType": "race_walk",
+      "venue": "out_of_stadia",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "race_walk",
+      "distance": 50,
+      "unit": "kilometres"
+    },
+    "50,000mW": {
+      "displayName": "50000 Metres Race Walk",
+      "eventType": "race_walk",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "race_walk",
+      "distance": 50000,
+      "unit": "metres"
+    },
+    "hmw": {
+      "displayName": "Half Marathon Race Walk",
+      "eventType": "race_walk",
+      "venue": "out_of_stadia",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "race_walk",
+      "distance": 21.0975,
+      "unit": "kilometres"
+    },
+    "marw": {
+      "displayName": "Marathon Race Walk",
+      "eventType": "race_walk",
+      "venue": "out_of_stadia",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "race_walk",
+      "distance": 42.195,
+      "unit": "kilometres"
+    },
+    "hj": {
+      "displayName": "High Jump",
+      "eventType": "field_measured",
+      "venue": "both",
+      "indoor": true,
+      "handTimingOffset": null,
+      "category": "jumps",
+      "measurementType": "height",
+      "unit": "metres"
+    },
+    "pv": {
+      "displayName": "Pole Vault",
+      "eventType": "field_measured",
+      "venue": "both",
+      "indoor": true,
+      "handTimingOffset": null,
+      "category": "jumps",
+      "measurementType": "height",
+      "unit": "metres"
+    },
+    "lj": {
+      "displayName": "Long Jump",
+      "eventType": "field_measured",
+      "venue": "both",
+      "indoor": true,
+      "handTimingOffset": null,
+      "category": "jumps",
+      "measurementType": "distance",
+      "unit": "metres"
+    },
+    "tj": {
+      "displayName": "Triple Jump",
+      "eventType": "field_measured",
+      "venue": "both",
+      "indoor": true,
+      "handTimingOffset": null,
+      "category": "jumps",
+      "measurementType": "distance",
+      "unit": "metres"
+    },
+    "sp": {
+      "displayName": "Shot Put",
+      "eventType": "field_measured",
+      "venue": "both",
+      "indoor": true,
+      "handTimingOffset": null,
+      "category": "throws",
+      "measurementType": "distance",
+      "unit": "metres"
+    },
+    "dt": {
+      "displayName": "Discus Throw",
+      "eventType": "field_measured",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "throws",
+      "measurementType": "distance",
+      "unit": "metres"
+    },
+    "ht": {
+      "displayName": "Hammer Throw",
+      "eventType": "field_measured",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "throws",
+      "measurementType": "distance",
+      "unit": "metres"
+    },
+    "jt": {
+      "displayName": "Javelin Throw",
+      "eventType": "field_measured",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "throws",
+      "measurementType": "distance",
+      "unit": "metres"
+    },
+    "wt": {
+      "displayName": "Weight Throw",
+      "eventType": "field_measured",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": null,
+      "category": "throws",
+      "measurementType": "distance",
+      "unit": "metres"
+    },
+    "4x100m": {
+      "displayName": "4×100 Metres Relay",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": 0.24,
+      "category": "relays",
+      "distance": 400,
+      "unit": "metres",
+      "isRelay": true
+    },
+    "4x200m": {
+      "displayName": "4×200 Metres Relay",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": 0.24,
+      "category": "relays",
+      "distance": 800,
+      "unit": "metres",
+      "isRelay": true
+    },
+    "4x200m sh": {
+      "displayName": "4×200 Metres Relay (Short Track)",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": 0.24,
+      "category": "relays",
+      "distance": 800,
+      "unit": "metres",
+      "modifier": "short_track",
+      "isRelay": true
+    },
+    "4x400m": {
+      "displayName": "4×400 Metres Relay",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": 0.24,
+      "category": "relays",
+      "distance": 1600,
+      "unit": "metres",
+      "isRelay": true
+    },
+    "4x400m sh": {
+      "displayName": "4×400 Metres Relay (Short Track)",
+      "eventType": "track_timed",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": 0.24,
+      "category": "relays",
+      "distance": 1600,
+      "unit": "metres",
+      "modifier": "short_track",
+      "isRelay": true
+    },
+    "dec": {
+      "displayName": "Decathlon",
+      "eventType": "combined",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "combined",
+      "numberOfEvents": 10
+    },
+    "hept": {
+      "displayName": "Heptathlon",
+      "eventType": "combined",
+      "venue": "track",
+      "indoor": false,
+      "handTimingOffset": null,
+      "category": "combined",
+      "numberOfEvents": 7
+    },
+    "hept sh": {
+      "displayName": "Heptathlon (Short Track)",
+      "eventType": "combined",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": null,
+      "category": "combined",
+      "numberOfEvents": 7,
+      "modifier": "short_track"
+    },
+    "pent sh": {
+      "displayName": "Pentathlon (Short Track)",
+      "eventType": "combined",
+      "venue": "track",
+      "indoor": true,
+      "handTimingOffset": null,
+      "category": "combined",
+      "numberOfEvents": 5,
+      "modifier": "short_track"
+    }
+  },
+  "metadata": {
+    "handTimingNote": "Hand timing offset (0.24s) applies to electronic timing conversion for events 50m-400m",
+    "venueTypes": {
+      "track": "Stadium track events",
+      "out_of_stadia": "Road racing and race walking outside the stadium",
+      "both": "Can be held in stadium or outside"
+    },
+    "eventTypes": {
+      "track_timed": "Running events measured by time",
+      "race_walk": "Race walking events measured by time",
+      "field_measured": "Field events measured by distance or height",
+      "combined": "Multi-discipline combined events"
+    }
+  }
+}
