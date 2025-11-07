@@ -1,8 +1,12 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import pdfParse from 'pdf-parse';
 import { eventsConfig, getCategoryForEvent as getCategory, isKnownEvent, getEventInfo } from './events-config.js';
 
+// ES module equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Parser for World Athletics Scoring Tables
@@ -272,8 +276,8 @@ class EnhancedScoringTableExtractor {
 
     // Handle complex concatenation cases where multiple values or dashes are stuck together
     allTokens = allTokens.flatMap(token => {
-      // Skip if it's already a simple value
-      if (token === '-' || token === '--' || /^\d+[\.:]\d+$/.test(token)) {
+      // Skip if it's already a simple value (including HH:MM:SS format)
+      if (token === '-' || token === '--' || /^\d+(?:[\.:]\d+){1,2}(?:\.\d+)?$/.test(token)) {
         // Handle double dash
         if (token === '--') return ['-', '-'];
         return [token];
@@ -281,11 +285,12 @@ class EnhancedScoringTableExtractor {
 
       // Handle concatenated values (e.g., "-5.79-9.50-19.42", "-5.856.25", "9.5219.03")
       // Strategy: Match valid performance patterns more precisely
-      // Valid: 9.52, 19.03, 1:23.45, 5.79
+      // Valid: 9.52, 19.03, 1:23.45, 5.79, 1:23:45, 2:03:45.50
       // Invalid: 9.5219 (this should be split into 9.52 and 19)
 
-      // Match pattern: digit(s) + [. or :] + exactly 2 digits (standard athletic time format)
-      const performancePattern = /\d+[\.:]\d{2}/g;
+      // Match pattern: supports HH:MM:SS.ss, MM:SS.ss, or SS.ss formats
+      // Pattern explanation: \d+ (hours/mins/secs) followed by optional :MM and :SS parts, with optional .SS decimals
+      const performancePattern = /\d+(?::\d{2}){0,2}(?:\.\d{2})?/g;
       const matches = token.match(performancePattern);
 
       if (matches) {
@@ -377,6 +382,63 @@ class EnhancedScoringTableExtractor {
     }
 
     return null;
+  }
+
+  /**
+   * Convert time format to seconds
+   * - ss.SS remains as ss.SS
+   * - mm:ss.SS converts to ss.SS
+   * - mm:ss converts to ss (no decimals)
+   * - hh:mm:ss converts to ss (no decimals)
+   * @param {string} timeStr - Time string to convert
+   * @returns {string} Time in seconds format
+   */
+  convertTimeToSeconds(timeStr) {
+    if (!timeStr || typeof timeStr !== 'string') return timeStr;
+
+    // Check for hh:mm:ss or hh:mm:ss.SS format
+    const hhmmssMatch = timeStr.match(/^(\d+):(\d+):(\d+(?:\.\d+)?)$/);
+    if (hhmmssMatch) {
+      const hours = parseInt(hhmmssMatch[1]);
+      const minutes = parseInt(hhmmssMatch[2]);
+      const secondsStr = hhmmssMatch[3];
+      const seconds = parseFloat(secondsStr);
+      const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
+
+      // If original had decimals, keep 2 decimal places; otherwise return integer
+      const hasDecimals = secondsStr.includes('.');
+      return hasDecimals ? totalSeconds.toFixed(2) : totalSeconds.toString();
+    }
+
+    // Check for mm:ss or mm:ss.SS format
+    const mmssMatch = timeStr.match(/^(\d+):(\d+(?:\.\d+)?)$/);
+    if (mmssMatch) {
+      const minutes = parseInt(mmssMatch[1]);
+      const secondsStr = mmssMatch[2];
+      const seconds = parseFloat(secondsStr);
+      const totalSeconds = (minutes * 60) + seconds;
+
+      // If original had decimals, keep 2 decimal places; otherwise return integer
+      const hasDecimals = secondsStr.includes('.');
+      return hasDecimals ? totalSeconds.toFixed(2) : totalSeconds.toString();
+    }
+
+    // Already in ss.SS format or distance format - return as is
+    return timeStr;
+  }
+
+  /**
+   * Check if an event is time-based (track or race walk)
+   * @param {string} eventName - Normalized event name
+   * @returns {boolean} True if event uses time (not distance/points)
+   */
+  isTimeBasedEvent(eventName) {
+    const eventInfo = getEventInfo(eventName);
+    if (!eventInfo) return false;
+
+    // Track and race walk events use time
+    // Field events (jumps, throws) and combined events use distance/points
+    return eventInfo.type === 'track' || eventInfo.type === 'race_walk' || eventInfo.type === 'relay';
   }
 
   /**
@@ -519,7 +581,7 @@ class EnhancedScoringTableExtractor {
       }
     }
 
-    // Generate pretty-printed version (with formatting)
+    // Generate pretty-printed version (with formatting) - keep original time formats
     let prettyJson = JSON.stringify(compactData, null, 2);
 
     // Replace multi-line [points, performance] arrays with single-line format
@@ -531,8 +593,25 @@ class EnhancedScoringTableExtractor {
     // And replaces with: [1400, "35.84"]
     prettyJson = prettyJson.replace(/\[\s+(\d+),\s+"([^"]+)"\s+\]/g, '[$1, "$2"]');
 
-    // Generate minified version (no whitespace)
-    const minifiedJson = JSON.stringify(compactData);
+    // Create minified version with time conversion
+    const minifiedData = {};
+    for (const [gender, categories] of Object.entries(this.tables)) {
+      minifiedData[gender] = {};
+      for (const [category, events] of Object.entries(categories)) {
+        minifiedData[gender][category] = {};
+        for (const [eventName, entries] of Object.entries(events)) {
+          // Convert times to seconds for time-based events in minified version only
+          const isTimeBased = this.isTimeBasedEvent(eventName);
+          minifiedData[gender][category][eventName] = entries.map(entry => {
+            const performance = isTimeBased ? this.convertTimeToSeconds(entry.performance) : entry.performance;
+            return [entry.points, performance];
+          });
+        }
+      }
+    }
+
+    // Generate minified version (no whitespace) with converted times
+    const minifiedJson = JSON.stringify(minifiedData);
 
     // Write both versions to tool directory
     fs.writeFileSync(outputPath, prettyJson);
