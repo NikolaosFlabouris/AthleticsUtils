@@ -4,6 +4,8 @@ import { resolve } from 'path';
 
 export default defineConfig({
   base: '/AthleticsUtils/',
+  root: 'web',
+  publicDir: 'public',
   plugins: [
     VitePWA({
       registerType: 'autoUpdate',
@@ -64,22 +66,15 @@ export default defineConfig({
     })
   ],
   build: {
-    outDir: 'dist',
+    outDir: '../dist',
+    emptyOutDir: true,
     assetsDir: 'assets',
     sourcemap: false,
     minify: 'terser',
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        score: resolve(__dirname, 'calculators/score.html')
-      },
-      output: {
-        manualChunks: {
-          'scoring-data': ['./src/js/data/scoring-data-loader.js'],
-          'shared-utils': [
-            './src/js/utils/performance-parser.js'
-          ]
-        }
+        main: resolve(__dirname, 'web/index.html'),
+        score: resolve(__dirname, 'web/calculators/score.html')
       }
     }
   }
