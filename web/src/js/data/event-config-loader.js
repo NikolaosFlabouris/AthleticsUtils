@@ -189,6 +189,34 @@ class EventConfigLoader {
   }
 
   /**
+   * Get hand timing offset for an event
+   * @param {string} eventKey - The event key (e.g., "100m")
+   * @returns {number|null} The offset in seconds, or null if not applicable
+   */
+  getHandTimingOffset(eventKey) {
+    if (!this.data || !this.data.handTimingOffsets) {
+      return null;
+    }
+
+    for (const offsetGroup of this.data.handTimingOffsets) {
+      if (offsetGroup.events.includes(eventKey)) {
+        return offsetGroup.offset;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Check if an event supports hand timing
+   * @param {string} eventKey - The event key to check
+   * @returns {boolean} True if event has a hand timing offset
+   */
+  supportsHandTiming(eventKey) {
+    return this.getHandTimingOffset(eventKey) !== null;
+  }
+
+  /**
    * Check if data is loaded
    * @returns {boolean}
    */

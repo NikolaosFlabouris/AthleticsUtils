@@ -9,9 +9,47 @@ import { parsePerformance, formatPerformance } from '../utils/performance-parser
 import { eventConfigLoader } from '../data/event-config-loader.js';
 
 class PerformanceCalculator extends BaseCalculator {
+  constructor(selectors) {
+    super(selectors);
+    this.isHandTimed = false;
+  }
+
+  setupDOMElements() {
+    super.setupDOMElements();
+    this.handTimingContainer = document.querySelector('#hand-timing-container');
+    this.handTimingCheckbox = document.querySelector('#hand-timing-checkbox');
+  }
+
+  setupEventListeners() {
+    super.setupEventListeners();
+    this.handTimingCheckbox?.addEventListener('change', (e) => {
+      this.isHandTimed = e.target.checked;
+    });
+  }
+
   async initialize() {
     await super.initialize();
     Navigation.initialize();
+  }
+
+  selectEvent(eventKey, displayName) {
+    // Store previous hand timing state
+    const previousHandTimingState = this.isHandTimed;
+
+    // Call parent method
+    super.selectEvent(eventKey, displayName);
+
+    // Show/hide hand timing checkbox based on event support
+    if (eventConfigLoader.supportsHandTiming(eventKey)) {
+      this.handTimingContainer.style.display = 'block';
+      // Maintain checkbox state if switching between hand-timing events
+      this.handTimingCheckbox.checked = previousHandTimingState;
+      this.isHandTimed = previousHandTimingState;
+    } else {
+      this.handTimingContainer.style.display = 'none';
+      this.handTimingCheckbox.checked = false;
+      this.isHandTimed = false;
+    }
   }
 
   handleCalculate() {
@@ -38,7 +76,7 @@ class PerformanceCalculator extends BaseCalculator {
         return;
       }
 
-      const result = lookupPoints(this.currentGender, this.currentEvent, normalizedPerformance);
+      const result = lookupPoints(this.currentGender, this.currentEvent, normalizedPerformance, this.isHandTimed);
 
       if (!result) {
         this.performanceInput.classList.add('input-error');
@@ -75,7 +113,13 @@ class PerformanceCalculator extends BaseCalculator {
     const content = document.createElement('div');
     content.className = 'result-card__content';
 
-    if (result.exactMatch) {
+    if (result.appliedOffset) {
+      // Hand timing offset was applied
+      const finalTime = formatPerformance(String(result.originalPerformance + result.appliedOffset), this.currentEvent);
+      const originalTime = formatPerformance(String(result.originalPerformance), this.currentEvent);
+      const offset = formatPerformance(String(result.appliedOffset), this.currentEvent);
+      content.textContent = `Adjusted Performance: ${finalTime} = ${originalTime} + ${offset} offset for hand timing`;
+    } else if (result.exactMatch) {
       content.textContent = `Performance: ${formatPerformance(result.closestPerformance, this.currentEvent)}`;
     } else {
       content.innerHTML = `

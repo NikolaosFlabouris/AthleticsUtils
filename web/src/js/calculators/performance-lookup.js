@@ -4,6 +4,7 @@
  */
 
 import { scoringDataLoader } from '../data/scoring-data-loader.js';
+import { eventConfigLoader } from '../data/event-config-loader.js';
 
 /**
  * Find points for a given performance in an event
@@ -12,9 +13,10 @@ import { scoringDataLoader } from '../data/scoring-data-loader.js';
  * @param {string} gender
  * @param {string} event
  * @param {string} performance - Normalized performance value
- * @returns {Object|null} {points, exactMatch, closestPerformance}
+ * @param {boolean} isHandTimed - Whether to apply hand timing offset
+ * @returns {Object|null} {points, exactMatch, closestPerformance, appliedOffset?, originalPerformance?}
  */
-export function lookupPoints(gender, event, performance) {
+export function lookupPoints(gender, event, performance, isHandTimed = false) {
   // Find the category for this event
   const category = scoringDataLoader.findCategory(gender, event);
 
@@ -30,7 +32,19 @@ export function lookupPoints(gender, event, performance) {
   }
 
   // Convert performance to number for comparison
-  const perfNum = parseFloat(performance);
+  let perfNum = parseFloat(performance);
+  let appliedOffset = null;
+  let originalPerformance = null;
+
+  // Apply hand timing offset if applicable
+  if (isHandTimed) {
+    const offset = eventConfigLoader.getHandTimingOffset(event);
+    if (offset) {
+      originalPerformance = perfNum;
+      perfNum += offset;
+      appliedOffset = offset;
+    }
+  }
 
   if (isNaN(perfNum)) {
     return null;
@@ -47,11 +61,16 @@ export function lookupPoints(gender, event, performance) {
 
     // Check for exact match (within small tolerance for floating point)
     if (Math.abs(perfValue - perfNum) < 0.005) {
-      return {
+      const result = {
         points,
         exactMatch: true,
         closestPerformance: perf
       };
+      if (appliedOffset !== null) {
+        result.appliedOffset = appliedOffset;
+        result.originalPerformance = originalPerformance;
+      }
+      return result;
     }
 
     // Track the entry that should be used based on World Athletics rules
@@ -90,11 +109,16 @@ export function lookupPoints(gender, event, performance) {
   }
 
   if (lowerPointsEntry) {
-    return {
+    const result = {
       points: lowerPointsEntry[0],
       exactMatch: false,
       closestPerformance: lowerPointsEntry[1]
     };
+    if (appliedOffset !== null) {
+      result.appliedOffset = appliedOffset;
+      result.originalPerformance = originalPerformance;
+    }
+    return result;
   }
 
   return null;
