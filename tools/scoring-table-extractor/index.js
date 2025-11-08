@@ -169,10 +169,16 @@ class EnhancedScoringTableExtractor {
         i++; // Skip the next token since we consumed it
       }
 
-      // Check if next token is a modifier (h, sh, sc, w)
-      if (i + 1 < eventTokens.length && /^(h|sh|sc|w)$/i.test(eventTokens[i + 1])) {
+      // Check if next token is a modifier (h, sh, sc, w, mix)
+      if (i + 1 < eventTokens.length && /^(h|sh|sc|w|mix)$/i.test(eventTokens[i + 1])) {
         eventName = eventName + ' ' + eventTokens[i + 1];
         i++; // Skip the next token since we consumed it
+
+        // Check for double modifiers like "mix sh"
+        if (i + 1 < eventTokens.length && /^(sh)$/i.test(eventTokens[i + 1])) {
+          eventName = eventName + ' ' + eventTokens[i + 1];
+          i++; // Skip this token too
+        }
       }
 
       const normalized = this.normalizeEventName(eventName);
@@ -232,13 +238,21 @@ class EnhancedScoringTableExtractor {
     normalized = normalized.replace(/(\d+(?:m|km|mile))(h|sh|sc|w)\b/g, '$1 $2');
 
     // Handle relay modifiers similarly
-    // "4x400mix" should stay as is (it's intentionally no space)
-    // "4x400msh" -> "4x400m sh", "4x400mh" -> "4x400m h"
-    normalized = normalized.replace(/(4x\d+m)(?!ix\b)(h|sh|sc|w)\b/g, '$1 $2');
+    // "4x400mix" -> "4x400m mix", "4x400mixsh" -> "4x400m mix sh", "4x400msh" -> "4x400m sh"
+    // First handle "mixsh" case specifically
+    normalized = normalized.replace(/(4x\d+)mixsh\b/g, '$1m mix sh');
+    // Then handle other cases
+    normalized = normalized.replace(/(4x\d+)(mix|m(?:h|sh|sc|w))\b/g, (_match, base, modifier) => {
+      if (modifier === 'mix') {
+        return `${base}m mix`;
+      } else {
+        // Remove the 'm' prefix from modifier (mh -> h, msh -> sh, etc.)
+        return `${base}m ${modifier.substring(1)}`;
+      }
+    });
 
     // Relay events: 4x100m, 4x200m, 4x400m, with optional modifiers (sh, mix)
-    // Note: "mix" appears as "4x400mix" (no separate 'm'), so match "mix" or just "m"
-    if (/^4x\d+m(ix)?(\s+(h|sh|sc|w))?$/.test(normalized)) {
+    if (/^4x\d+m(\s+(mix|h|sh|sc|w))?(\s+(sh))?$/.test(normalized)) {
       return normalized;
     }
 

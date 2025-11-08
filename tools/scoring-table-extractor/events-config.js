@@ -279,8 +279,8 @@ export function buildEventMap() {
 
     // Add mixed variant
     if (event.allowMixed) {
-      // Replace final 'm' with 'mix': "4x400m" -> "4x400mix"
-      const mixName = baseName.replace(/m$/, 'mix');
+      // Add 'mix' after the 'm': "4x400m" -> "4x400m mix"
+      const mixName = `${baseName} mix`;
       eventMap.set(mixName, {
         category: 'relays',
         type: 'relay',

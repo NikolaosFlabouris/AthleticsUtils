@@ -205,24 +205,36 @@ export class BaseCalculator {
       return;
     }
 
-    // Group events by category
-    const eventsByCategory = {};
+    // Separate primary and non-primary events
+    const primaryEvents = [];
+    const otherEvents = [];
+
     for (const event of filteredEvents) {
-      const category = event.category || 'other';
-      if (!eventsByCategory[category]) {
-        eventsByCategory[category] = [];
+      if (eventConfigLoader.isPrimaryEvent(event.key)) {
+        primaryEvents.push(event);
+      } else {
+        otherEvents.push(event);
       }
-      eventsByCategory[category].push(event);
+    }
+
+    // Group primary events by category
+    const primaryByCategory = {};
+    for (const event of primaryEvents) {
+      const category = event.category || 'other';
+      if (!primaryByCategory[category]) {
+        primaryByCategory[category] = [];
+      }
+      primaryByCategory[category].push(event);
     }
 
     // Sort events within each category by distance (shortest to longest)
-    for (const category in eventsByCategory) {
-      eventsByCategory[category] = eventConfigLoader.sortEventsByDistance(eventsByCategory[category]);
+    for (const category in primaryByCategory) {
+      primaryByCategory[category] = eventConfigLoader.sortEventsByDistance(primaryByCategory[category]);
     }
 
     // Define category order
     const categoryOrder = ['sprints', 'middle_distance', 'long_distance', 'race_walk', 'jumps', 'throws', 'relays', 'combined'];
-    const sortedCategories = Object.keys(eventsByCategory).sort((a, b) => {
+    const sortedCategories = Object.keys(primaryByCategory).sort((a, b) => {
       const indexA = categoryOrder.indexOf(a);
       const indexB = categoryOrder.indexOf(b);
       if (indexA === -1) return 1;
@@ -233,8 +245,9 @@ export class BaseCalculator {
     // Render dropdown
     this.eventDropdown.innerHTML = '';
 
+    // Render primary events by category
     for (const category of sortedCategories) {
-      const events = eventsByCategory[category];
+      const events = primaryByCategory[category];
 
       // Add category header
       const categoryHeader = document.createElement('div');
@@ -256,6 +269,57 @@ export class BaseCalculator {
         });
 
         this.eventDropdown.appendChild(item);
+      }
+    }
+
+    // Render "Other" category for non-primary events
+    if (otherEvents.length > 0) {
+      // Sort other events by category, then by distance
+      const otherByCategory = {};
+      for (const event of otherEvents) {
+        const category = event.category || 'other';
+        if (!otherByCategory[category]) {
+          otherByCategory[category] = [];
+        }
+        otherByCategory[category].push(event);
+      }
+
+      for (const category in otherByCategory) {
+        otherByCategory[category] = eventConfigLoader.sortEventsByDistance(otherByCategory[category]);
+      }
+
+      // Sort categories
+      const otherSortedCategories = Object.keys(otherByCategory).sort((a, b) => {
+        const indexA = categoryOrder.indexOf(a);
+        const indexB = categoryOrder.indexOf(b);
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        return indexA - indexB;
+      });
+
+      // Add "Other" category header
+      const otherHeader = document.createElement('div');
+      otherHeader.className = 'event-dropdown__category';
+      otherHeader.textContent = 'Other';
+      this.eventDropdown.appendChild(otherHeader);
+
+      // Add all other events
+      for (const category of otherSortedCategories) {
+        const events = otherByCategory[category];
+        for (const event of events) {
+          const item = document.createElement('div');
+          item.className = 'event-dropdown__item';
+          item.textContent = event.displayName;
+          item.dataset.eventKey = event.key;
+
+          item.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.selectEvent(event.key, event.displayName);
+          });
+
+          this.eventDropdown.appendChild(item);
+        }
       }
     }
 

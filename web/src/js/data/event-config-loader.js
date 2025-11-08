@@ -97,6 +97,27 @@ class EventConfigLoader {
   }
 
   /**
+   * Get primary (Olympic/common) events
+   * @returns {Array<string>} Array of primary event keys
+   */
+  getPrimaryEvents() {
+    if (!this.data || !this.data.primaryEvents) {
+      return [];
+    }
+    return this.data.primaryEvents;
+  }
+
+  /**
+   * Check if an event is a primary event
+   * @param {string} eventKey - The event key to check
+   * @returns {boolean} True if event is primary
+   */
+  isPrimaryEvent(eventKey) {
+    const primaryEvents = this.getPrimaryEvents();
+    return primaryEvents.includes(eventKey);
+  }
+
+  /**
    * Get events grouped by category
    * @returns {Object} Events grouped by category
    */
