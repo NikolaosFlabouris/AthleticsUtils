@@ -7,6 +7,7 @@ import { BaseCalculator } from '../components/calculator-base.js';
 import { lookupPoints, lookupPerformance, findEquivalentPerformances } from '../calculators/performance-lookup.js';
 import { parsePerformance, formatPerformance } from '../utils/performance-parser.js';
 import { eventConfigLoader } from '../data/event-config-loader.js';
+import { HistoryManager } from '../utils/history-manager.js';
 
 class PerformanceCalculator extends BaseCalculator {
   constructor(selectors) {
@@ -23,6 +24,8 @@ class PerformanceCalculator extends BaseCalculator {
     this.modeToggleScore = document.querySelector('#mode-toggle-score');
     this.inputLabel = document.querySelector('#input-label');
     this.inputHelp = document.querySelector('#input-help');
+    this.historySection = document.querySelector('#history-section');
+    this.historyTableBody = document.querySelector('#history-table-body');
   }
 
   setupEventListeners() {
@@ -44,6 +47,8 @@ class PerformanceCalculator extends BaseCalculator {
   async initialize() {
     await super.initialize();
     Navigation.initialize();
+    this.renderHistory();
+    this.setupHistoryEventListeners();
   }
 
   switchMode(mode) {
@@ -268,6 +273,15 @@ class PerformanceCalculator extends BaseCalculator {
     this.resultsContent.appendChild(equivCard);
 
     this.showResults();
+
+    // Save to history
+    this.saveToHistory({
+      gender: this.currentGender,
+      event: this.currentEvent,
+      eventDisplayName: eventConfigLoader.getEventInfo(this.currentEvent)?.displayName || this.currentEvent,
+      performance: formatPerformance(result.closestPerformance, this.currentEvent),
+      score: result.points
+    });
   }
 
   displayScoreResults(result, equivalents, submittedScore) {
@@ -341,6 +355,148 @@ class PerformanceCalculator extends BaseCalculator {
     this.resultsContent.appendChild(equivCard);
 
     this.showResults();
+
+    // Save to history
+    this.saveToHistory({
+      gender: this.currentGender,
+      event: this.currentEvent,
+      eventDisplayName: eventConfigLoader.getEventInfo(this.currentEvent)?.displayName || this.currentEvent,
+      performance: formatPerformance(result.performance, this.currentEvent),
+      score: submittedScore
+    });
+  }
+
+  saveToHistory(entry) {
+    HistoryManager.addEntry(entry);
+    this.renderHistory();
+  }
+
+  renderHistory() {
+    const history = HistoryManager.load();
+
+    if (history.length === 0) {
+      this.historySection.classList.add('hidden');
+      return;
+    }
+
+    this.historySection.classList.remove('hidden');
+    this.historyTableBody.innerHTML = '';
+
+    for (const entry of history) {
+      const row = this.createHistoryRow(entry);
+      this.historyTableBody.appendChild(row);
+    }
+  }
+
+  createHistoryRow(entry) {
+    const row = document.createElement('tr');
+    row.className = 'history-row history-row--adding';
+    row.draggable = true;
+    row.dataset.historyId = entry.id;
+
+    row.innerHTML = `
+      <td class="history-row__gender">${this.capitalizeFirst(entry.gender)}</td>
+      <td class="history-row__event">${entry.eventDisplayName}</td>
+      <td class="history-row__performance">${entry.performance}</td>
+      <td class="history-row__score">${entry.score}</td>
+      <td class="history-row__actions">
+        <button class="history-delete-btn" aria-label="Delete" data-history-id="${entry.id}">×</button>
+      </td>
+    `;
+
+    // Remove animation class after animation completes
+    setTimeout(() => row.classList.remove('history-row--adding'), 200);
+
+    return row;
+  }
+
+  setupHistoryEventListeners() {
+    // Delete button clicks
+    this.historyTableBody?.addEventListener('click', (e) => {
+      if (e.target.classList.contains('history-delete-btn')) {
+        const id = e.target.dataset.historyId;
+        const row = e.target.closest('tr');
+
+        // Animate removal
+        row.classList.add('history-row--removing');
+        setTimeout(() => {
+          HistoryManager.removeEntry(id);
+          this.renderHistory();
+        }, 200);
+      }
+    });
+
+    // Drag and drop
+    let draggedElement = null;
+
+    this.historyTableBody?.addEventListener('dragstart', (e) => {
+      if (e.target.classList.contains('history-row')) {
+        draggedElement = e.target;
+        e.target.classList.add('dragging');
+      }
+    });
+
+    this.historyTableBody?.addEventListener('dragend', (e) => {
+      if (e.target.classList.contains('history-row')) {
+        e.target.classList.remove('dragging');
+        draggedElement = null;
+      }
+    });
+
+    this.historyTableBody?.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      const currentRow = e.target.closest('.history-row');
+
+      if (currentRow && draggedElement && currentRow !== draggedElement) {
+        // Remove all drag-over classes
+        this.historyTableBody.querySelectorAll('.drag-over').forEach(el => {
+          el.classList.remove('drag-over');
+        });
+        currentRow.classList.add('drag-over');
+      }
+    });
+
+    this.historyTableBody?.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const dropTarget = e.target.closest('.history-row');
+
+      // Remove drag-over class
+      this.historyTableBody.querySelectorAll('.drag-over').forEach(el => {
+        el.classList.remove('drag-over');
+      });
+
+      if (dropTarget && draggedElement && dropTarget !== draggedElement) {
+        // Reorder in DOM
+        const allRows = [...this.historyTableBody.querySelectorAll('.history-row')];
+        const draggedIndex = allRows.indexOf(draggedElement);
+        const dropIndex = allRows.indexOf(dropTarget);
+
+        if (draggedIndex < dropIndex) {
+          dropTarget.after(draggedElement);
+        } else {
+          dropTarget.before(draggedElement);
+        }
+
+        // Save new order to localStorage
+        this.saveHistoryOrder();
+      }
+    });
+  }
+
+  saveHistoryOrder() {
+    const rows = this.historyTableBody.querySelectorAll('.history-row');
+    const history = HistoryManager.load();
+    const newOrder = [];
+
+    rows.forEach(row => {
+      const id = row.dataset.historyId;
+      const entry = history.find(h => h.id === id);
+      if (entry) {
+        newOrder.push(entry);
+      }
+    });
+
+    HistoryManager.reorder(newOrder);
   }
 }
 
