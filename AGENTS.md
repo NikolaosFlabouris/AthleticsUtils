@@ -15,75 +15,105 @@ This file provides guidance for AI coding agents (Claude, GitHub Copilot, etc.) 
 
 ## Architecture
 
+### Important: Project Root Structure
+
+**The web application lives in the `web/` directory.** This is configured via `root: 'web'` in `vite.config.js`. When working with the project:
+- All web files (HTML, JS, CSS) are in `web/`
+- Vite serves from `web/` as the root
+- Build output goes to `dist/` at the repository root
+- Always include the `web/` prefix when referencing paths in configuration files
+
 ### Multi-Page Architecture
 
 The project uses Vite's multi-page support with:
-- **Home Page** (`/index.html`) - Landing page
-- **Calculator Pages** (`/calculators/*.html`) - Individual tool pages
+- **Home Page** (`web/index.html`) - Landing page
+- **Calculator Pages** (`web/calculators/*.html`) - Individual tool pages
 - **Shared Components** - Reusable across pages
 - **Code Splitting** - Each page loads only what it needs
 
 ### Directory Structure
 
+**Important**: The web application lives in the `web/` directory (configured via `root: 'web'` in `vite.config.js`). All paths below are relative to the repository root.
+
 ```
-AthleticsUtils.github.io/
-├── index.html                    # Home page (landing page)
-├── calculators/                  # Individual calculator pages
-│   └── score.html                # World Athletics Score Calculator
-├── public/                       # Static assets (not processed by Vite)
-│   ├── data/                     # Data files
-│   │   └── athletics_scoring_tables.min.json  # 1.45MB scoring data
-│   └── icons/                    # PWA icons
-├── src/                          # Source files (processed by Vite)
-│   ├── styles/
-│   │   ├── variables.css         # CSS custom properties (colors, spacing, etc.)
-│   │   ├── main.css              # Global styles
-│   │   ├── components/           # Component-specific styles
-│   │   └── pages/                # Page-specific styles
-│   └── js/
-│       ├── pages/                # Page entry points
-│       │   ├── home.js           # Home page logic
-│       │   └── score-calculator.js  # Score calculator page logic
-│       ├── components/           # Reusable components
-│       │   ├── navigation.js     # Shared navigation bar
-│       │   └── calculator-base.js  # Base calculator class
-│       ├── calculators/          # Calculator-specific logic
-│       │   └── performance-lookup.js  # Performance lookup logic
-│       ├── data/                 # Data management
-│       │   └── scoring-data-loader.js  # Loads & caches scoring data
-│       └── utils/                # Utility functions
-│           └── performance-parser.js  # Parse time/distance inputs
-└── tools/                        # Build/development tools
-    └── scoring-table-extractor/  # PDF extraction tool for scoring tables
+AthleticsUtils/
+├── web/                          # Web application root (Vite root directory)
+│   ├── index.html                # Home page (landing page)
+│   ├── calculators/              # Individual calculator pages
+│   │   └── score.html            # World Athletics Score Calculator
+│   ├── public/                   # Static assets (not processed by Vite)
+│   │   ├── data/                 # Data files
+│   │   │   ├── athletics_scoring_tables.min.json  # ~3MB scoring data
+│   │   │   └── events_config.json                 # Event metadata/configuration
+│   │   └── icons/                # PWA icons
+│   └── src/                      # Source files (processed by Vite)
+│       ├── styles/
+│       │   ├── variables.css     # CSS custom properties (colors, spacing, etc.)
+│       │   ├── main.css          # Global styles
+│       │   ├── components/       # Component-specific styles
+│       │   │   └── navigation.css
+│       │   └── pages/            # Page-specific styles
+│       │       └── home.css
+│       └── js/
+│           ├── main.js           # Main application entry point
+│           ├── pages/            # Page entry points
+│           │   ├── home.js       # Home page logic
+│           │   └── score-calculator.js  # Score calculator page logic
+│           ├── components/       # Reusable components
+│           │   ├── navigation.js # Shared navigation bar
+│           │   └── calculator-base.js  # Base calculator class
+│           ├── calculators/      # Calculator-specific logic
+│           │   └── performance-lookup.js  # Performance lookup logic
+│           ├── data/             # Data management
+│           │   ├── scoring-data-loader.js    # Loads & caches scoring data
+│           │   └── event-config-loader.js    # Loads & caches event config
+│           └── utils/            # Utility functions
+│               └── performance-parser.js  # Parse time/distance inputs
+├── tools/                        # Build/development tools
+│   └── scoring-table-extractor/  # PDF extraction tool for scoring tables
+│       ├── index.js              # Main extraction script
+│       ├── events-config.js      # Event configuration generator
+│       ├── package.json          # Tool dependencies
+│       └── *.pdf                 # Source PDF files
+├── dist/                         # Build output (generated, not in git)
+├── .github/                      # GitHub configuration
+│   └── workflows/
+│       └── deploy.yml            # GitHub Actions deployment workflow
+├── vite.config.js                # Vite configuration (note: root = 'web')
+└── package.json                  # Project dependencies and scripts
 ```
 
 ## Key Files and Their Purpose
 
 ### Configuration Files
-- **`vite.config.js`** - Vite configuration with multi-page setup
+- **`vite.config.js`** - Vite configuration with multi-page setup (sets `root: 'web'`)
 - **`package.json`** - Dependencies and npm scripts
 - **`.gitignore`** - Git ignore patterns
+- **`.github/workflows/deploy.yml`** - GitHub Actions auto-deployment
 
 ### Entry Points
-- **`index.html`** - Home page (main entry)
-- **`calculators/score.html`** - Score calculator page entry
-- **`src/js/pages/home.js`** - Home page JavaScript
-- **`src/js/pages/score-calculator.js`** - Score calculator JavaScript
+- **`web/index.html`** - Home page (main entry)
+- **`web/calculators/score.html`** - Score calculator page entry
+- **`web/src/js/main.js`** - Main application entry point
+- **`web/src/js/pages/home.js`** - Home page JavaScript
+- **`web/src/js/pages/score-calculator.js`** - Score calculator JavaScript
 
 ### Core Components
-- **`src/js/components/navigation.js`** - Navigation bar (used on all pages)
-- **`src/js/components/calculator-base.js`** - Base class for calculators
-- **`src/js/data/scoring-data-loader.js`** - Loads scoring data with caching
-- **`src/js/utils/performance-parser.js`** - Parses user input (times/distances)
+- **`web/src/js/components/navigation.js`** - Navigation bar (used on all pages)
+- **`web/src/js/components/calculator-base.js`** - Base class for calculators
+- **`web/src/js/data/scoring-data-loader.js`** - Loads scoring data with caching
+- **`web/src/js/data/event-config-loader.js`** - Loads event configuration with caching
+- **`web/src/js/utils/performance-parser.js`** - Parses user input (times/distances)
 
 ### Styling
-- **`src/styles/variables.css`** - CSS custom properties (modify for theming)
-- **`src/styles/main.css`** - Global styles
-- **`src/styles/components/`** - Component-specific styles
-- **`src/styles/pages/`** - Page-specific styles
+- **`web/src/styles/variables.css`** - CSS custom properties (modify for theming)
+- **`web/src/styles/main.css`** - Global styles
+- **`web/src/styles/components/`** - Component-specific styles
+- **`web/src/styles/pages/`** - Page-specific styles
 
 ### Data
-- **`public/data/athletics_scoring_tables.min.json`** - Minified scoring tables (1.45MB)
+- **`web/public/data/athletics_scoring_tables.min.json`** - Minified scoring tables (~3MB)
+- **`web/public/data/events_config.json`** - Event metadata and configuration
 - **`tools/scoring-table-extractor/`** - Tool to extract data from official PDFs
 
 ## Development Workflow
@@ -133,9 +163,9 @@ npm run deploy  # Build and deploy to GitHub Pages
 
 ### Adding a New Calculator
 
-1. **Create HTML page** in `calculators/`
+1. **Create HTML page** in `web/calculators/`
    ```html
-   <!-- calculators/new-calculator.html -->
+   <!-- web/calculators/new-calculator.html -->
    <!DOCTYPE html>
    <html lang="en">
    <head>
@@ -150,9 +180,9 @@ npm run deploy  # Build and deploy to GitHub Pages
    </html>
    ```
 
-2. **Create page script** in `src/js/pages/`
+2. **Create page script** in `web/src/js/pages/`
    ```javascript
-   // src/js/pages/new-calculator.js
+   // web/src/js/pages/new-calculator.js
    import { Navigation } from '../components/navigation.js';
    import { BaseCalculator } from '../components/calculator-base.js';
 
@@ -178,11 +208,11 @@ npm run deploy  # Build and deploy to GitHub Pages
 
 3. **Update `vite.config.js`** - Add to `rollupOptions.input`:
    ```javascript
-   newCalculator: resolve(__dirname, 'calculators/new-calculator.html')
+   newCalculator: resolve(__dirname, 'web/calculators/new-calculator.html')
    ```
 
 4. **Update navigation** - Add link in:
-   - `index.html` (home page tools grid)
+   - `web/index.html` (home page tools grid)
    - All HTML pages' navigation sections
 
 5. **Test**
@@ -238,10 +268,10 @@ When World Athletics releases new tables:
 
 ### Adding New Styles
 
-1. **Global styles** → `src/styles/main.css`
-2. **Variables** → `src/styles/variables.css`
-3. **Component styles** → `src/styles/components/component-name.css`
-4. **Page styles** → `src/styles/pages/page-name.css`
+1. **Global styles** → `web/src/styles/main.css`
+2. **Variables** → `web/src/styles/variables.css`
+3. **Component styles** → `web/src/styles/components/component-name.css`
+4. **Page styles** → `web/src/styles/pages/page-name.css`
 
 Import in HTML:
 ```html
@@ -251,9 +281,9 @@ Import in HTML:
 
 ### Adding Utility Functions
 
-Create in `src/js/utils/`:
+Create in `web/src/js/utils/`:
 ```javascript
-// src/js/utils/your-utility.js
+// web/src/js/utils/your-utility.js
 export function yourFunction() {
   // Implementation
 }
@@ -293,6 +323,35 @@ import { ScoringDataLoader } from '../data/scoring-data-loader.js';
 
 const dataLoader = new ScoringDataLoader();
 const scoringData = await dataLoader.loadScoringData();
+```
+
+Data is cached in memory after first load.
+
+### Event Configuration Data
+
+The event configuration provides metadata about athletics events:
+```json
+{
+  "primaryEvents": ["100m", "200m", ...],
+  "events": {
+    "100m": {
+      "displayName": "100m",
+      "measurementFormat": "time",
+      "category": "sprints",
+      "distance": 100,
+      "unit": "metres"
+    },
+    ...
+  }
+}
+```
+
+Use `EventConfigLoader`:
+```javascript
+import { EventConfigLoader } from '../data/event-config-loader.js';
+
+const configLoader = new EventConfigLoader();
+const eventConfig = await configLoader.load();
 ```
 
 Data is cached in memory after first load.
@@ -375,12 +434,14 @@ npm run preview
 
 ### File Modification Guidelines
 
-- **DON'T modify** `public/data/athletics_scoring_tables.min.json` manually
-  - Regenerate using the extraction tool
+- **DON'T modify** `web/public/data/athletics_scoring_tables.min.json` manually
+  - Regenerate using the extraction tool in `tools/scoring-table-extractor/`
+- **DON'T modify** `web/public/data/events_config.json` manually
+  - Regenerate using the extraction tool's `events-config.js` script
 - **DON'T add frameworks** - Project uses vanilla JavaScript by design
 - **DO extend BaseCalculator** - For new calculators
 - **DO use CSS variables** - For theming and consistency
-- **DO update vite.config.js** - When adding new pages
+- **DO update vite.config.js** - When adding new pages (remember `web/` prefix in paths)
 
 ### Code Quality
 
