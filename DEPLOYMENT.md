@@ -103,7 +103,8 @@ After deployment:
 ### Assets not loading
 
 - Check that `base` in `vite.config.js` matches your deployment path
-- For repository sites (not username.github.io), you may need to set `base: '/repository-name/'`
+- For custom domains, use `base: '/'`
+- For repository sites (username.github.io/repository-name), you may need to set `base: '/repository-name/'`
 
 ### Icons missing
 

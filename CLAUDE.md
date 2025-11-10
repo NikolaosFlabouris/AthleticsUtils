@@ -177,7 +177,7 @@ The tool automatically publishes to `web/public/data/athletics_scoring_tables.mi
 ### GitHub Pages
 
 - Site deploys to: https://athleticsutils.com/
-- Base path: `/AthleticsUtils/` (configured in [vite.config.js](vite.config.js))
+- Base path: `/` (root domain, configured in [vite.config.js](vite.config.js))
 - Deployment: `npm run deploy` (builds and pushes to `gh-pages` branch)
 - Auto-deploy via GitHub Actions on push to `main`
 
