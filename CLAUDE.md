@@ -6,8 +6,8 @@ This file provides context for Claude Code (Anthropic's official CLI) when worki
 
 **Athletics Utilities** is a Progressive Web App (PWA) providing athletics (track & field) calculators. It's built with vanilla JavaScript, HTML, and CSS using Vite as the build tool.
 
-**Live Site**: https://athleticsutils.github.io/
-**Repository**: https://github.com/NikolaosFlabouris/AthleticsUtils.github.io
+**Live Site**: https://athleticsutils.com/
+**Repository**: https://github.com/NikolaosFlabouris/AthleticsUtils
 
 ## Quick Reference
 
@@ -176,7 +176,7 @@ The tool automatically publishes to `web/public/data/athletics_scoring_tables.mi
 
 ### GitHub Pages
 
-- Site deploys to: https://athleticsutils.github.io/
+- Site deploys to: https://athleticsutils.com/
 - Base path: `/AthleticsUtils/` (configured in [vite.config.js](vite.config.js))
 - Deployment: `npm run deploy` (builds and pushes to `gh-pages` branch)
 - Auto-deploy via GitHub Actions on push to `main`

@@ -40,7 +40,7 @@ Also known as: IAAF Points Calculator, World Athletics Points Calculator, IAAF S
 ## Project Structure
 
 ```
-AthleticsUtils.github.io/
+AthleticsUtils/
 ├── index.html                                   # Home page (landing page)
 ├── calculators/
 │   └── score.html                               # World Athletics Score Calculator page
@@ -114,8 +114,8 @@ This project uses a **multi-page architecture** with Vite's multi-page support:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/NikolaosFlabouris/AthleticsUtils.github.io.git
-cd AthleticsUtils.github.io
+git clone https://github.com/NikolaosFlabouris/AthleticsUtils.git
+cd AthleticsUtils
 ```
 
 2. Install dependencies:
@@ -332,4 +332,4 @@ ISC
 ## Contact
 
 For questions, issues, or suggestions, please open an issue on GitHub:
-https://github.com/NikolaosFlabouris/AthleticsUtils.github.io/issues
+https://github.com/NikolaosFlabouris/AthleticsUtils/issues
