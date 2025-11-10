@@ -178,15 +178,55 @@ export function findEquivalentPerformances(gender, points) {
     }
   }
 
-  // Sort by category and event name
-  equivalents.sort((a, b) => {
-    if (a.category !== b.category) {
-      return a.category.localeCompare(b.category);
+  // Filter to only include primary events
+  const primaryEvents = eventConfigLoader.getPrimaryEvents();
+  const filteredEquivalents = equivalents.filter(equiv =>
+    primaryEvents.includes(equiv.event)
+  );
+
+  // Group by category
+  const byCategory = {};
+  for (const equiv of filteredEquivalents) {
+    const category = equiv.category || 'other';
+    if (!byCategory[category]) {
+      byCategory[category] = [];
     }
-    return a.event.localeCompare(b.event);
+    byCategory[category].push(equiv);
+  }
+
+  // Sort events within each category by distance (same as event dropdown)
+  for (const category in byCategory) {
+    const eventsWithInfo = byCategory[category].map(equiv => {
+      const eventInfo = eventConfigLoader.getEventInfo(equiv.event);
+      return { ...equiv, eventInfo };
+    });
+
+    // Sort using the same logic as the event dropdown
+    byCategory[category] = eventConfigLoader.sortEventsByDistance(
+      eventsWithInfo.map(e => ({ ...e.eventInfo, key: e.event }))
+    ).map((sortedEvent, index) => {
+      // Find the corresponding equivalent
+      return eventsWithInfo.find(e => e.event === sortedEvent.key);
+    });
+  }
+
+  // Define category order (same as event dropdown)
+  const categoryOrder = ['sprints', 'middle_distance', 'long_distance', 'race_walk', 'jumps', 'throws', 'relays', 'combined'];
+  const sortedCategories = Object.keys(byCategory).sort((a, b) => {
+    const indexA = categoryOrder.indexOf(a);
+    const indexB = categoryOrder.indexOf(b);
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
   });
 
-  return equivalents;
+  // Flatten back to a single array
+  const sortedEquivalents = [];
+  for (const category of sortedCategories) {
+    sortedEquivalents.push(...byCategory[category]);
+  }
+
+  return sortedEquivalents;
 }
 
 /**
