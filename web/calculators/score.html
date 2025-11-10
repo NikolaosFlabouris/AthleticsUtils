@@ -15,7 +15,7 @@
   <header class="header">
     <div class="container">
       <div class="header__brand">
-        <h1 class="header__title">Athletics Utils</h1>
+        <h1 class="header__title">Athletics Utilities</h1>
         <p class="header__subtitle">World Athletics Score Calculator</p>
       </div>
     </div>
@@ -77,7 +77,29 @@
           </div>
 
           <div class="form-group">
-            <label for="performance-input">Performance</label>
+            <label>Calculation Mode</label>
+            <div class="mode-toggle">
+              <button
+                type="button"
+                id="mode-toggle-performance"
+                class="mode-toggle__option mode-toggle__option--active"
+                data-mode="performance"
+              >
+                Performance → Score
+              </button>
+              <button
+                type="button"
+                id="mode-toggle-score"
+                class="mode-toggle__option"
+                data-mode="score"
+              >
+                Score → Performance
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="performance-input" id="input-label">Performance</label>
             <input
               type="text"
               id="performance-input"
@@ -85,7 +107,7 @@
               placeholder="Select an event first"
               disabled
             >
-            <small class="form-help">Select an event to see performance format</small>
+            <small class="form-help" id="input-help">Select an event to see performance format</small>
             <div id="hand-timing-container" class="hand-timing-checkbox" style="display: none;">
               <label class="checkbox-label">
                 <input type="checkbox" id="hand-timing-checkbox">
@@ -121,17 +143,31 @@
       <section class="info-section">
         <h3>How to Use This Calculator</h3>
         <p>
+          <strong>Performance → Score Mode:</strong><br>
           1. Select your gender and event<br>
           2. Enter your performance (time in seconds or distance in meters)<br>
           3. View your World Athletics points and equivalent performances across all events
         </p>
         <p>
-          <strong>Examples:</strong>
+          <strong>Score → Performance Mode:</strong><br>
+          1. Select your gender and event<br>
+          2. Enter a World Athletics score (whole number)<br>
+          3. View the equivalent performance and other events with the same score
+        </p>
+        <p>
+          <strong>Performance Examples:</strong>
         </p>
         <ul>
           <li>100m sprint: Enter "10.5" for 10.5 seconds</li>
           <li>Long jump: Enter "7.50" for 7.50 meters</li>
           <li>1500m: Enter "90.5" for 1:30.5 (90.5 seconds) or "210.0" for 3:30</li>
+        </ul>
+        <p>
+          <strong>Score Examples:</strong>
+        </p>
+        <ul>
+          <li>Enter "1200" to find the 100m time worth 1200 points</li>
+          <li>Enter "1000" to find the long jump distance worth 1000 points</li>
         </ul>
 
         <h3 style="margin-top: 2rem;">About World Athletics Points</h3>

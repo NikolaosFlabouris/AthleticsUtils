@@ -125,6 +125,125 @@ export function lookupPoints(gender, event, performance, isHandTimed = false) {
 }
 
 /**
+ * Find performance for a given score in an event (reverse lookup)
+ * When a score falls between two table entries, returns the performance with LOWER points
+ * @param {string} gender
+ * @param {string} event
+ * @param {number} points - Score to look up (will be rounded to whole number)
+ * @param {boolean} isHandTimed - Whether to subtract hand timing offset from result
+ * @returns {Object|null} {performance, exactMatch, points, appliedOffset?, originalPerformance?}
+ */
+export function lookupPerformance(gender, event, points, isHandTimed = false) {
+  // Round points to whole number
+  const targetPoints = Math.round(points);
+
+  // Find the category for this event
+  const category = scoringDataLoader.findCategory(gender, event);
+
+  if (!category) {
+    return null;
+  }
+
+  // Get the event data
+  const eventData = scoringDataLoader.getEventData(gender, category, event);
+
+  if (!eventData || eventData.length === 0) {
+    return null;
+  }
+
+  // Find exact match or the entry with lower points when between two values
+  let exactMatchEntry = null;
+  let lowerPointsEntry = null;
+
+  for (const [entryPoints, perf] of eventData) {
+    // Check for exact match
+    if (entryPoints === targetPoints) {
+      exactMatchEntry = [entryPoints, perf];
+      break;
+    }
+
+    // Track the entry with highest points that is still lower than target
+    // This is the entry we want when score falls between values
+    if (entryPoints < targetPoints) {
+      if (!lowerPointsEntry || entryPoints > lowerPointsEntry[0]) {
+        lowerPointsEntry = [entryPoints, perf];
+      }
+    }
+  }
+
+  // Use exact match if found, otherwise use lower points entry
+  const selectedEntry = exactMatchEntry || lowerPointsEntry;
+
+  // If still no entry found (score is lower than all table entries), use the lowest score entry
+  if (!selectedEntry) {
+    let lowestEntry = null;
+    for (const [entryPoints, perf] of eventData) {
+      if (!lowestEntry || entryPoints < lowestEntry[0]) {
+        lowestEntry = [entryPoints, perf];
+      }
+    }
+    if (lowestEntry) {
+      let performance = lowestEntry[1];
+      let appliedOffset = null;
+      let originalPerformance = null;
+
+      // Apply hand timing adjustment if requested
+      if (isHandTimed) {
+        const offset = eventConfigLoader.getHandTimingOffset(event);
+        if (offset) {
+          originalPerformance = performance;
+          const perfNum = parseFloat(performance);
+          // Subtract offset for hand timing (opposite of adding for FAT)
+          const adjustedPerf = perfNum - offset;
+          performance = adjustedPerf.toFixed(2);
+          appliedOffset = -offset; // Negative to indicate subtraction
+        }
+      }
+
+      const result = {
+        performance,
+        exactMatch: false,
+        points: lowestEntry[0]
+      };
+      if (appliedOffset !== null) {
+        result.appliedOffset = appliedOffset;
+        result.originalPerformance = originalPerformance;
+      }
+      return result;
+    }
+    return null;
+  }
+
+  let performance = selectedEntry[1];
+  let appliedOffset = null;
+  let originalPerformance = null;
+
+  // Apply hand timing adjustment if requested
+  if (isHandTimed) {
+    const offset = eventConfigLoader.getHandTimingOffset(event);
+    if (offset) {
+      originalPerformance = performance;
+      const perfNum = parseFloat(performance);
+      // Subtract offset for hand timing (opposite of adding for FAT)
+      const adjustedPerf = perfNum - offset;
+      performance = adjustedPerf.toFixed(2);
+      appliedOffset = -offset; // Negative to indicate subtraction
+    }
+  }
+
+  const result = {
+    performance,
+    exactMatch: exactMatchEntry !== null,
+    points: selectedEntry[0]
+  };
+  if (appliedOffset !== null) {
+    result.appliedOffset = appliedOffset;
+    result.originalPerformance = originalPerformance;
+  }
+  return result;
+}
+
+/**
  * Find all equivalent performances across all events for a given point value
  * @param {string} gender
  * @param {number} points
