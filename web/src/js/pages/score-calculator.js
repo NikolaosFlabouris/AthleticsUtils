@@ -296,27 +296,28 @@ class PerformanceCalculator extends BaseCalculator {
     const eventDisplayName = eventConfigLoader.getEventInfo(this.currentEvent)?.displayName || this.currentEvent;
     title.textContent = `${eventDisplayName} - ${this.capitalizeFirst(this.currentGender)}`;
 
-    const points = document.createElement('div');
-    points.className = 'result-card__points';
-    points.textContent = `${submittedScore} points`;
+    const performanceElement = document.createElement('div');
+    performanceElement.className = 'result-card__points';
 
-    const content = document.createElement('div');
-    content.className = 'result-card__content';
+    const scoreElement = document.createElement('div');
+    scoreElement.className = 'result-card__content';
+    scoreElement.textContent = `Score: ${submittedScore} points`;
 
     if (result.appliedOffset) {
       // Hand timing adjustment was applied (offset is negative for HT)
       const htPerformance = formatPerformance(result.performance, this.currentEvent);
       const fatPerformance = formatPerformance(result.originalPerformance, this.currentEvent);
       const offset = formatPerformance(String(Math.abs(result.appliedOffset)), this.currentEvent);
-      content.textContent = `Adjusted Performance: ${htPerformance} = ${fatPerformance} - ${offset} offset for hand timing`;
+      performanceElement.textContent = `${htPerformance} (hand timed)`;
+      scoreElement.innerHTML = `${htPerformance} = ${fatPerformance} - ${offset} offset for hand timing<br>Score: ${submittedScore} points`;
     } else {
       const performance = formatPerformance(result.performance, this.currentEvent);
-      content.textContent = `Performance: ${performance}`;
+      performanceElement.textContent = performance;
     }
 
     mainCard.appendChild(title);
-    mainCard.appendChild(points);
-    mainCard.appendChild(content);
+    mainCard.appendChild(performanceElement);
+    mainCard.appendChild(scoreElement);
     this.resultsContent.appendChild(mainCard);
 
     // Equivalent performances card
