@@ -1,4 +1,23 @@
 {
+  "paceCalculatorDistances": [
+    "3000m",
+    "3000m sh",
+    "2mile",
+    "2mile sh",
+    "5000m",
+    "5000m sh",
+    "5km",
+    "10000m",
+    "10km",
+    "10mile",
+    "15km",
+    "20km",
+    "hm",
+    "25km",
+    "30km",
+    "marathon",
+    "100km"
+  ],
   "primaryEvents": [
     "60m",
     "100m",
