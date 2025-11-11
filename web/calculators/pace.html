@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Running Pace Calculator - Calculate your running pace per km or mile, or determine finish times based on your pace. Free pace calculator for runners.">
+  <meta name="keywords" content="pace calculator, running pace, pace per km, pace per mile, running calculator, marathon pace, 5k pace, 10k pace, half marathon pace">
+  <meta name="theme-color" content="#1a73e8">
+  <title>Pace Calculator | Running Pace Calculator - Free</title>
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="stylesheet" href="../src/styles/main.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="header__brand">
+        <h1 class="header__title">Athletics Utilities</h1>
+        <p class="header__subtitle">Pace Calculator</p>
+      </div>
+    </div>
+  </header>
+
+  <nav class="navigation">
+    <div class="container">
+      <ul class="navigation__list">
+        <li><a href="/" class="navigation__link">Home</a></li>
+        <li><a href="/calculators/score.html" class="navigation__link">Score Calculator</a></li>
+        <li><a href="/calculators/pace.html" class="navigation__link navigation__link--active">Pace Calculator</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="container">
+      <section class="calculator">
+        <div class="calculator__header">
+          <h2>Running Pace Calculator</h2>
+          <p class="calculator__description">
+            Calculate your running pace per kilometre or mile, or determine your finish time based on your target pace.
+          </p>
+        </div>
+
+        <div class="calculator__controls">
+          <div class="form-group">
+            <label>Calculation Mode</label>
+            <div class="mode-toggle">
+              <button
+                type="button"
+                id="mode-toggle-pace"
+                class="mode-toggle__option mode-toggle__option--active"
+                data-mode="pace"
+              >
+                Pace
+              </button>
+              <button
+                type="button"
+                id="mode-toggle-time"
+                class="mode-toggle__option"
+                data-mode="totalTime"
+              >
+                Total Time
+              </button>
+            </div>
+          </div>
+
+          <!-- Pace Mode Controls -->
+          <div id="pace-mode-controls">
+            <div class="form-group">
+              <label for="time-input-pace">Total Time</label>
+              <input
+                type="text"
+                id="time-input-pace"
+                class="form-input"
+                placeholder="e.g., 25:00 or 1:23:45"
+                value="30:00"
+              >
+              <small class="form-help">Enter time in HH:MM:SS or MM:SS format</small>
+            </div>
+
+            <div class="form-group">
+              <label for="distance-select-pace">Distance</label>
+              <select id="distance-select-pace" class="form-select">
+                <option value="">Select distance...</option>
+              </select>
+              <small class="form-help" id="distance-equivalent-pace"></small>
+            </div>
+
+            <div class="form-group">
+              <label for="pace-unit-select">Pace Unit</label>
+              <select id="pace-unit-select" class="form-select">
+                <option value="km">/km</option>
+                <option value="mile">/mile</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Total Time Mode Controls -->
+          <div id="time-mode-controls" class="hidden">
+            <div class="form-group">
+              <label for="pace-input-time">Pace</label>
+              <input
+                type="text"
+                id="pace-input-time"
+                class="form-input"
+                placeholder="e.g., 5:00 or 4:30"
+              >
+              <small class="form-help">Enter pace in MM:SS format</small>
+            </div>
+
+            <div class="form-group">
+              <label for="pace-unit-select-time">Pace Unit</label>
+              <select id="pace-unit-select-time" class="form-select">
+                <option value="km">/km</option>
+                <option value="mile">/mile</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="distance-select-time">Distance</label>
+              <select id="distance-select-time" class="form-select">
+                <option value="">Select distance...</option>
+              </select>
+              <small class="form-help" id="distance-equivalent-time"></small>
+            </div>
+          </div>
+        </div>
+
+        <div id="results-container" class="calculator__results hidden">
+          <div class="results-header">
+            <h3>Results</h3>
+          </div>
+          <div id="results-content" class="results-content">
+            <!-- Results will be injected here -->
+          </div>
+        </div>
+
+        <section id="history-section" class="history-section hidden">
+          <div class="history-header">
+            <h3>Calculation History</h3>
+          </div>
+          <div class="history-table-container">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Distance</th>
+                  <th>Total Time</th>
+                  <th>Pace</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body">
+                <!-- Rows injected here -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <div id="loading-indicator" class="loading hidden">
+          <div class="loading__spinner"></div>
+          <p>Loading...</p>
+        </div>
+
+        <div id="error-message" class="error-message hidden">
+          <!-- Error messages will appear here -->
+        </div>
+      </section>
+
+      <section class="info-section">
+        <h3>How to Use This Calculator</h3>
+        <p>
+          <strong>Calculate Pace:</strong><br>
+          1. Enter your total time (e.g., 30:00 for 30 minutes)<br>
+          2. Select your distance (e.g., 5km)<br>
+          3. Choose your preferred pace unit (/km or /mile)<br>
+          4. View your pace and projected split times
+        </p>
+        <p>
+          <strong>Calculate Total Time:</strong><br>
+          1. Enter your target pace (e.g., 5:00 for 5 minutes per km)<br>
+          2. Choose your pace unit (/km or /mile)<br>
+          3. Select your distance<br>
+          4. View your projected finish time and split times
+        </p>
+        <p>
+          <strong>Time Format Examples:</strong>
+        </p>
+        <ul>
+          <li>5km in 25 minutes: Enter "25:00"</li>
+          <li>10km in 50 minutes 30 seconds: Enter "50:30"</li>
+          <li>Marathon in 3 hours 45 minutes: Enter "3:45:00"</li>
+        </ul>
+
+        <h3 style="margin-top: 2rem;">About Running Pace</h3>
+        <p>
+          Running pace is the time it takes to cover a specific distance, typically expressed as minutes per kilometre (min/km) or minutes per mile (min/mile). Understanding your pace helps you:
+        </p>
+        <ul>
+          <li>Plan race strategies and pacing</li>
+          <li>Set realistic training goals</li>
+          <li>Track improvement over time</li>
+          <li>Compare performances across different distances</li>
+        </ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+  </footer>
+
+  <script type="module" src="../src/js/pages/pace-calculator.js"></script>
+</body>
+</html>
