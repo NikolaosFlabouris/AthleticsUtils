@@ -30,10 +30,6 @@ class PaceCalculator extends PaceCalculatorBase {
       results: '#results-container'
     });
 
-    // Debounce timer for auto-calculate
-    this.calculateDebounceTimer = null;
-    this.debounceDelay = 300; // ms
-
     // History storage key
     this.historyStorageKey = 'athleticsUtils.paceHistory';
     this.maxHistoryEntries = 10;
@@ -53,6 +49,7 @@ class PaceCalculator extends PaceCalculatorBase {
     this.distanceSelectPace = document.getElementById('distance-select-pace');
     this.paceUnitSelect = document.getElementById('pace-unit-select');
     this.distanceEquivalentPace = document.getElementById('distance-equivalent-pace');
+    this.calculateBtnPace = document.getElementById('calculate-btn-pace');
 
     // Time mode elements
     this.timeControls = document.getElementById('time-mode-controls');
@@ -60,6 +57,7 @@ class PaceCalculator extends PaceCalculatorBase {
     this.paceUnitSelectTime = document.getElementById('pace-unit-select-time');
     this.distanceSelectTime = document.getElementById('distance-select-time');
     this.distanceEquivalentTime = document.getElementById('distance-equivalent-time');
+    this.calculateBtnTime = document.getElementById('calculate-btn-time');
 
     // Results
     this.resultsContent = document.getElementById('results-content');
@@ -79,9 +77,6 @@ class PaceCalculator extends PaceCalculatorBase {
 
     // Load and display history
     this.loadHistory();
-
-    // Auto-calculate with default values
-    setTimeout(() => this.handlePaceModeCalculate(), 100);
   }
 
   /**
@@ -120,35 +115,27 @@ class PaceCalculator extends PaceCalculatorBase {
     this.paceModeBtn.addEventListener('click', () => this.switchMode('pace'));
     this.timeModeBtn.addEventListener('click', () => this.switchMode('totalTime'));
 
-    // Pace mode inputs (auto-calculate on change)
-    this.timeInputPace.addEventListener('input', () => this.debouncedCalculate());
+    // Pace mode button
+    this.calculateBtnPace.addEventListener('click', () => this.handlePaceModeCalculate());
+
+    // Pace mode distance/unit change (update equivalent display only)
     this.distanceSelectPace.addEventListener('change', () => {
       this.updateDistanceEquivalent('pace');
-      this.debouncedCalculate();
     });
-    this.paceUnitSelect.addEventListener('change', () => this.debouncedCalculate());
+    this.paceUnitSelect.addEventListener('change', () => {
+      this.updateDistanceEquivalent('pace');
+    });
 
-    // Time mode inputs (auto-calculate on change)
-    this.paceInputTime.addEventListener('input', () => this.debouncedCalculate());
-    this.paceUnitSelectTime.addEventListener('change', () => this.debouncedCalculate());
+    // Time mode button
+    this.calculateBtnTime.addEventListener('click', () => this.handleTimeModeCalculate());
+
+    // Time mode distance/unit change (update equivalent display only)
+    this.paceUnitSelectTime.addEventListener('change', () => {
+      this.updateDistanceEquivalent('time');
+    });
     this.distanceSelectTime.addEventListener('change', () => {
       this.updateDistanceEquivalent('time');
-      this.debouncedCalculate();
     });
-  }
-
-  /**
-   * Debounced calculate function
-   */
-  debouncedCalculate() {
-    clearTimeout(this.calculateDebounceTimer);
-    this.calculateDebounceTimer = setTimeout(() => {
-      if (this.currentMode === 'pace') {
-        this.handlePaceModeCalculate();
-      } else {
-        this.handleTimeModeCalculate();
-      }
-    }, this.debounceDelay);
   }
 
   /**
@@ -170,9 +157,8 @@ class PaceCalculator extends PaceCalculatorBase {
       this.paceControls.classList.add('hidden');
     }
 
-    // Clear results and recalculate
+    // Clear results
     this.clearResults();
-    this.debouncedCalculate();
   }
 
   /**

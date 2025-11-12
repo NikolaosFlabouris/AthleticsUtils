@@ -43,7 +43,7 @@
 
         <div class="calculator__controls">
           <div class="form-group">
-            <label>Calculation Mode</label>
+            <label>Calculate:</label>
             <div class="mode-toggle">
               <button
                 type="button"
@@ -72,8 +72,7 @@
                 type="text"
                 id="time-input-pace"
                 class="form-input"
-                placeholder="e.g., 25:00 or 1:23:45"
-                value="30:00"
+                placeholder="e.g., 30:00"
               >
               <small class="form-help">Enter time in HH:MM:SS or MM:SS format</small>
             </div>
@@ -89,9 +88,13 @@
             <div class="form-group">
               <label for="pace-unit-select">Pace Unit</label>
               <select id="pace-unit-select" class="form-select">
-                <option value="km">/km</option>
-                <option value="mile">/mile</option>
+                <option value="km">km</option>
+                <option value="mile">mile</option>
               </select>
+            </div>
+
+            <div class="form-group">
+              <button type="button" id="calculate-btn-pace" class="btn btn-primary">Calculate</button>
             </div>
           </div>
 
@@ -111,8 +114,8 @@
             <div class="form-group">
               <label for="pace-unit-select-time">Pace Unit</label>
               <select id="pace-unit-select-time" class="form-select">
-                <option value="km">/km</option>
-                <option value="mile">/mile</option>
+                <option value="km">km</option>
+                <option value="mile">mile</option>
               </select>
             </div>
 
@@ -122,6 +125,10 @@
                 <option value="">Select distance...</option>
               </select>
               <small class="form-help" id="distance-equivalent-time"></small>
+            </div>
+
+            <div class="form-group">
+              <button type="button" id="calculate-btn-time" class="btn btn-primary">Calculate</button>
             </div>
           </div>
         </div>
@@ -172,15 +179,15 @@
           <strong>Calculate Pace:</strong><br>
           1. Enter your total time (e.g., 30:00 for 30 minutes)<br>
           2. Select your distance (e.g., 5km)<br>
-          3. Choose your preferred pace unit (/km or /mile)<br>
-          4. View your pace and projected split times
+          3. Choose your preferred pace unit (km or mile)<br>
+          4. Click the Calculate button to view your pace and projected split times
         </p>
         <p>
           <strong>Calculate Total Time:</strong><br>
           1. Enter your target pace (e.g., 5:00 for 5 minutes per km)<br>
-          2. Choose your pace unit (/km or /mile)<br>
+          2. Choose your pace unit (km or mile)<br>
           3. Select your distance<br>
-          4. View your projected finish time and split times
+          4. Click the Calculate button to view your projected finish time and split times
         </p>
         <p>
           <strong>Time Format Examples:</strong>
