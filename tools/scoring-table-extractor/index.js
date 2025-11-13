@@ -642,7 +642,7 @@ class EnhancedScoringTableExtractor {
     console.log(`💾 Minified version: ${minifiedPath}`);
 
     // Copy minified version to website's public/data directory
-    const websiteDataDir = path.join(path.dirname(path.dirname(__dirname)), 'public', 'data');
+    const websiteDataDir = path.join(path.dirname(path.dirname(__dirname)), 'web', 'public', 'data');
     const websiteDataPath = path.join(websiteDataDir, path.basename(minifiedPath));
 
     try {
