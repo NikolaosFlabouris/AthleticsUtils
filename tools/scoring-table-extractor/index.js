@@ -582,6 +582,10 @@ class EnhancedScoringTableExtractor {
     // Clean and sort data before exporting
     this.cleanAndSortData();
 
+    // Detect and report duplicate tables
+    const duplicates = this.detectDuplicateTables();
+    this.reportDuplicateResults(duplicates);
+
     // Convert data to array format: [points, performance]
     const compactData = {};
     for (const [gender, categories] of Object.entries(this.tables)) {
@@ -687,6 +691,128 @@ class EnhancedScoringTableExtractor {
         }
       }
     }
+  }
+
+  /**
+   * Compare two tables to check if they are identical
+   * Tables are identical if they have the same length and all [points, performance] pairs match
+   * @param {Array} table1 - First table array of {performance, points} objects
+   * @param {Array} table2 - Second table array of {performance, points} objects
+   * @returns {boolean} True if tables are identical
+   */
+  areTablesIdentical(table1, table2) {
+    // Quick check: if lengths differ, they're not identical
+    if (table1.length !== table2.length) {
+      return false;
+    }
+
+    // Compare each entry
+    for (let i = 0; i < table1.length; i++) {
+      const entry1 = table1[i];
+      const entry2 = table2[i];
+
+      // Compare both points and performance values
+      if (entry1.points !== entry2.points || entry1.performance !== entry2.performance) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Detect duplicate tables within each gender category
+   * Compares all tables to find which ones have identical data
+   * @returns {Object} Duplicate groups organized by gender
+   */
+  detectDuplicateTables() {
+    const duplicates = {};
+
+    // Process each gender separately
+    for (const [gender, categories] of Object.entries(this.tables)) {
+      const eventTables = [];
+
+      // Collect all event tables for this gender
+      for (const [category, events] of Object.entries(categories)) {
+        for (const [eventName, table] of Object.entries(events)) {
+          eventTables.push({
+            gender,
+            category,
+            eventName,
+            table
+          });
+        }
+      }
+
+      // Compare each table with every other table in the same gender
+      const duplicateGroups = [];
+      const processed = new Set();
+
+      for (let i = 0; i < eventTables.length; i++) {
+        if (processed.has(i)) continue;
+
+        const group = [eventTables[i]];
+
+        // Find all tables identical to this one
+        for (let j = i + 1; j < eventTables.length; j++) {
+          if (processed.has(j)) continue;
+
+          if (this.areTablesIdentical(eventTables[i].table, eventTables[j].table)) {
+            group.push(eventTables[j]);
+            processed.add(j);
+          }
+        }
+
+        // Only keep groups with 2+ identical tables
+        if (group.length > 1) {
+          duplicateGroups.push(group);
+          processed.add(i);
+        }
+      }
+
+      // Store duplicate groups for this gender
+      if (duplicateGroups.length > 0) {
+        duplicates[gender] = duplicateGroups;
+      }
+    }
+
+    return duplicates;
+  }
+
+  /**
+   * Report duplicate table detection results to console
+   * @param {Object} duplicates - Duplicate groups from detectDuplicateTables()
+   */
+  reportDuplicateResults(duplicates) {
+    console.log('\n' + '='.repeat(50));
+    console.log('🔍 DUPLICATE TABLE DETECTION RESULTS');
+    console.log('='.repeat(50));
+
+    if (Object.keys(duplicates).length === 0) {
+      console.log('\n✅ No duplicate tables found. All event tables are unique.\n');
+      console.log('='.repeat(50) + '\n');
+      return;
+    }
+
+    let totalDuplicateEvents = 0;
+    let totalGroups = 0;
+
+    for (const [gender, groups] of Object.entries(duplicates)) {
+      console.log(`\n${gender.toUpperCase()}'S EVENTS:`);
+
+      groups.forEach((group, index) => {
+        console.log(`\n  Group ${index + 1} (${group.length} identical tables):`);
+        group.forEach(event => {
+          console.log(`    - ${event.eventName} (${event.category})`);
+        });
+        totalDuplicateEvents += group.length;
+        totalGroups++;
+      });
+    }
+
+    console.log('\n' + '='.repeat(50));
+    console.log(`📊 SUMMARY: ${totalDuplicateEvents} tables with duplicates across ${totalGroups} groups`);
+    console.log('='.repeat(50) + '\n');
   }
 
   /**
