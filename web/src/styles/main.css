@@ -380,59 +380,6 @@ body {
   gap: var(--spacing-lg);
 }
 
-/* Info Section */
-.info-section {
-  background: var(--color-background-secondary);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  margin-bottom: var(--spacing-xl);
-}
-
-.info-section h3 {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  margin-bottom: var(--spacing-md);
-  color: var(--color-text);
-}
-
-.info-section p {
-  margin-bottom: var(--spacing-md);
-  color: var(--color-text-secondary);
-  line-height: var(--line-height-relaxed);
-}
-
-.info-section ul {
-  list-style: none;
-  padding-left: 0;
-}
-
-.info-section li {
-  padding-left: var(--spacing-lg);
-  margin-bottom: var(--spacing-sm);
-  color: var(--color-text-secondary);
-  position: relative;
-}
-
-.info-section li::before {
-  content: '✓';
-  position: absolute;
-  left: 0;
-  color: var(--color-success);
-  font-weight: var(--font-weight-bold);
-}
-
-.info-section a {
-  color: var(--color-primary);
-  text-decoration: none;
-  font-weight: var(--font-weight-medium);
-  transition: color var(--transition-fast);
-}
-
-.info-section a:hover {
-  color: var(--color-primary-dark);
-  text-decoration: underline;
-}
-
 /* Loading */
 .loading {
   display: flex;
@@ -502,10 +449,9 @@ body {
 }
 
 .info-section li::before {
-  content: '✓';
+  content: '•';
   position: absolute;
   left: 0;
-  color: var(--color-success);
   font-weight: var(--font-weight-bold);
 }
 
