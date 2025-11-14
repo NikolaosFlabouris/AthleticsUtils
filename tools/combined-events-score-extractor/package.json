@@ -1,0 +1,25 @@
+{
+  "name": "combined-events-config-minifier",
+  "version": "1.0.0",
+  "description": "Minify and publish combined events configuration to the web application",
+  "main": "minify-and-publish.js",
+  "type": "module",
+  "scripts": {
+    "start": "node minify-and-publish.js",
+    "publish": "node minify-and-publish.js",
+    "help": "echo 'Available commands:\n  npm start - Minify and publish config\n  npm run publish - Same as start'"
+  },
+  "keywords": [
+    "athletics",
+    "combined-events",
+    "decathlon",
+    "heptathlon",
+    "pentathlon",
+    "minifier"
+  ],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
