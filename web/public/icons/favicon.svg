@@ -1,4 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <circle cx="50" cy="50" r="45" fill="#1a73e8"/>
-  <text x="50" y="50" font-family="Arial, sans-serif" font-size="50" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="central">A</text>
+  <circle cx="50" cy="50" r="48" fill="#1a73e8"/>
+
+  <!-- Running figure -->
+  <g fill="white">
+    <!-- Head -->
+    <circle cx="52" cy="28" r="7"/>
+
+    <!-- Body -->
+    <path d="M 52 35 L 52 52"/>
+
+    <!-- Front arm (reaching forward) -->
+    <path d="M 52 38 L 68 32" stroke="white" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Back arm (reaching back) -->
+    <path d="M 52 38 L 40 42" stroke="white" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Front leg (bent, stepping forward) -->
+    <path d="M 52 52 L 58 65 L 62 70" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+
+    <!-- Back leg (extended back) -->
+    <path d="M 52 52 L 42 62 L 36 60" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+
+    <!-- Track lines (suggesting motion) -->
+    <line x1="20" y1="75" x2="35" y2="75" stroke="white" stroke-width="2" opacity="0.6"/>
+    <line x1="22" y1="82" x2="32" y2="82" stroke="white" stroke-width="2" opacity="0.4"/>
+  </g>
 </svg>
