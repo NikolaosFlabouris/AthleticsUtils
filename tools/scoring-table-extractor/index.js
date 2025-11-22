@@ -496,8 +496,13 @@ class EnhancedScoringTableExtractor {
 
       // Determine gender: mixed relay events go to 'mixed' gender
       let eventGender = section.gender;
+      let cleanedEventName = eventName;
+
       if (/mix/.test(eventName)) {
         eventGender = 'mixed';
+        // Remove the "mix" modifier from the event name since it's already categorized under "mixed" gender
+        // This ensures consistency with men's and women's events (e.g., "4x400m" instead of "4x400m mix")
+        cleanedEventName = eventName.replace(/\s+mix\s*/g, ' ').trim();
       }
 
       // Initialize nested structure
@@ -518,13 +523,13 @@ class EnhancedScoringTableExtractor {
         this.tables[eventGender][eventCategory] = {};
       }
 
-      // Initialize event array if needed
-      if (!this.tables[eventGender][eventCategory][eventName]) {
-        this.tables[eventGender][eventCategory][eventName] = [];
+      // Initialize event array if needed (use cleaned name for storage)
+      if (!this.tables[eventGender][eventCategory][cleanedEventName]) {
+        this.tables[eventGender][eventCategory][cleanedEventName] = [];
       }
 
-      // Add the performance-points mapping
-      this.tables[eventGender][eventCategory][eventName].push({
+      // Add the performance-points mapping (use cleaned name for storage)
+      this.tables[eventGender][eventCategory][cleanedEventName].push({
         performance: performance,
         points: points
       });
