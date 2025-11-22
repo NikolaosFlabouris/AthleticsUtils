@@ -21,6 +21,7 @@ import {
   formatDistance,
   convertDistance
 } from '../utils/pace-formatter.js';
+import { makeCollapsible } from '../utils/collapsible-section.js';
 
 class PaceCalculator extends PaceCalculatorBase {
   constructor() {
@@ -758,28 +759,38 @@ class PaceCalculator extends PaceCalculatorBase {
     const equivalents = getEquivalentPaces(pacePerKm);
     const equivalentsCard = document.createElement('div');
     equivalentsCard.className = 'result-card';
-    equivalentsCard.innerHTML = `
-      <h3 class="result-card__title">Equivalent Paces & Speeds</h3>
-      <div class="equivalencies-grid">
-        <div class="equivalency-item">
-          <div class="equivalency-item__event">Pace per km</div>
-          <div class="equivalency-item__performance">${formatPaceTime(equivalents.perKm)} /km</div>
-        </div>
-        <div class="equivalency-item">
-          <div class="equivalency-item__event">Pace per mile</div>
-          <div class="equivalency-item__performance">${formatPaceTime(equivalents.perMile)} /mile</div>
-        </div>
-        <div class="equivalency-item">
-          <div class="equivalency-item__event">Speed (km/h)</div>
-          <div class="equivalency-item__performance">${formatSpeed(equivalents.kmh, 'km/h')}</div>
-        </div>
-        <div class="equivalency-item">
-          <div class="equivalency-item__event">Speed (mph)</div>
-          <div class="equivalency-item__performance">${formatSpeed(equivalents.mph, 'mph')}</div>
-        </div>
+
+    const equivalentsTitle = document.createElement('h3');
+    equivalentsTitle.className = 'result-card__title';
+    equivalentsTitle.textContent = 'Equivalent Paces & Speeds';
+
+    const equivalentsGrid = document.createElement('div');
+    equivalentsGrid.className = 'equivalencies-grid';
+    equivalentsGrid.innerHTML = `
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per km</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perKm)} /km</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per mile</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perMile)} /mile</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (km/h)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.kmh, 'km/h')}</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (mph)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.mph, 'mph')}</div>
       </div>
     `;
+
+    equivalentsCard.appendChild(equivalentsTitle);
+    equivalentsCard.appendChild(equivalentsGrid);
     this.resultsContent.appendChild(equivalentsCard);
+
+    // Make the equivalent paces section collapsible
+    makeCollapsible(equivalentsTitle, equivalentsGrid, 'paceCalculator.equivalentPaces.collapsed', true);
 
     // Splits - use custom interval if provided
     const splitIntervalMetres = paceIntervalInfo ? paceIntervalInfo.metres : 1000;
@@ -824,28 +835,38 @@ class PaceCalculator extends PaceCalculatorBase {
     const equivalents = getEquivalentPaces(pacePerKm);
     const equivalentsCard = document.createElement('div');
     equivalentsCard.className = 'result-card';
-    equivalentsCard.innerHTML = `
-      <h3 class="result-card__title">Equivalent Paces & Speeds</h3>
-      <div class="equivalencies-grid">
-        <div class="equivalency-item">
-          <div class="equivalency-item__event">Pace per km</div>
-          <div class="equivalency-item__performance">${formatPaceTime(equivalents.perKm)} /km</div>
-        </div>
-        <div class="equivalency-item">
-          <div class="equivalency-item__event">Pace per mile</div>
-          <div class="equivalency-item__performance">${formatPaceTime(equivalents.perMile)} /mile</div>
-        </div>
-        <div class="equivalency-item">
-          <div class="equivalency-item__event">Speed (km/h)</div>
-          <div class="equivalency-item__performance">${formatSpeed(equivalents.kmh, 'km/h')}</div>
-        </div>
-        <div class="equivalency-item">
-          <div class="equivalency-item__event">Speed (mph)</div>
-          <div class="equivalency-item__performance">${formatSpeed(equivalents.mph, 'mph')}</div>
-        </div>
+
+    const equivalentsTitle = document.createElement('h3');
+    equivalentsTitle.className = 'result-card__title';
+    equivalentsTitle.textContent = 'Equivalent Paces & Speeds';
+
+    const equivalentsGrid = document.createElement('div');
+    equivalentsGrid.className = 'equivalencies-grid';
+    equivalentsGrid.innerHTML = `
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per km</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perKm)} /km</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per mile</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perMile)} /mile</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (km/h)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.kmh, 'km/h')}</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (mph)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.mph, 'mph')}</div>
       </div>
     `;
+
+    equivalentsCard.appendChild(equivalentsTitle);
+    equivalentsCard.appendChild(equivalentsGrid);
     this.resultsContent.appendChild(equivalentsCard);
+
+    // Make the equivalent paces section collapsible
+    makeCollapsible(equivalentsTitle, equivalentsGrid, 'paceCalculator.equivalentPaces.collapsed', true);
 
     // Splits - use custom interval if provided
     const splitIntervalMetres = paceIntervalInfo ? paceIntervalInfo.metres : 1000;

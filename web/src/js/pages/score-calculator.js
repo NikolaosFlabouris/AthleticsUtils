@@ -8,6 +8,7 @@ import { lookupPoints, lookupPerformance, findEquivalentPerformances } from '../
 import { parsePerformance, formatPerformance } from '../utils/performance-parser.js';
 import { eventConfigLoader } from '../data/event-config-loader.js';
 import { HistoryManager } from '../utils/history-manager.js';
+import { makeCollapsible } from '../utils/collapsible-section.js';
 
 class PerformanceCalculator extends BaseCalculator {
   constructor(selectors) {
@@ -272,6 +273,9 @@ class PerformanceCalculator extends BaseCalculator {
     equivCard.appendChild(equivGrid);
     this.resultsContent.appendChild(equivCard);
 
+    // Make the equivalent performances section collapsible
+    makeCollapsible(equivTitle, equivGrid, 'scoreCalculator.equivalentPerformances.collapsed', true);
+
     this.showResults();
 
     // Save to history
@@ -354,6 +358,9 @@ class PerformanceCalculator extends BaseCalculator {
     equivCard.appendChild(equivTitle);
     equivCard.appendChild(equivGrid);
     this.resultsContent.appendChild(equivCard);
+
+    // Make the equivalent performances section collapsible
+    makeCollapsible(equivTitle, equivGrid, 'scoreCalculator.equivalentPerformances.collapsed', true);
 
     this.showResults();
 

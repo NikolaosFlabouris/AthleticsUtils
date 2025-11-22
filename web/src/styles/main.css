@@ -316,6 +316,7 @@ body {
   color: var(--color-text-secondary);
   cursor: pointer;
   user-select: none;
+  white-space: nowrap;
 }
 
 .checkbox-label input[type="checkbox"] {

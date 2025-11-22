@@ -54,6 +54,46 @@
   font-family: var(--font-family-mono);
 }
 
+/* Collapsible Section */
+.result-card__title--collapsible {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  transition: color 0.2s ease;
+}
+
+.result-card__title--collapsible:hover {
+  color: var(--color-primary);
+}
+
+.result-card__collapse-icon {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  transition: transform 0.3s ease;
+  color: var(--color-text-secondary);
+  min-width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.result-card__collapse-icon--collapsed {
+  transform: rotate(-90deg);
+}
+
+.result-card__collapsible-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  max-height: 5000px;
+  opacity: 1;
+}
+
+.result-card__collapsible-content--collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
 /* Responsive */
 @media (min-width: 1024px) {
   .equivalencies-grid {

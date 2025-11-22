@@ -4,19 +4,24 @@
  */
 
 /**
- * Format pace time from seconds to MM:SS format
+ * Format pace time from seconds to MM:SS or HH:MM:SS format
  * @param {number} seconds - Time in seconds
- * @returns {string} Formatted pace time (e.g., "5:00", "12:34")
+ * @returns {string} Formatted pace time (e.g., "5:00", "12:34", "2:00:00")
  */
 export function formatPaceTime(seconds) {
   if (seconds == null || isNaN(seconds) || seconds < 0) {
     return '';
   }
 
-  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
   const secs = Math.round(seconds % 60);
 
-  return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  } else {
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  }
 }
 
 /**
