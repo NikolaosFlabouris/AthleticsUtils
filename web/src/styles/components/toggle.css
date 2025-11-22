@@ -1,5 +1,6 @@
-/* Mode Toggle Component */
-.mode-toggle {
+/* Toggle Component (shared styles for mode and gender toggles) */
+.mode-toggle,
+.gender-toggle {
   display: flex;
   gap: 0;
   background: var(--color-background-secondary);
@@ -8,7 +9,8 @@
   border: 2px solid var(--color-border);
 }
 
-.mode-toggle__option {
+.mode-toggle__option,
+.gender-toggle__option {
   flex: 1;
   padding: var(--spacing-sm) var(--spacing-md);
   font-size: var(--font-size-sm);
@@ -24,26 +26,30 @@
   text-align: center;
 }
 
-.mode-toggle__option:hover:not(.mode-toggle__option--active) {
+.mode-toggle__option:hover:not(.mode-toggle__option--active),
+.gender-toggle__option:hover:not(.gender-toggle__option--active) {
   background: var(--color-background);
   color: var(--color-text);
 }
 
-.mode-toggle__option--active {
+.mode-toggle__option--active,
+.gender-toggle__option--active {
   background: var(--color-primary);
   color: white;
   box-shadow: var(--shadow-sm);
   font-weight: var(--font-weight-semibold);
 }
 
-.mode-toggle__option:focus {
+.mode-toggle__option:focus,
+.gender-toggle__option:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.3);
 }
 
 /* Responsive: Allow text wrapping on small screens */
 @media (max-width: 640px) {
-  .mode-toggle__option {
+  .mode-toggle__option,
+  .gender-toggle__option {
     white-space: normal;
     word-wrap: break-word;
     line-height: 1.3;

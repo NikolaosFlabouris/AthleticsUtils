@@ -44,10 +44,33 @@
 
         <div class="calculator__controls">
           <div class="form-group">
-            <label for="gender-select">Gender</label>
-            <select id="gender-select" class="form-select">
-              <option value="">Select gender...</option>
-            </select>
+            <label>Gender</label>
+            <div class="gender-toggle">
+              <button
+                type="button"
+                id="gender-toggle-men"
+                class="gender-toggle__option"
+                data-gender="men"
+              >
+                Men
+              </button>
+              <button
+                type="button"
+                id="gender-toggle-women"
+                class="gender-toggle__option"
+                data-gender="women"
+              >
+                Women
+              </button>
+              <button
+                type="button"
+                id="gender-toggle-mixed"
+                class="gender-toggle__option"
+                data-gender="mixed"
+              >
+                Mixed
+              </button>
+            </div>
           </div>
 
           <div class="form-group">

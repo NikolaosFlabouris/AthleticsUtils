@@ -19,7 +19,9 @@ export class BaseCalculator {
   }
 
   setupDOMElements() {
-    this.genderSelect = document.querySelector(this.selectors.genderSelect);
+    this.genderToggleMen = document.querySelector('#gender-toggle-men');
+    this.genderToggleWomen = document.querySelector('#gender-toggle-women');
+    this.genderToggleMixed = document.querySelector('#gender-toggle-mixed');
     this.eventTrigger = document.querySelector('#event-trigger');
     this.eventTriggerText = document.querySelector('#event-trigger-text');
     this.eventSearch = document.querySelector('#event-search');
@@ -39,7 +41,9 @@ export class BaseCalculator {
   }
 
   setupEventListeners() {
-    this.genderSelect?.addEventListener('change', (e) => this.handleGenderChange(e));
+    this.genderToggleMen?.addEventListener('click', () => this.handleGenderToggle('men'));
+    this.genderToggleWomen?.addEventListener('click', () => this.handleGenderToggle('women'));
+    this.genderToggleMixed?.addEventListener('click', () => this.handleGenderToggle('mixed'));
     this.eventTrigger?.addEventListener('click', () => this.handleEventTriggerClick());
     this.eventSearch?.addEventListener('input', (e) => this.handleEventSearchInput(e));
     this.eventSearch?.addEventListener('keydown', (e) => this.handleEventSearchKeydown(e));
@@ -64,7 +68,7 @@ export class BaseCalculator {
         eventConfigLoader.load()
       ]);
       this.allEvents = eventConfigLoader.getAllEvents();
-      this.populateGenderDropdown();
+      this.initializeGenderToggle();
       this.showLoading(false);
     } catch (error) {
       console.error('Error loading scoring data:', error);
@@ -73,31 +77,40 @@ export class BaseCalculator {
     }
   }
 
-  populateGenderDropdown() {
-    const genders = scoringDataLoader.getGenders();
-    this.genderSelect.innerHTML = '<option value="">Select gender...</option>';
+  initializeGenderToggle() {
+    // Load saved gender from session storage, default to 'men'
+    const savedGender = sessionStorage.getItem('selectedGender') || 'men';
 
-    for (const gender of genders) {
-      const option = document.createElement('option');
-      option.value = gender;
-      option.textContent = this.capitalizeFirst(gender);
-      this.genderSelect.appendChild(option);
-    }
+    // Set the initial gender and trigger UI update
+    this.handleGenderToggle(savedGender);
   }
 
-  handleGenderChange(e) {
-    this.currentGender = e.target.value;
-
-    if (!this.currentGender) {
-      this.eventTrigger.disabled = true;
-      this.eventTriggerText.textContent = 'Select event...';
-      this.performanceInput.disabled = true;
-      this.calculateBtn.disabled = true;
-      this.hideResults();
-      this.hideEventDropdown();
+  handleGenderToggle(gender) {
+    // Don't do anything if clicking the already selected gender
+    if (this.currentGender === gender) {
       return;
     }
 
+    this.currentGender = gender;
+
+    // Save to session storage
+    sessionStorage.setItem('selectedGender', gender);
+
+    // Remove active class from all gender toggle buttons
+    this.genderToggleMen?.classList.remove('gender-toggle__option--active');
+    this.genderToggleWomen?.classList.remove('gender-toggle__option--active');
+    this.genderToggleMixed?.classList.remove('gender-toggle__option--active');
+
+    // Add active class to the selected gender button
+    if (gender === 'men') {
+      this.genderToggleMen?.classList.add('gender-toggle__option--active');
+    } else if (gender === 'women') {
+      this.genderToggleWomen?.classList.add('gender-toggle__option--active');
+    } else if (gender === 'mixed') {
+      this.genderToggleMixed?.classList.add('gender-toggle__option--active');
+    }
+
+    // Update available events and reset event selection
     this.filterAvailableEvents(this.currentGender);
     this.eventTrigger.disabled = false;
     this.eventTriggerText.textContent = 'Select event...';
