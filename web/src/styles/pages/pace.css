@@ -39,6 +39,17 @@
   min-width: 100px;
 }
 
+/* Hide spinner buttons on number inputs in advanced mode */
+.distance-input-group .form-input[type="number"]::-webkit-inner-spin-button,
+.distance-input-group .form-input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.distance-input-group .form-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 /* Responsive: Horizontal layout on wider screens */
 @media (min-width: 640px) {
   /* Ensure mode toggle spans full width */
