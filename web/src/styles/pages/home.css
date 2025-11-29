@@ -55,6 +55,9 @@
   font-weight: var(--font-weight-semibold);
   margin-bottom: var(--spacing-md);
   color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 
 .tool-card__description {

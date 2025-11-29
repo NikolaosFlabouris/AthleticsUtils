@@ -55,6 +55,16 @@ body {
   margin-bottom: var(--spacing-sm);
 }
 
+.header__title-link {
+  color: white;
+  text-decoration: none;
+  transition: opacity var(--transition-fast);
+}
+
+.header__title-link:hover {
+  opacity: 0.85;
+}
+
 .header__subtitle {
   font-size: var(--font-size-lg);
   opacity: 0.95;
@@ -335,6 +345,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: var(--spacing-xs);
   text-decoration: none;
 }
 
