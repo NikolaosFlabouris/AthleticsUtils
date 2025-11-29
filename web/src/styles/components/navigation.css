@@ -19,7 +19,15 @@
   gap: var(--spacing-lg);
   margin: 0;
   padding: var(--spacing-md) 0;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.navigation__list::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
 .navigation__link {
