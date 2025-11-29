@@ -4,6 +4,39 @@
  */
 
 /**
+ * Format sub-60 second times with decimal precision
+ * @param {number} seconds - Time in seconds (must be < 60)
+ * @returns {string} Formatted time (e.g., "45.5 sec", "59.99 sec", "0.01 sec")
+ * @private
+ */
+function formatSubMinuteTime(seconds) {
+  // Round to 2 decimal places
+  const rounded = Math.round(seconds * 100) / 100;
+
+  // If rounding pushes to 60+, format as MM:SS instead
+  if (rounded >= 60) {
+    const minutes = Math.floor(rounded / 60);
+    const secs = Math.round(rounded % 60);
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  // Format with 2 decimal places
+  let formatted = rounded.toFixed(2);
+
+  // Remove trailing zeros, but keep at least one decimal
+  if (formatted.endsWith('0') && !formatted.endsWith('.0')) {
+    formatted = formatted.slice(0, -1);
+  }
+
+  // Ensure at least one decimal place
+  if (!formatted.includes('.')) {
+    formatted += '.0';
+  }
+
+  return formatted + ' sec';
+}
+
+/**
  * Format pace time from seconds to MM:SS or HH:MM:SS format
  * @param {number} seconds - Time in seconds
  * @returns {string} Formatted pace time (e.g., "5:00", "12:34", "2:00:00")
@@ -11,6 +44,11 @@
 export function formatPaceTime(seconds) {
   if (seconds == null || isNaN(seconds) || seconds < 0) {
     return '';
+  }
+
+  // Handle sub-60 second times with decimal precision
+  if (seconds < 60) {
+    return formatSubMinuteTime(seconds);
   }
 
   const hours = Math.floor(seconds / 3600);
@@ -116,6 +154,11 @@ export function parseTimeInput(input) {
 export function formatTotalTime(seconds) {
   if (seconds == null || isNaN(seconds) || seconds < 0) {
     return '';
+  }
+
+  // Handle sub-60 second times with decimal precision
+  if (seconds < 60) {
+    return formatSubMinuteTime(seconds);
   }
 
   const hours = Math.floor(seconds / 3600);
