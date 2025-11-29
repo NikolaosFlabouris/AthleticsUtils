@@ -33,7 +33,7 @@ function formatSubMinuteTime(seconds) {
     formatted += '.0';
   }
 
-  return formatted + ' sec';
+  return formatted + 's';
 }
 
 /**
