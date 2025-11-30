@@ -20,18 +20,11 @@ function formatSubMinuteTime(seconds) {
     return `${minutes}:${secs.toString().padStart(2, '0')}`;
   }
 
-  // Format with 2 decimal places
+  // Format with up to 2 decimal places, removing trailing zeros
   let formatted = rounded.toFixed(2);
 
-  // Remove trailing zeros, but keep at least one decimal
-  if (formatted.endsWith('0') && !formatted.endsWith('.0')) {
-    formatted = formatted.slice(0, -1);
-  }
-
-  // Ensure at least one decimal place
-  if (!formatted.includes('.')) {
-    formatted += '.0';
-  }
+  // Remove all trailing zeros and decimal point if whole number
+  formatted = formatted.replace(/\.?0+$/, '');
 
   return formatted + 's';
 }
