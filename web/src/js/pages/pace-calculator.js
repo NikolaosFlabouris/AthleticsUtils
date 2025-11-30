@@ -224,7 +224,7 @@ class PaceCalculator extends PaceCalculatorBase {
   /**
    * Convert distance to metres based on unit
    * @param {number} distance - The distance value
-   * @param {string} unit - The unit (m, km, miles, yards)
+   * @param {string} unit - The unit (m, km, miles, yards, feet)
    * @returns {number} Distance in metres
    */
   convertDistanceToMetres(distance, unit) {
@@ -232,7 +232,8 @@ class PaceCalculator extends PaceCalculatorBase {
       'm': 1,
       'km': 1000,
       'miles': 1609.344,
-      'yards': 0.9144
+      'yards': 0.9144,
+      'feet': 0.3048
     };
 
     return distance * (conversions[unit] || 1);
@@ -780,12 +781,36 @@ class PaceCalculator extends PaceCalculatorBase {
         <div class="equivalency-item__performance">${formatPaceTime(equivalents.perMile)}/mile</div>
       </div>
       <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per m</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perMeter)}/m</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per yard</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perYard)}/yard</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per foot</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perFoot)}/ft</div>
+      </div>
+      <div class="equivalency-item">
         <div class="equivalency-item__event">Speed (km/h)</div>
         <div class="equivalency-item__performance">${formatSpeed(equivalents.kmh, 'km/h')}</div>
       </div>
       <div class="equivalency-item">
         <div class="equivalency-item__event">Speed (mph)</div>
         <div class="equivalency-item__performance">${formatSpeed(equivalents.mph, 'mph')}</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (m/s)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.metersPerSecond, 'm/s')}</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (ft/s)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.feetPerSecond, 'ft/s')}</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (yd/s)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.yardsPerSecond, 'yd/s')}</div>
       </div>
     `;
 
@@ -858,12 +883,36 @@ class PaceCalculator extends PaceCalculatorBase {
         <div class="equivalency-item__performance">${formatPaceTime(equivalents.perMile)}/mile</div>
       </div>
       <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per m</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perMeter)}/m</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per yard</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perYard)}/yard</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per foot</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perFoot)}/ft</div>
+      </div>
+      <div class="equivalency-item">
         <div class="equivalency-item__event">Speed (km/h)</div>
         <div class="equivalency-item__performance">${formatSpeed(equivalents.kmh, 'km/h')}</div>
       </div>
       <div class="equivalency-item">
         <div class="equivalency-item__event">Speed (mph)</div>
         <div class="equivalency-item__performance">${formatSpeed(equivalents.mph, 'mph')}</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (m/s)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.metersPerSecond, 'm/s')}</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (ft/s)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.feetPerSecond, 'ft/s')}</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (yd/s)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.yardsPerSecond, 'yd/s')}</div>
       </div>
     `;
 
