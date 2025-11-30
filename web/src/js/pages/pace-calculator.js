@@ -494,7 +494,7 @@ class PaceCalculator extends PaceCalculatorBase {
           mode: 'pace',
           distance: distanceDisplayName,
           totalTime: formatTotalTime(totalTimeSeconds),
-          pace: `${formatPaceTime(paceSeconds)} /${paceUnit}`,
+          pace: `${formatPaceTime(paceSeconds)}/${paceUnit}`,
           timestamp: Date.now()
         });
 
@@ -574,7 +574,7 @@ class PaceCalculator extends PaceCalculatorBase {
           mode: 'pace',
           distance: distanceDisplayName,
           totalTime: formatTotalTime(totalTimeSeconds),
-          pace: `${formatPaceTime(paceSeconds)} /${paceIntervalValue}${paceIntervalUnit}`,
+          pace: `${formatPaceTime(paceSeconds)}/${paceIntervalValue}${paceIntervalUnit}`,
           timestamp: Date.now()
         });
       }
@@ -632,7 +632,7 @@ class PaceCalculator extends PaceCalculatorBase {
           mode: 'totalTime',
           distance: distanceDisplayName,
           totalTime: formatTotalTime(totalTimeSeconds),
-          pace: `${formatPaceTime(paceSeconds)} /${paceUnit}`,
+          pace: `${formatPaceTime(paceSeconds)}/${paceUnit}`,
           timestamp: Date.now()
         });
 
@@ -712,7 +712,7 @@ class PaceCalculator extends PaceCalculatorBase {
           mode: 'totalTime',
           distance: distanceDisplayName,
           totalTime: formatTotalTime(totalTimeSeconds),
-          pace: `${formatPaceTime(paceSeconds)} /${paceIntervalValue}${paceIntervalUnit}`,
+          pace: `${formatPaceTime(paceSeconds)}/${paceIntervalValue}${paceIntervalUnit}`,
           timestamp: Date.now()
         });
       }
@@ -736,12 +736,12 @@ class PaceCalculator extends PaceCalculatorBase {
 
     if (paceIntervalInfo) {
       // Advanced mode with custom pace interval
-      paceDisplayText = `${formatPaceTime(paceSeconds)} /${paceIntervalInfo.value}${paceIntervalInfo.unit}`;
+      paceDisplayText = `${formatPaceTime(paceSeconds)}/${paceIntervalInfo.value}${paceIntervalInfo.unit}`;
       // Convert custom pace to pace per km for equivalents calculation
       pacePerKm = paceSeconds / (paceIntervalInfo.metres / 1000);
     } else {
       // Standard mode
-      paceDisplayText = `${formatPaceTime(paceSeconds)} /${paceUnit}`;
+      paceDisplayText = `${formatPaceTime(paceSeconds)}/${paceUnit}`;
       pacePerKm = paceSeconds / (paceUnit === 'mile' ? 1.609344 : 1);
     }
 
@@ -769,11 +769,11 @@ class PaceCalculator extends PaceCalculatorBase {
     equivalentsGrid.innerHTML = `
       <div class="equivalency-item">
         <div class="equivalency-item__event">Pace per km</div>
-        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perKm)} /km</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perKm)}/km</div>
       </div>
       <div class="equivalency-item">
         <div class="equivalency-item__event">Pace per mile</div>
-        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perMile)} /mile</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perMile)}/mile</div>
       </div>
       <div class="equivalency-item">
         <div class="equivalency-item__event">Speed (km/h)</div>
@@ -812,12 +812,12 @@ class PaceCalculator extends PaceCalculatorBase {
 
     if (paceIntervalInfo) {
       // Advanced mode with custom pace interval
-      paceDisplayText = `${formatPaceTime(paceSeconds)} /${paceIntervalInfo.value}${paceIntervalInfo.unit}`;
+      paceDisplayText = `${formatPaceTime(paceSeconds)}/${paceIntervalInfo.value}${paceIntervalInfo.unit}`;
       // Convert custom pace to pace per km for equivalents calculation
       pacePerKm = paceSeconds / (paceIntervalInfo.metres / 1000);
     } else {
       // Standard mode
-      paceDisplayText = `${formatPaceTime(paceSeconds)} /${paceUnit}`;
+      paceDisplayText = `${formatPaceTime(paceSeconds)}/${paceUnit}`;
       pacePerKm = paceSeconds / (paceUnit === 'mile' ? 1.609344 : 1);
     }
 
@@ -845,11 +845,11 @@ class PaceCalculator extends PaceCalculatorBase {
     equivalentsGrid.innerHTML = `
       <div class="equivalency-item">
         <div class="equivalency-item__event">Pace per km</div>
-        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perKm)} /km</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perKm)}/km</div>
       </div>
       <div class="equivalency-item">
         <div class="equivalency-item__event">Pace per mile</div>
-        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perMile)} /mile</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perMile)}/mile</div>
       </div>
       <div class="equivalency-item">
         <div class="equivalency-item__event">Speed (km/h)</div>
