@@ -570,11 +570,12 @@ class PaceCalculator extends PaceCalculatorBase {
 
         this.displayPaceResults(paceSeconds, null, distanceMetres, eventConfig, totalTimeSeconds, paceIntervalInfo);
 
+        const intervalText = parseFloat(paceIntervalValue) === 1 ? '' : paceIntervalValue;
         this.saveToHistory({
           mode: 'pace',
           distance: distanceDisplayName,
           totalTime: formatTotalTime(totalTimeSeconds),
-          pace: `${formatPaceTime(paceSeconds)}/${paceIntervalValue}${paceIntervalUnit}`,
+          pace: `${formatPaceTime(paceSeconds)}/${intervalText}${paceIntervalUnit}`,
           timestamp: Date.now()
         });
       }
@@ -708,11 +709,12 @@ class PaceCalculator extends PaceCalculatorBase {
 
         this.displayTimeResults(totalTimeSeconds, paceSeconds, null, distanceMetres, eventConfig, paceIntervalInfo);
 
+        const intervalText = parseFloat(paceIntervalValue) === 1 ? '' : paceIntervalValue;
         this.saveToHistory({
           mode: 'totalTime',
           distance: distanceDisplayName,
           totalTime: formatTotalTime(totalTimeSeconds),
-          pace: `${formatPaceTime(paceSeconds)}/${paceIntervalValue}${paceIntervalUnit}`,
+          pace: `${formatPaceTime(paceSeconds)}/${intervalText}${paceIntervalUnit}`,
           timestamp: Date.now()
         });
       }
@@ -736,7 +738,9 @@ class PaceCalculator extends PaceCalculatorBase {
 
     if (paceIntervalInfo) {
       // Advanced mode with custom pace interval
-      paceDisplayText = `${formatPaceTime(paceSeconds)}/${paceIntervalInfo.value}${paceIntervalInfo.unit}`;
+      // Omit "1" if the interval value is exactly 1 for better readability
+      const intervalText = paceIntervalInfo.value === 1 ? '' : paceIntervalInfo.value;
+      paceDisplayText = `${formatPaceTime(paceSeconds)}/${intervalText}${paceIntervalInfo.unit}`;
       // Convert custom pace to pace per km for equivalents calculation
       pacePerKm = paceSeconds / (paceIntervalInfo.metres / 1000);
     } else {
@@ -812,7 +816,9 @@ class PaceCalculator extends PaceCalculatorBase {
 
     if (paceIntervalInfo) {
       // Advanced mode with custom pace interval
-      paceDisplayText = `${formatPaceTime(paceSeconds)}/${paceIntervalInfo.value}${paceIntervalInfo.unit}`;
+      // Omit "1" if the interval value is exactly 1 for better readability
+      const intervalText = paceIntervalInfo.value === 1 ? '' : paceIntervalInfo.value;
+      paceDisplayText = `${formatPaceTime(paceSeconds)}/${intervalText}${paceIntervalInfo.unit}`;
       // Convert custom pace to pace per km for equivalents calculation
       pacePerKm = paceSeconds / (paceIntervalInfo.metres / 1000);
     } else {
