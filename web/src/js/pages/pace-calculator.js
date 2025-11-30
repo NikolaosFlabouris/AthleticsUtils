@@ -935,18 +935,23 @@ class PaceCalculator extends PaceCalculatorBase {
     const splitsCard = document.createElement('div');
     splitsCard.className = 'result-card';
 
+    const splitsTitle = document.createElement('h3');
+    splitsTitle.className = 'result-card__title';
+    splitsTitle.textContent = 'Split Times';
+
+    const splitsContent = document.createElement('div');
+    splitsContent.className = 'history-table-container';
+
     let tableHTML = `
-      <h3 class="result-card__title">Split Times</h3>
-      <div class="history-table-container">
-        <table class="history-table">
-          <thead>
-            <tr>
-              <th>Distance</th>
-              <th>Time</th>
-              <th>Pace</th>
-            </tr>
-          </thead>
-          <tbody>
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Distance</th>
+            <th>Cumulative Time</th>
+            <th>Pace</th>
+          </tr>
+        </thead>
+        <tbody>
     `;
 
     splits.forEach(split => {
@@ -960,13 +965,17 @@ class PaceCalculator extends PaceCalculatorBase {
     });
 
     tableHTML += `
-          </tbody>
-        </table>
-      </div>
+        </tbody>
+      </table>
     `;
 
-    splitsCard.innerHTML = tableHTML;
+    splitsContent.innerHTML = tableHTML;
+    splitsCard.appendChild(splitsTitle);
+    splitsCard.appendChild(splitsContent);
     this.resultsContent.appendChild(splitsCard);
+
+    // Make the split times section collapsible and start collapsed by default
+    makeCollapsible(splitsTitle, splitsContent, 'paceCalculator.splitTimes.collapsed', false);
   }
 
   /**
