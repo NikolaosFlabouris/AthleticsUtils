@@ -837,9 +837,29 @@ class PaceCalculator extends PaceCalculatorBase {
     // Make the equivalent paces section collapsible
     makeCollapsible(equivalentsTitle, equivalentsGrid, 'paceCalculator.equivalentPaces.collapsed', true);
 
-    // Splits - use custom interval if provided
-    const splitIntervalMetres = paceIntervalInfo ? paceIntervalInfo.metres : 1000;
-    const splits = this.calculateCustomSplits(distanceMetres, pacePerKm, eventConfig, splitIntervalMetres, paceIntervalInfo);
+    // Splits - use custom interval if provided, or create interval based on pace unit
+    let splitIntervalMetres;
+    let splitIntervalInfo;
+
+    if (paceIntervalInfo) {
+      // Advanced mode - use custom interval
+      splitIntervalMetres = paceIntervalInfo.metres;
+      splitIntervalInfo = paceIntervalInfo;
+    } else {
+      // Standard mode - create interval based on pace unit
+      if (paceUnit === 'mile') {
+        splitIntervalMetres = 1609.344;
+        splitIntervalInfo = { value: 1, unit: 'miles', metres: 1609.344 };
+      } else if (paceUnit === '400m') {
+        splitIntervalMetres = 400;
+        splitIntervalInfo = { value: 400, unit: 'm', metres: 400 };
+      } else {
+        splitIntervalMetres = 1000;
+        splitIntervalInfo = { value: 1, unit: 'km', metres: 1000 };
+      }
+    }
+
+    const splits = this.calculateCustomSplits(distanceMetres, pacePerKm, eventConfig, splitIntervalMetres, splitIntervalInfo);
     this.displaySplits(splits);
 
     this.showResults();
@@ -945,9 +965,29 @@ class PaceCalculator extends PaceCalculatorBase {
     // Make the equivalent paces section collapsible
     makeCollapsible(equivalentsTitle, equivalentsGrid, 'paceCalculator.equivalentPaces.collapsed', true);
 
-    // Splits - use custom interval if provided
-    const splitIntervalMetres = paceIntervalInfo ? paceIntervalInfo.metres : 1000;
-    const splits = this.calculateCustomSplits(distanceMetres, pacePerKm, eventConfig, splitIntervalMetres, paceIntervalInfo);
+    // Splits - use custom interval if provided, or create interval based on pace unit
+    let splitIntervalMetres;
+    let splitIntervalInfo;
+
+    if (paceIntervalInfo) {
+      // Advanced mode - use custom interval
+      splitIntervalMetres = paceIntervalInfo.metres;
+      splitIntervalInfo = paceIntervalInfo;
+    } else {
+      // Standard mode - create interval based on pace unit
+      if (paceUnit === 'mile') {
+        splitIntervalMetres = 1609.344;
+        splitIntervalInfo = { value: 1, unit: 'miles', metres: 1609.344 };
+      } else if (paceUnit === '400m') {
+        splitIntervalMetres = 400;
+        splitIntervalInfo = { value: 400, unit: 'm', metres: 400 };
+      } else {
+        splitIntervalMetres = 1000;
+        splitIntervalInfo = { value: 1, unit: 'km', metres: 1000 };
+      }
+    }
+
+    const splits = this.calculateCustomSplits(distanceMetres, pacePerKm, eventConfig, splitIntervalMetres, splitIntervalInfo);
     this.displaySplits(splits);
 
     this.showResults();
