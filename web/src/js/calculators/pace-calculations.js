@@ -25,7 +25,7 @@ export function getDistanceInMetres(eventKey, eventsConfig) {
  * Calculate pace per unit distance
  * @param {number} distanceMetres - Total distance in metres
  * @param {number} totalTimeSeconds - Total time in seconds
- * @param {string} paceUnit - Unit for pace ('km' or 'mile')
+ * @param {string} paceUnit - Unit for pace ('km', 'mile', or '400m')
  * @returns {number} Pace in seconds per unit
  */
 export function calculatePace(distanceMetres, totalTimeSeconds, paceUnit) {
@@ -34,17 +34,30 @@ export function calculatePace(distanceMetres, totalTimeSeconds, paceUnit) {
   }
 
   // Convert distance to the desired pace unit
-  const distanceInPaceUnit = convertDistance(distanceMetres, 'metres', paceUnit === 'mile' ? 'miles' : 'km');
+  let targetUnit;
+  if (paceUnit === 'mile') {
+    targetUnit = 'miles';
+  } else if (paceUnit === '400m') {
+    targetUnit = 'm';
+  } else {
+    targetUnit = 'km';
+  }
+
+  const distanceInPaceUnit = convertDistance(distanceMetres, 'metres', targetUnit);
+
+  // For 400m pace, divide by 400 (since we converted to metres)
+  const divisor = paceUnit === '400m' ? 400 : 1;
+  const adjustedDistance = paceUnit === '400m' ? distanceInPaceUnit / 400 : distanceInPaceUnit;
 
   // Calculate pace (seconds per unit)
-  return totalTimeSeconds / distanceInPaceUnit;
+  return totalTimeSeconds / adjustedDistance;
 }
 
 /**
  * Calculate total time from pace and distance
  * @param {number} distanceMetres - Total distance in metres
  * @param {number} paceSecondsPerUnit - Pace in seconds per unit
- * @param {string} paceUnit - Unit for pace ('km' or 'mile')
+ * @param {string} paceUnit - Unit for pace ('km', 'mile', or '400m')
  * @returns {number} Total time in seconds
  */
 export function calculateTotalTime(distanceMetres, paceSecondsPerUnit, paceUnit) {
@@ -53,10 +66,22 @@ export function calculateTotalTime(distanceMetres, paceSecondsPerUnit, paceUnit)
   }
 
   // Convert distance to the pace unit
-  const distanceInPaceUnit = convertDistance(distanceMetres, 'metres', paceUnit === 'mile' ? 'miles' : 'km');
+  let targetUnit;
+  if (paceUnit === 'mile') {
+    targetUnit = 'miles';
+  } else if (paceUnit === '400m') {
+    targetUnit = 'm';
+  } else {
+    targetUnit = 'km';
+  }
+
+  const distanceInPaceUnit = convertDistance(distanceMetres, 'metres', targetUnit);
+
+  // For 400m pace, divide by 400 (since we converted to metres)
+  const adjustedDistance = paceUnit === '400m' ? distanceInPaceUnit / 400 : distanceInPaceUnit;
 
   // Calculate total time
-  return paceSecondsPerUnit * distanceInPaceUnit;
+  return paceSecondsPerUnit * adjustedDistance;
 }
 
 /**
