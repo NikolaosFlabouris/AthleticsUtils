@@ -166,31 +166,109 @@ export function formatTotalTime(seconds) {
 }
 
 /**
+ * Get singular or plural form of unit based on value
+ * @param {number} value - Numeric value
+ * @param {string} unit - Unit name (e.g., 'miles', 'feet', 'yards', 'km', 'm')
+ * @returns {string} Appropriate unit form
+ */
+export function getSingularPluralUnit(value, unit) {
+  // Metric abbreviations don't change
+  if (unit === 'km' || unit === 'm') {
+    return unit;
+  }
+
+  // For imperial units, use singular when value is exactly 1
+  if (value === 1) {
+    const singularMap = {
+      'miles': 'mile',
+      'feet': 'foot',
+      'yards': 'yard'
+    };
+    return singularMap[unit] || unit;
+  }
+
+  return unit;
+}
+
+/**
+ * Determine if spacing is needed between value and unit
+ * @param {string} unit - Unit name
+ * @returns {boolean} True if space should be added
+ */
+export function needsSpacing(unit) {
+  // Imperial words need spacing
+  const imperialWords = ['miles', 'mile', 'feet', 'foot', 'yards', 'yard'];
+  return imperialWords.includes(unit);
+}
+
+/**
+ * Format pace interval for display
+ * @param {number} value - Interval value
+ * @param {string} unit - Unit name
+ * @returns {string} Formatted pace interval (e.g., "/km", "/1.5 miles", "/foot")
+ */
+export function formatPaceInterval(value, unit) {
+  // Get appropriate singular/plural form
+  const displayUnit = getSingularPluralUnit(value, unit);
+
+  // If value is exactly 1, omit it
+  if (value === 1) {
+    return `/${displayUnit}`;
+  }
+
+  // Otherwise show value with appropriate spacing
+  const spacing = needsSpacing(displayUnit) ? ' ' : '';
+  return `/${value}${spacing}${displayUnit}`;
+}
+
+/**
  * Format distance with unit
  * @param {number} value - Distance value
+ * @param {string} unit - Unit name
+ * @returns {string} Formatted distance (e.g., "5km", "1 mile", "0.5 feet")
+ */
+export function formatDistanceWithUnit(value, unit) {
+  // Get appropriate singular/plural form
+  const displayUnit = getSingularPluralUnit(value, unit);
+
+  // Determine spacing
+  const spacing = needsSpacing(displayUnit) ? ' ' : '';
+
+  return `${value}${spacing}${displayUnit}`;
+}
+
+/**
+ * Format distance with unit (for display with decimal formatting)
+ * @param {number} value - Distance value
  * @param {string} unit - Unit ('km', 'miles', or 'metres')
- * @returns {string} Formatted distance (e.g., "5 km", "3.1 miles", "5000 m")
+ * @returns {string} Formatted distance (e.g., "5km", "3.1 miles", "5000m")
  */
 export function formatDistance(value, unit) {
   if (value == null || isNaN(value)) {
     return '';
   }
 
-  // For kilometres and miles, show up to 4 decimal places if needed
-  if (unit === 'km' || unit === 'miles') {
-    // Remove trailing zeros
-    const formatted = value.toFixed(4).replace(/\.?0+$/, '');
-    return `${formatted} ${unit}`;
+  // Get appropriate singular/plural form based on value
+  const displayUnit = getSingularPluralUnit(value, unit);
+
+  // Determine spacing based on unit type
+  const spacing = needsSpacing(displayUnit) ? ' ' : '';
+
+  // Format value based on unit type
+  let formattedValue;
+
+  if (unit === 'km' || unit === 'miles' || unit === 'mile') {
+    // For kilometres and miles, show up to 4 decimal places if needed
+    formattedValue = value.toFixed(4).replace(/\.?0+$/, '');
+  } else if (unit === 'yards' || unit === 'yard' || unit === 'feet' || unit === 'foot') {
+    // For yards and feet, show up to 2 decimal places if needed
+    formattedValue = value.toFixed(2).replace(/\.?0+$/, '');
+  } else {
+    // For metres, show whole numbers
+    formattedValue = Math.round(value);
   }
 
-  // For yards and feet, show up to 2 decimal places if needed
-  if (unit === 'yards' || unit === 'feet') {
-    const formatted = value.toFixed(2).replace(/\.?0+$/, '');
-    return `${formatted} ${unit}`;
-  }
-
-  // For metres, show whole numbers
-  return `${Math.round(value)} ${unit}`;
+  return `${formattedValue}${spacing}${displayUnit}`;
 }
 
 /**

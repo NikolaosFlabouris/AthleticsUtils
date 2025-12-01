@@ -19,7 +19,9 @@ import {
   formatTotalTime,
   formatSpeed,
   formatDistance,
-  convertDistance
+  convertDistance,
+  formatPaceInterval,
+  formatDistanceWithUnit
 } from '../utils/pace-formatter.js';
 import { makeCollapsible } from '../utils/collapsible-section.js';
 
@@ -579,12 +581,12 @@ class PaceCalculator extends PaceCalculatorBase {
 
         this.displayPaceResults(paceSeconds, null, distanceMetres, eventConfig, totalTimeSeconds, paceIntervalInfo);
 
-        const intervalText = parseFloat(paceIntervalValue) === 1 ? '' : paceIntervalValue;
+        const paceIntervalText = formatPaceInterval(parseFloat(paceIntervalValue), paceIntervalUnit);
         this.saveToHistory({
           mode: 'pace',
           distance: distanceDisplayName,
           totalTime: formatTotalTime(totalTimeSeconds),
-          pace: `${formatPaceTime(paceSeconds)}/${intervalText}${paceIntervalUnit}`,
+          pace: `${formatPaceTime(paceSeconds)}${paceIntervalText}`,
           timestamp: Date.now()
         });
       }
@@ -718,12 +720,12 @@ class PaceCalculator extends PaceCalculatorBase {
 
         this.displayTimeResults(totalTimeSeconds, paceSeconds, null, distanceMetres, eventConfig, paceIntervalInfo);
 
-        const intervalText = parseFloat(paceIntervalValue) === 1 ? '' : paceIntervalValue;
+        const paceIntervalText = formatPaceInterval(parseFloat(paceIntervalValue), paceIntervalUnit);
         this.saveToHistory({
           mode: 'totalTime',
           distance: distanceDisplayName,
           totalTime: formatTotalTime(totalTimeSeconds),
-          pace: `${formatPaceTime(paceSeconds)}/${intervalText}${paceIntervalUnit}`,
+          pace: `${formatPaceTime(paceSeconds)}${paceIntervalText}`,
           timestamp: Date.now()
         });
       }
@@ -747,9 +749,8 @@ class PaceCalculator extends PaceCalculatorBase {
 
     if (paceIntervalInfo) {
       // Advanced mode with custom pace interval
-      // Omit "1" if the interval value is exactly 1 for better readability
-      const intervalText = paceIntervalInfo.value === 1 ? '' : paceIntervalInfo.value;
-      paceDisplayText = `${formatPaceTime(paceSeconds)}/${intervalText}${paceIntervalInfo.unit}`;
+      const paceIntervalText = formatPaceInterval(paceIntervalInfo.value, paceIntervalInfo.unit);
+      paceDisplayText = `${formatPaceTime(paceSeconds)}${paceIntervalText}`;
       // Convert custom pace to pace per km for equivalents calculation
       pacePerKm = paceSeconds / (paceIntervalInfo.metres / 1000);
     } else {
@@ -856,9 +857,8 @@ class PaceCalculator extends PaceCalculatorBase {
 
     if (paceIntervalInfo) {
       // Advanced mode with custom pace interval
-      // Omit "1" if the interval value is exactly 1 for better readability
-      const intervalText = paceIntervalInfo.value === 1 ? '' : paceIntervalInfo.value;
-      paceDisplayText = `${formatPaceTime(paceSeconds)}/${intervalText}${paceIntervalInfo.unit}`;
+      const paceIntervalText = formatPaceInterval(paceIntervalInfo.value, paceIntervalInfo.unit);
+      paceDisplayText = `${formatPaceTime(paceSeconds)}${paceIntervalText}`;
       // Convert custom pace to pace per km for equivalents calculation
       pacePerKm = paceSeconds / (paceIntervalInfo.metres / 1000);
     } else {
@@ -979,10 +979,12 @@ class PaceCalculator extends PaceCalculatorBase {
       if (paceIntervalInfo) {
         // Custom interval - show in the interval units
         const distanceInIntervalUnits = currentDistanceMetres / splitIntervalMetres * paceIntervalInfo.value;
-        distanceLabel = `${distanceInIntervalUnits.toFixed(2)} ${splitUnit}`;
+        const formattedValue = parseFloat(distanceInIntervalUnits.toFixed(2));
+        distanceLabel = formatDistanceWithUnit(formattedValue, splitUnit);
       } else {
         // Standard 1km intervals
-        distanceLabel = `${(currentDistanceMetres / 1000).toFixed(2)} km`;
+        const distanceInKm = parseFloat((currentDistanceMetres / 1000).toFixed(2));
+        distanceLabel = formatDistanceWithUnit(distanceInKm, 'km');
       }
 
       splits.push({
