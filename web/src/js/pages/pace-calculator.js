@@ -391,7 +391,15 @@ class PaceCalculator extends PaceCalculatorBase {
       }
 
       // Show equivalent distance if units differ
-      const targetUnit = paceUnit === 'mile' ? 'miles' : 'km';
+      let targetUnit;
+      if (paceUnit === 'mile') {
+        targetUnit = 'miles';
+      } else if (paceUnit === '400m') {
+        targetUnit = 'm';
+      } else {
+        targetUnit = 'km';
+      }
+
       if (eventConfig.unit !== targetUnit) {
         const converted = convertDistance(eventConfig.distance, eventConfig.unit, targetUnit);
         const formatted = formatDistance(converted, targetUnit);
@@ -747,7 +755,14 @@ class PaceCalculator extends PaceCalculatorBase {
     } else {
       // Standard mode
       paceDisplayText = `${formatPaceTime(paceSeconds)}/${paceUnit}`;
-      pacePerKm = paceSeconds / (paceUnit === 'mile' ? 1.609344 : 1);
+      // Convert pace to pace per km for equivalents calculation
+      if (paceUnit === 'mile') {
+        pacePerKm = paceSeconds / 1.609344;
+      } else if (paceUnit === '400m') {
+        pacePerKm = paceSeconds * 2.5; // 400m * 2.5 = 1000m = 1km
+      } else {
+        pacePerKm = paceSeconds;
+      }
     }
 
     // Main result card
@@ -849,7 +864,14 @@ class PaceCalculator extends PaceCalculatorBase {
     } else {
       // Standard mode
       paceDisplayText = `${formatPaceTime(paceSeconds)}/${paceUnit}`;
-      pacePerKm = paceSeconds / (paceUnit === 'mile' ? 1.609344 : 1);
+      // Convert pace to pace per km for equivalents calculation
+      if (paceUnit === 'mile') {
+        pacePerKm = paceSeconds / 1.609344;
+      } else if (paceUnit === '400m') {
+        pacePerKm = paceSeconds * 2.5; // 400m * 2.5 = 1000m = 1km
+      } else {
+        pacePerKm = paceSeconds;
+      }
     }
 
     // Main result card
