@@ -1,5 +1,12 @@
 {
   "paceCalculatorDistances": [
+    "100m",
+    "200m",
+    "400m",
+    "800m",
+    "1000m",
+    "1500m",
+    "1mile",
     "3000m",
     "2mile",
     "5km",

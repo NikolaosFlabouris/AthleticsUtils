@@ -326,3 +326,91 @@ export function getTimePlaceholder() {
 export function getPacePlaceholder() {
   return 'e.g., 5:00 or 4:30';
 }
+
+/**
+ * Parse speed input
+ * @param {string} input - Speed input (e.g., "12.5", "15")
+ * @returns {number|null} Speed as number, or null if invalid
+ */
+export function parseSpeedInput(input) {
+  if (!input || typeof input !== 'string') {
+    return null;
+  }
+
+  const trimmed = input.trim();
+  const speed = parseFloat(trimmed);
+
+  if (isNaN(speed) || speed <= 0) {
+    return null;
+  }
+
+  return speed;
+}
+
+/**
+ * Format speed with appropriate precision
+ * @param {number} speed - Speed value
+ * @param {string} unit - Speed unit ('kmh', 'mph', 'ms', 'fts', 'yds')
+ * @returns {string} Formatted speed
+ */
+export function formatSpeedValue(speed, unit) {
+  if (speed == null || isNaN(speed)) {
+    return '';
+  }
+
+  // Different units need different precision
+  const precision = {
+    'kmh': 1,  // km/h: 1 decimal place (12.5 km/h)
+    'mph': 1,  // mph: 1 decimal place (7.8 mph)
+    'ms': 2,   // m/s: 2 decimal places (3.47 m/s)
+    'fts': 2,  // ft/s: 2 decimal places (11.38 ft/s)
+    'yds': 2   // yd/s: 2 decimal places (3.79 yd/s)
+  };
+
+  const decimals = precision[unit] || 1;
+  return speed.toFixed(decimals);
+}
+
+/**
+ * Get speed unit display name
+ * @param {string} unit - Speed unit code
+ * @returns {string} Display name
+ */
+export function getSpeedUnitDisplay(unit) {
+  const displays = {
+    'kmh': 'km/h',
+    'mph': 'mph',
+    'ms': 'm/s',
+    'fts': 'ft/s',
+    'yds': 'yd/s'
+  };
+  return displays[unit] || unit;
+}
+
+/**
+ * Format speed with unit for display
+ * @param {number} speed - Speed value
+ * @param {string} unit - Speed unit
+ * @returns {string} Formatted speed with unit (e.g., "12.5 km/h")
+ */
+export function formatSpeedWithUnit(speed, unit) {
+  const formattedValue = formatSpeedValue(speed, unit);
+  const displayUnit = getSpeedUnitDisplay(unit);
+  return `${formattedValue} ${displayUnit}`;
+}
+
+/**
+ * Get placeholder for speed input
+ * @param {string} unit - Speed unit
+ * @returns {string} Placeholder text
+ */
+export function getSpeedPlaceholder(unit) {
+  const examples = {
+    'kmh': 'e.g., 12.5',
+    'mph': 'e.g., 7.8',
+    'ms': 'e.g., 3.47',
+    'fts': 'e.g., 11.38',
+    'yds': 'e.g., 3.79'
+  };
+  return examples[unit] || 'e.g., 12.5';
+}

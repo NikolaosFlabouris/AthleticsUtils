@@ -9,15 +9,26 @@ import { createIcon } from '../components/icon.js';
 import {
   calculatePace,
   calculateTotalTime,
+  calculateSpeed,
+  calculateTotalTimeFromSpeed,
+  convertPaceToSpeedUnit,
+  convertSpeedToPace,
+  getSpeedUnitSplitInterval,
+  calculateSmartSplits,
   getDistanceInMetres,
   getEquivalentPaces
 } from '../calculators/pace-calculations.js';
 import {
   parseTimeInput,
   parsePaceInput,
+  parseSpeedInput,
   formatPaceTime,
   formatTotalTime,
   formatSpeed,
+  formatSpeedValue,
+  formatSpeedWithUnit,
+  getSpeedUnitDisplay,
+  getSpeedPlaceholder,
   formatDistance,
   convertDistance,
   formatPaceInterval,
@@ -42,11 +53,17 @@ class PaceCalculator extends PaceCalculatorBase {
    * Initialize DOM elements
    */
   initializeElements() {
-    // Calculation mode toggle buttons (Pace / Total Time)
-    this.paceModeBtn = document.getElementById('mode-toggle-pace');
-    this.timeModeBtn = document.getElementById('mode-toggle-time');
+    // Primary toggle buttons (Measurement Type: Pace / Speed)
+    this.measurementPaceBtn = document.getElementById('mode-toggle-measurement-pace');
+    this.measurementSpeedBtn = document.getElementById('mode-toggle-measurement-speed');
 
-    // Standard/Advanced mode toggle buttons
+    // Secondary toggle buttons (Calculate / Total Time) with dynamic labels
+    this.calculateModeBtn = document.getElementById('mode-toggle-calculate');
+    this.timeModeBtn = document.getElementById('mode-toggle-time');
+    this.calculateLabel = document.getElementById('calculate-label');
+    this.timeLabel = document.getElementById('time-label');
+
+    // Tertiary toggle buttons (Standard / Advanced)
     this.standardModeBtn = document.getElementById('mode-toggle-standard');
     this.advancedModeBtn = document.getElementById('mode-toggle-advanced');
 
@@ -86,6 +103,40 @@ class PaceCalculator extends PaceCalculatorBase {
     this.distanceEquivalentTimeAdvanced = document.getElementById('distance-equivalent-time-advanced');
     this.calculateBtnTimeAdvanced = document.getElementById('calculate-btn-time-advanced');
 
+    // Speed Standard mode elements (dist + time → speed)
+    this.speedStandardControls = document.getElementById('speed-standard-controls');
+    this.distanceSelectSpeedStandard = document.getElementById('distance-select-speed-standard');
+    this.timeInputSpeedStandard = document.getElementById('time-input-speed-standard');
+    this.speedUnitSelectStandard = document.getElementById('speed-unit-select-standard');
+    this.distanceEquivalentSpeedStandard = document.getElementById('distance-equivalent-speed-standard');
+    this.calculateBtnSpeedStandard = document.getElementById('calculate-btn-speed-standard');
+
+    // Speed Advanced mode elements (custom dist + time → speed)
+    this.speedAdvancedControls = document.getElementById('speed-advanced-controls');
+    this.distanceInputSpeedAdvanced = document.getElementById('distance-input-speed-advanced');
+    this.distanceUnitSelectSpeedAdvanced = document.getElementById('distance-unit-select-speed-advanced');
+    this.timeInputSpeedAdvanced = document.getElementById('time-input-speed-advanced');
+    this.speedUnitSelectAdvanced = document.getElementById('speed-unit-select-advanced');
+    this.distanceEquivalentSpeedAdvanced = document.getElementById('distance-equivalent-speed-advanced');
+    this.calculateBtnSpeedAdvanced = document.getElementById('calculate-btn-speed-advanced');
+
+    // Speed Time Standard mode elements (dist + speed → time)
+    this.speedTimeStandardControls = document.getElementById('speed-time-standard-controls');
+    this.distanceSelectSpeedTimeStandard = document.getElementById('distance-select-speed-time-standard');
+    this.speedInputTimeStandard = document.getElementById('speed-input-time-standard');
+    this.speedUnitSelectTimeStandard = document.getElementById('speed-unit-select-time-standard');
+    this.distanceEquivalentSpeedTimeStandard = document.getElementById('distance-equivalent-speed-time-standard');
+    this.calculateBtnSpeedTimeStandard = document.getElementById('calculate-btn-speed-time-standard');
+
+    // Speed Time Advanced mode elements (custom dist + speed → time)
+    this.speedTimeAdvancedControls = document.getElementById('speed-time-advanced-controls');
+    this.distanceInputSpeedTimeAdvanced = document.getElementById('distance-input-speed-time-advanced');
+    this.distanceUnitSelectSpeedTimeAdvanced = document.getElementById('distance-unit-select-speed-time-advanced');
+    this.speedInputTimeAdvanced = document.getElementById('speed-input-time-advanced');
+    this.speedUnitSelectTimeAdvanced = document.getElementById('speed-unit-select-time-advanced');
+    this.distanceEquivalentSpeedTimeAdvanced = document.getElementById('distance-equivalent-speed-time-advanced');
+    this.calculateBtnSpeedTimeAdvanced = document.getElementById('calculate-btn-speed-time-advanced');
+
     // Results
     this.resultsContent = document.getElementById('results-content');
 
@@ -113,10 +164,17 @@ class PaceCalculator extends PaceCalculatorBase {
    * Initialize state from sessionStorage
    */
   initializeState() {
-    // Load state from sessionStorage or use defaults
-    this.currentMode = sessionStorage.getItem('paceCalculatorMode') || 'pace';
-    this.currentPaceMode = sessionStorage.getItem('paceCalculatorPaceMode') || 'standard';
-    this.currentTimeMode = sessionStorage.getItem('paceCalculatorTimeMode') || 'standard';
+    // Load measurement mode (pace vs speed)
+    this.currentMeasurementMode = sessionStorage.getItem('paceCalculatorMeasurementMode') || 'pace';
+
+    // Load calculate mode (calculate vs totalTime)
+    this.currentMode = sessionStorage.getItem('paceCalculatorCalculateMode') || 'calculate';
+
+    // Load sub-modes for each combination
+    this.currentPaceMode = sessionStorage.getItem('paceCalculatorPaceSubMode') || 'standard';
+    this.currentTimeMode = sessionStorage.getItem('paceCalculatorTimeSubMode') || 'standard';
+    this.currentSpeedMode = sessionStorage.getItem('paceCalculatorSpeedSubMode') || 'standard';
+    this.currentSpeedTimeMode = sessionStorage.getItem('paceCalculatorSpeedTimeSubMode') || 'standard';
 
     // Apply initial mode state
     this.applyModeState();
@@ -126,26 +184,41 @@ class PaceCalculator extends PaceCalculatorBase {
    * Save state to sessionStorage
    */
   saveState() {
-    sessionStorage.setItem('paceCalculatorMode', this.currentMode);
-    sessionStorage.setItem('paceCalculatorPaceMode', this.currentPaceMode);
-    sessionStorage.setItem('paceCalculatorTimeMode', this.currentTimeMode);
+    sessionStorage.setItem('paceCalculatorMeasurementMode', this.currentMeasurementMode);
+    sessionStorage.setItem('paceCalculatorCalculateMode', this.currentMode);
+    sessionStorage.setItem('paceCalculatorPaceSubMode', this.currentPaceMode);
+    sessionStorage.setItem('paceCalculatorTimeSubMode', this.currentTimeMode);
+    sessionStorage.setItem('paceCalculatorSpeedSubMode', this.currentSpeedMode);
+    sessionStorage.setItem('paceCalculatorSpeedTimeSubMode', this.currentSpeedTimeMode);
   }
 
   /**
    * Apply current mode state to UI
    */
   applyModeState() {
-    // Update calculation mode buttons (Pace / Total Time)
-    if (this.currentMode === 'pace') {
-      this.paceModeBtn.classList.add('mode-toggle__option--active');
+    // Update measurement type buttons (Pace / Speed)
+    if (this.currentMeasurementMode === 'pace') {
+      this.measurementPaceBtn.classList.add('mode-toggle__option--active');
+      this.measurementSpeedBtn.classList.remove('mode-toggle__option--active');
+    } else {
+      this.measurementSpeedBtn.classList.add('mode-toggle__option--active');
+      this.measurementPaceBtn.classList.remove('mode-toggle__option--active');
+    }
+
+    // Update dynamic labels based on measurement mode
+    this.updateDynamicLabels();
+
+    // Update calculate mode buttons (Calculate / Total Time)
+    if (this.currentMode === 'calculate') {
+      this.calculateModeBtn.classList.add('mode-toggle__option--active');
       this.timeModeBtn.classList.remove('mode-toggle__option--active');
     } else {
       this.timeModeBtn.classList.add('mode-toggle__option--active');
-      this.paceModeBtn.classList.remove('mode-toggle__option--active');
+      this.calculateModeBtn.classList.remove('mode-toggle__option--active');
     }
 
-    // Update Standard/Advanced buttons based on current calculation mode
-    const currentSubMode = this.currentMode === 'pace' ? this.currentPaceMode : this.currentTimeMode;
+    // Update Standard/Advanced buttons based on current sub-mode
+    const currentSubMode = this.getCurrentSubMode();
     if (currentSubMode === 'standard') {
       this.standardModeBtn.classList.add('mode-toggle__option--active');
       this.advancedModeBtn.classList.remove('mode-toggle__option--active');
@@ -159,29 +232,97 @@ class PaceCalculator extends PaceCalculatorBase {
   }
 
   /**
+   * Update dynamic labels based on measurement mode
+   */
+  updateDynamicLabels() {
+    if (this.currentMeasurementMode === 'pace') {
+      this.calculateLabel.textContent = 'Pace';
+    } else {
+      this.calculateLabel.textContent = 'Speed';
+    }
+    // timeLabel always stays "Total Time"
+  }
+
+  /**
+   * Get the current sub-mode based on measurement and calculate modes
+   * @returns {string} Current sub-mode ('standard' or 'advanced')
+   */
+  getCurrentSubMode() {
+    if (this.currentMeasurementMode === 'pace') {
+      return this.currentMode === 'calculate' ? this.currentPaceMode : this.currentTimeMode;
+    } else {
+      return this.currentMode === 'calculate' ? this.currentSpeedMode : this.currentSpeedTimeMode;
+    }
+  }
+
+  /**
+   * Get the active control group element
+   * @returns {HTMLElement} The active control group element
+   */
+  getActiveControlGroup() {
+    const key = `${this.currentMeasurementMode}-${this.currentMode}-${this.getCurrentSubMode()}`;
+    const groups = {
+      'pace-calculate-standard': this.paceStandardControls,
+      'pace-calculate-advanced': this.paceAdvancedControls,
+      'pace-totalTime-standard': this.timeStandardControls,
+      'pace-totalTime-advanced': this.timeAdvancedControls,
+      'speed-calculate-standard': this.speedStandardControls,
+      'speed-calculate-advanced': this.speedAdvancedControls,
+      'speed-totalTime-standard': this.speedTimeStandardControls,
+      'speed-totalTime-advanced': this.speedTimeAdvancedControls
+    };
+    return groups[key];
+  }
+
+  /**
    * Update which control group is visible
    */
   updateControlVisibility() {
-    // Hide all control groups
+    // Hide all 8 control groups
     this.paceStandardControls.classList.add('hidden');
     this.paceAdvancedControls.classList.add('hidden');
     this.timeStandardControls.classList.add('hidden');
     this.timeAdvancedControls.classList.add('hidden');
+    this.speedStandardControls.classList.add('hidden');
+    this.speedAdvancedControls.classList.add('hidden');
+    this.speedTimeStandardControls.classList.add('hidden');
+    this.speedTimeAdvancedControls.classList.add('hidden');
 
-    // Show the appropriate control group
-    if (this.currentMode === 'pace') {
-      if (this.currentPaceMode === 'standard') {
-        this.paceStandardControls.classList.remove('hidden');
-      } else {
-        this.paceAdvancedControls.classList.remove('hidden');
-      }
-    } else {
-      if (this.currentTimeMode === 'standard') {
-        this.timeStandardControls.classList.remove('hidden');
-      } else {
-        this.timeAdvancedControls.classList.remove('hidden');
-      }
+    // Show the active control group
+    const activeGroup = this.getActiveControlGroup();
+    if (activeGroup) {
+      activeGroup.classList.remove('hidden');
     }
+  }
+
+  /**
+   * Get equivalent speed unit for pace unit
+   * @param {string} paceUnit - Pace unit ('km', 'mile', '400m')
+   * @returns {string} Equivalent speed unit
+   */
+  getEquivalentSpeedUnit(paceUnit) {
+    const mapping = {
+      'km': 'kmh',
+      'mile': 'mph',
+      '400m': 'ms'
+    };
+    return mapping[paceUnit] || 'kmh';
+  }
+
+  /**
+   * Get equivalent pace unit for speed unit
+   * @param {string} speedUnit - Speed unit ('kmh', 'mph', 'ms', 'fts', 'yds')
+   * @returns {string} Equivalent pace unit
+   */
+  getEquivalentPaceUnit(speedUnit) {
+    const mapping = {
+      'kmh': 'km',
+      'mph': 'mile',
+      'ms': '400m',
+      'fts': '400m',
+      'yds': '400m'
+    };
+    return mapping[speedUnit] || 'km';
   }
 
   /**
@@ -190,10 +331,12 @@ class PaceCalculator extends PaceCalculatorBase {
   populateDistanceDropdowns() {
     const distances = this.getPaceDistances();
 
-    // Only populate Standard mode dropdowns (Advanced mode uses custom input)
+    // Populate all Standard mode dropdowns (Advanced mode uses custom input)
     const dropdowns = [
       this.distanceSelectPaceStandard,
-      this.distanceSelectTimeStandard
+      this.distanceSelectTimeStandard,
+      this.distanceSelectSpeedStandard,
+      this.distanceSelectSpeedTimeStandard
     ];
 
     dropdowns.forEach(select => {
@@ -214,12 +357,16 @@ class PaceCalculator extends PaceCalculatorBase {
     const defaultDistance = '5km';
     this.distanceSelectPaceStandard.value = defaultDistance;
     this.distanceSelectTimeStandard.value = defaultDistance;
+    this.distanceSelectSpeedStandard.value = defaultDistance;
+    this.distanceSelectSpeedTimeStandard.value = defaultDistance;
     this.updateDistanceEquivalent('pace', 'standard');
     this.updateDistanceEquivalent('time', 'standard');
 
     // Advanced mode: set default values for custom input (5 km)
     this.distanceInputPaceAdvanced.value = '5';
     this.distanceInputTimeAdvanced.value = '5';
+    this.distanceInputSpeedAdvanced.value = '5';
+    this.distanceInputSpeedTimeAdvanced.value = '5';
     // Unit selects already default to 'km' in HTML
   }
 
@@ -255,11 +402,15 @@ class PaceCalculator extends PaceCalculatorBase {
    * Setup event listeners
    */
   setupEventListeners() {
-    // Calculation mode toggle (Pace / Total Time)
-    this.paceModeBtn.addEventListener('click', () => this.switchMode('pace'));
+    // Primary toggle: Measurement Type (Pace / Speed)
+    this.measurementPaceBtn.addEventListener('click', () => this.handleMeasurementModeSwitch('pace'));
+    this.measurementSpeedBtn.addEventListener('click', () => this.handleMeasurementModeSwitch('speed'));
+
+    // Secondary toggle: Calculation mode (Calculate / Total Time)
+    this.calculateModeBtn.addEventListener('click', () => this.switchMode('calculate'));
     this.timeModeBtn.addEventListener('click', () => this.switchMode('totalTime'));
 
-    // Standard/Advanced mode toggle
+    // Tertiary toggle: Standard/Advanced mode
     this.standardModeBtn.addEventListener('click', () => this.switchSubMode('standard'));
     this.advancedModeBtn.addEventListener('click', () => this.switchSubMode('advanced'));
 
@@ -298,25 +449,64 @@ class PaceCalculator extends PaceCalculatorBase {
     this.distanceUnitSelectTimeAdvanced.addEventListener('change', () => {
       this.updateDistanceEquivalent('time', 'advanced');
     });
+
+    // Speed Standard mode
+    this.calculateBtnSpeedStandard.addEventListener('click', () => this.handleSpeedModeCalculate('standard'));
+    this.distanceSelectSpeedStandard.addEventListener('change', () => {
+      this.updateDistanceEquivalent('speed', 'standard');
+    });
+    this.speedUnitSelectStandard.addEventListener('change', () => {
+      this.updateDistanceEquivalent('speed', 'standard');
+    });
+
+    // Speed Advanced mode
+    this.calculateBtnSpeedAdvanced.addEventListener('click', () => this.handleSpeedModeCalculate('advanced'));
+    this.distanceInputSpeedAdvanced.addEventListener('input', () => {
+      this.updateDistanceEquivalent('speed', 'advanced');
+    });
+    this.distanceUnitSelectSpeedAdvanced.addEventListener('change', () => {
+      this.updateDistanceEquivalent('speed', 'advanced');
+    });
+
+    // Speed Time Standard mode
+    this.calculateBtnSpeedTimeStandard.addEventListener('click', () => this.handleSpeedTimeModeCalculate('standard'));
+    this.distanceSelectSpeedTimeStandard.addEventListener('change', () => {
+      this.updateDistanceEquivalent('speedTime', 'standard');
+    });
+    this.speedUnitSelectTimeStandard.addEventListener('change', () => {
+      this.updateDistanceEquivalent('speedTime', 'standard');
+    });
+
+    // Speed Time Advanced mode
+    this.calculateBtnSpeedTimeAdvanced.addEventListener('click', () => this.handleSpeedTimeModeCalculate('advanced'));
+    this.distanceInputSpeedTimeAdvanced.addEventListener('input', () => {
+      this.updateDistanceEquivalent('speedTime', 'advanced');
+    });
+    this.distanceUnitSelectSpeedTimeAdvanced.addEventListener('change', () => {
+      this.updateDistanceEquivalent('speedTime', 'advanced');
+    });
   }
 
   /**
    * Switch between calculation modes (Pace / Total Time)
    */
+  /**
+   * Switch between Calculate and Total Time modes (secondary toggle)
+   */
   switchMode(mode) {
     this.currentMode = mode;
 
     // Update calculation mode buttons
-    if (mode === 'pace') {
-      this.paceModeBtn.classList.add('mode-toggle__option--active');
+    if (mode === 'calculate') {
+      this.calculateModeBtn.classList.add('mode-toggle__option--active');
       this.timeModeBtn.classList.remove('mode-toggle__option--active');
     } else {
       this.timeModeBtn.classList.add('mode-toggle__option--active');
-      this.paceModeBtn.classList.remove('mode-toggle__option--active');
+      this.calculateModeBtn.classList.remove('mode-toggle__option--active');
     }
 
-    // Update Standard/Advanced toggle to reflect the mode for this calculation type
-    const currentSubMode = mode === 'pace' ? this.currentPaceMode : this.currentTimeMode;
+    // Update Standard/Advanced toggle to reflect the sub-mode for this combination
+    const currentSubMode = this.getCurrentSubMode();
     if (currentSubMode === 'standard') {
       this.standardModeBtn.classList.add('mode-toggle__option--active');
       this.advancedModeBtn.classList.remove('mode-toggle__option--active');
@@ -334,14 +524,22 @@ class PaceCalculator extends PaceCalculatorBase {
   }
 
   /**
-   * Switch between Standard/Advanced modes
+   * Switch between Standard/Advanced modes (tertiary toggle)
    */
   switchSubMode(subMode) {
-    // Update the appropriate mode variable based on current calculation mode
-    if (this.currentMode === 'pace') {
-      this.currentPaceMode = subMode;
+    // Update the appropriate sub-mode variable based on current measurement and calculation modes
+    if (this.currentMeasurementMode === 'pace') {
+      if (this.currentMode === 'calculate') {
+        this.currentPaceMode = subMode;
+      } else {
+        this.currentTimeMode = subMode;
+      }
     } else {
-      this.currentTimeMode = subMode;
+      if (this.currentMode === 'calculate') {
+        this.currentSpeedMode = subMode;
+      } else {
+        this.currentSpeedTimeMode = subMode;
+      }
     }
 
     // Update Standard/Advanced toggle buttons
@@ -359,6 +557,141 @@ class PaceCalculator extends PaceCalculatorBase {
     // Save state and clear results
     this.saveState();
     this.clearResults();
+  }
+
+  /**
+   * Handle switching between Pace and Speed measurement modes (primary toggle)
+   * Converts values where possible
+   */
+  handleMeasurementModeSwitch(newMode) {
+    const oldMode = this.currentMeasurementMode;
+    if (oldMode === newMode) return;
+
+    // Try to convert values between pace and speed
+    if (this.currentMode === 'calculate') {
+      // We're in "calculate pace/speed from distance+time" mode
+      // Distance and time inputs stay the same, just update unit selectors
+
+      if (newMode === 'speed') {
+        // Pace → Speed: Convert pace unit to equivalent speed unit
+        const currentSubMode = this.currentPaceMode;
+
+        if (currentSubMode === 'standard') {
+          const paceUnit = this.paceUnitSelectStandard.value;
+          const speedUnit = this.getEquivalentSpeedUnit(paceUnit);
+          this.speedUnitSelectStandard.value = speedUnit;
+        }
+        // Advanced mode: speed units are already set to defaults
+      } else {
+        // Speed → Pace: Convert speed unit to equivalent pace unit
+        const currentSubMode = this.currentSpeedMode;
+
+        if (currentSubMode === 'standard') {
+          const speedUnit = this.speedUnitSelectStandard.value;
+          const paceUnit = this.getEquivalentPaceUnit(speedUnit);
+          this.paceUnitSelectStandard.value = paceUnit;
+        }
+      }
+    } else {
+      // We're in "calculate time from distance+pace/speed" mode
+      // Need to convert the pace/speed input value
+
+      if (newMode === 'speed') {
+        // Pace → Speed: Convert pace input to speed
+        const currentSubMode = this.currentTimeMode;
+
+        if (currentSubMode === 'standard') {
+          const paceInput = this.paceInputTimeStandard.value.trim();
+          if (paceInput) {
+            const paceSeconds = parsePaceInput(paceInput);
+            if (paceSeconds) {
+              const paceUnit = this.paceUnitSelectTimeStandard.value;
+              const speedUnit = this.getEquivalentSpeedUnit(paceUnit);
+
+              // Convert pace to pace per km first
+              const pacePerKm = this.convertPaceToPerKm(paceSeconds, paceUnit);
+              // Then convert to speed
+              const speed = convertPaceToSpeedUnit(pacePerKm, speedUnit);
+
+              this.speedInputTimeStandard.value = speed.toFixed(2);
+              this.speedUnitSelectTimeStandard.value = speedUnit;
+            }
+          }
+        }
+        // Advanced mode: similar conversion would go here
+      } else {
+        // Speed → Pace: Convert speed input to pace
+        const currentSubMode = this.currentSpeedTimeMode;
+
+        if (currentSubMode === 'standard') {
+          const speedInput = this.speedInputTimeStandard.value.trim();
+          if (speedInput) {
+            const speed = parseFloat(speedInput);
+            if (!isNaN(speed) && speed > 0) {
+              const speedUnit = this.speedUnitSelectTimeStandard.value;
+              const paceUnit = this.getEquivalentPaceUnit(speedUnit);
+
+              // Convert speed to pace per km
+              const pacePerKm = convertSpeedToPace(speed, speedUnit);
+              // Then convert to target pace unit
+              const paceInTargetUnit = this.convertPaceFromPerKm(pacePerKm, paceUnit);
+
+              this.paceInputTimeStandard.value = formatPaceTime(paceInTargetUnit);
+              this.paceUnitSelectTimeStandard.value = paceUnit;
+            }
+          }
+        }
+      }
+    }
+
+    // Update state
+    this.currentMeasurementMode = newMode;
+
+    // Update measurement type button visual state
+    if (newMode === 'pace') {
+      this.measurementPaceBtn.classList.add('mode-toggle__option--active');
+      this.measurementSpeedBtn.classList.remove('mode-toggle__option--active');
+    } else {
+      this.measurementSpeedBtn.classList.add('mode-toggle__option--active');
+      this.measurementPaceBtn.classList.remove('mode-toggle__option--active');
+    }
+
+    this.updateDynamicLabels();
+    this.updateControlVisibility();
+    this.saveState();
+    this.clearResults();
+  }
+
+  /**
+   * Convert pace to pace per km
+   * @param {number} paceSeconds - Pace in seconds
+   * @param {string} paceUnit - Pace unit ('km', 'mile', '400m')
+   * @returns {number} Pace in seconds per km
+   */
+  convertPaceToPerKm(paceSeconds, paceUnit) {
+    if (paceUnit === 'mile') {
+      return paceSeconds / 1.609344;
+    } else if (paceUnit === '400m') {
+      return paceSeconds * 2.5;
+    } else {
+      return paceSeconds;
+    }
+  }
+
+  /**
+   * Convert pace from per km to target unit
+   * @param {number} pacePerKm - Pace in seconds per km
+   * @param {string} paceUnit - Target pace unit ('km', 'mile', '400m')
+   * @returns {number} Pace in seconds per target unit
+   */
+  convertPaceFromPerKm(pacePerKm, paceUnit) {
+    if (paceUnit === 'mile') {
+      return pacePerKm * 1.609344;
+    } else if (paceUnit === '400m') {
+      return pacePerKm / 2.5;
+    } else {
+      return pacePerKm;
+    }
   }
 
   /**
@@ -738,6 +1071,246 @@ class PaceCalculator extends PaceCalculatorBase {
   }
 
   /**
+   * Handle speed mode calculation (Distance + Time → Speed)
+   */
+  handleSpeedModeCalculate(subMode) {
+    try {
+      this.hideError();
+
+      let timeInput, speedUnitSelect, distanceMetres, distanceDisplayName;
+
+      if (subMode === 'standard') {
+        // Standard mode: use dropdown distance
+        timeInput = this.timeInputSpeedStandard;
+        const distanceSelect = this.distanceSelectSpeedStandard;
+        speedUnitSelect = this.speedUnitSelectStandard;
+
+        timeInput.classList.remove('input-error');
+        distanceSelect.classList.remove('input-error');
+
+        const timeInputValue = timeInput.value.trim();
+        const distanceKey = distanceSelect.value;
+
+        if (!timeInputValue || !distanceKey) {
+          this.hideResults();
+          return;
+        }
+
+        const totalTimeSeconds = parseTimeInput(timeInputValue);
+        if (!this.validateTime(totalTimeSeconds)) {
+          timeInput.classList.add('input-error');
+          this.showError('Please enter a valid time (e.g., 25:00 or 1:23:45)');
+          this.hideResults();
+          return;
+        }
+
+        distanceMetres = getDistanceInMetres(distanceKey, this.eventsConfig);
+        const eventConfig = this.getEventConfig(distanceKey);
+        distanceDisplayName = eventConfig.displayName;
+        const speedUnit = speedUnitSelect.value;
+
+        const speed = calculateSpeed(distanceMetres, totalTimeSeconds, speedUnit);
+        this.displaySpeedResults(speed, speedUnit, distanceMetres, eventConfig, totalTimeSeconds);
+
+        this.saveToHistory({
+          measurementMode: 'speed',
+          mode: 'calculate',
+          distance: distanceDisplayName,
+          totalTime: formatTotalTime(totalTimeSeconds),
+          speed: formatSpeedWithUnit(speed, speedUnit),
+          timestamp: Date.now()
+        });
+
+      } else {
+        // Advanced mode: use custom distance input
+        timeInput = this.timeInputSpeedAdvanced;
+        const distanceInput = this.distanceInputSpeedAdvanced;
+        const distanceUnitSelect = this.distanceUnitSelectSpeedAdvanced;
+        speedUnitSelect = this.speedUnitSelectAdvanced;
+
+        timeInput.classList.remove('input-error');
+        distanceInput.classList.remove('input-error');
+
+        const timeInputValue = timeInput.value.trim();
+        const distanceValue = distanceInput.value.trim();
+        const distanceUnit = distanceUnitSelect.value;
+        const speedUnit = speedUnitSelect.value;
+
+        if (!timeInputValue || !distanceValue) {
+          this.hideResults();
+          return;
+        }
+
+        // Validate distance
+        if (!this.validateDistance(distanceValue)) {
+          distanceInput.classList.add('input-error');
+          this.showError('Please enter a valid distance greater than zero');
+          this.hideResults();
+          return;
+        }
+
+        // Validate time
+        const totalTimeSeconds = parseTimeInput(timeInputValue);
+        if (!this.validateTime(totalTimeSeconds)) {
+          timeInput.classList.add('input-error');
+          this.showError('Please enter a valid time (e.g., 25:00 or 1:23:45)');
+          this.hideResults();
+          return;
+        }
+
+        // Convert custom distance to metres
+        distanceMetres = this.convertDistanceToMetres(parseFloat(distanceValue), distanceUnit);
+        distanceDisplayName = `${distanceValue}${distanceUnit}`;
+
+        const speed = calculateSpeed(distanceMetres, totalTimeSeconds, speedUnit);
+
+        // Create a synthetic event config for display
+        const eventConfig = {
+          displayName: distanceDisplayName,
+          distance: parseFloat(distanceValue),
+          unit: distanceUnit
+        };
+
+        this.displaySpeedResults(speed, speedUnit, distanceMetres, eventConfig, totalTimeSeconds);
+
+        this.saveToHistory({
+          measurementMode: 'speed',
+          mode: 'calculate',
+          distance: distanceDisplayName,
+          totalTime: formatTotalTime(totalTimeSeconds),
+          speed: formatSpeedWithUnit(speed, speedUnit),
+          timestamp: Date.now()
+        });
+      }
+
+    } catch (error) {
+      console.error('Calculation error:', error);
+      this.showError('Unable to calculate speed. Please check your inputs.');
+      this.hideResults();
+    }
+  }
+
+  /**
+   * Handle speed time mode calculation (Distance + Speed → Total Time)
+   */
+  handleSpeedTimeModeCalculate(subMode) {
+    try {
+      this.hideError();
+
+      let speedInput, speedUnitSelect, distanceMetres, distanceDisplayName;
+
+      if (subMode === 'standard') {
+        // Standard mode: use dropdown distance
+        speedInput = this.speedInputTimeStandard;
+        const distanceSelect = this.distanceSelectSpeedTimeStandard;
+        speedUnitSelect = this.speedUnitSelectTimeStandard;
+
+        speedInput.classList.remove('input-error');
+        distanceSelect.classList.remove('input-error');
+
+        const speedInputValue = speedInput.value.trim();
+        const distanceKey = distanceSelect.value;
+
+        if (!speedInputValue || !distanceKey) {
+          this.hideResults();
+          return;
+        }
+
+        const speed = parseSpeedInput(speedInputValue);
+        if (speed === null || speed <= 0) {
+          speedInput.classList.add('input-error');
+          this.showError('Please enter a valid speed greater than zero');
+          this.hideResults();
+          return;
+        }
+
+        distanceMetres = getDistanceInMetres(distanceKey, this.eventsConfig);
+        const eventConfig = this.getEventConfig(distanceKey);
+        distanceDisplayName = eventConfig.displayName;
+        const speedUnit = speedUnitSelect.value;
+
+        const totalTimeSeconds = calculateTotalTimeFromSpeed(distanceMetres, speed, speedUnit);
+        this.displaySpeedTimeResults(totalTimeSeconds, speed, speedUnit, distanceMetres, eventConfig);
+
+        this.saveToHistory({
+          measurementMode: 'speed',
+          mode: 'totalTime',
+          distance: distanceDisplayName,
+          totalTime: formatTotalTime(totalTimeSeconds),
+          speed: formatSpeedWithUnit(speed, speedUnit),
+          timestamp: Date.now()
+        });
+
+      } else {
+        // Advanced mode: use custom distance input
+        speedInput = this.speedInputTimeAdvanced;
+        const distanceInput = this.distanceInputSpeedTimeAdvanced;
+        const distanceUnitSelect = this.distanceUnitSelectSpeedTimeAdvanced;
+        speedUnitSelect = this.speedUnitSelectTimeAdvanced;
+
+        speedInput.classList.remove('input-error');
+        distanceInput.classList.remove('input-error');
+
+        const speedInputValue = speedInput.value.trim();
+        const distanceValue = distanceInput.value.trim();
+        const distanceUnit = distanceUnitSelect.value;
+        const speedUnit = speedUnitSelect.value;
+
+        if (!speedInputValue || !distanceValue) {
+          this.hideResults();
+          return;
+        }
+
+        // Validate distance
+        if (!this.validateDistance(distanceValue)) {
+          distanceInput.classList.add('input-error');
+          this.showError('Please enter a valid distance greater than zero');
+          this.hideResults();
+          return;
+        }
+
+        // Validate speed
+        const speed = parseSpeedInput(speedInputValue);
+        if (speed === null || speed <= 0) {
+          speedInput.classList.add('input-error');
+          this.showError('Please enter a valid speed greater than zero');
+          this.hideResults();
+          return;
+        }
+
+        // Convert custom distance to metres
+        distanceMetres = this.convertDistanceToMetres(parseFloat(distanceValue), distanceUnit);
+        distanceDisplayName = `${distanceValue}${distanceUnit}`;
+
+        const totalTimeSeconds = calculateTotalTimeFromSpeed(distanceMetres, speed, speedUnit);
+
+        // Create a synthetic event config for display
+        const eventConfig = {
+          displayName: distanceDisplayName,
+          distance: parseFloat(distanceValue),
+          unit: distanceUnit
+        };
+
+        this.displaySpeedTimeResults(totalTimeSeconds, speed, speedUnit, distanceMetres, eventConfig);
+
+        this.saveToHistory({
+          measurementMode: 'speed',
+          mode: 'totalTime',
+          distance: distanceDisplayName,
+          totalTime: formatTotalTime(totalTimeSeconds),
+          speed: formatSpeedWithUnit(speed, speedUnit),
+          timestamp: Date.now()
+        });
+      }
+
+    } catch (error) {
+      console.error('Calculation error:', error);
+      this.showError('Unable to calculate total time. Please check your inputs.');
+      this.hideResults();
+    }
+  }
+
+  /**
    * Display pace calculation results
    */
   displayPaceResults(paceSeconds, paceUnit, distanceMetres, eventConfig, totalTimeSeconds, paceIntervalInfo = null) {
@@ -994,6 +1567,186 @@ class PaceCalculator extends PaceCalculatorBase {
   }
 
   /**
+   * Display speed calculation results
+   */
+  displaySpeedResults(speed, speedUnit, distanceMetres, eventConfig, totalTimeSeconds) {
+    this.resultsContent.innerHTML = '';
+
+    const speedDisplayText = formatSpeedWithUnit(speed, speedUnit);
+
+    // Convert speed to pace per km for equivalents calculation
+    const pacePerKm = convertSpeedToPace(speed, speedUnit);
+
+    // Main result card
+    const mainCard = document.createElement('div');
+    mainCard.className = 'result-card';
+    mainCard.innerHTML = `
+      <h3 class="result-card__title">Your Speed</h3>
+      <div class="result-card__points">${speedDisplayText}</div>
+      <p class="result-card__content">To complete ${eventConfig.displayName} in ${formatTotalTime(totalTimeSeconds)}</p>
+    `;
+    this.resultsContent.appendChild(mainCard);
+
+    // Equivalent paces & speeds (all 10 conversions)
+    const equivalents = getEquivalentPaces(pacePerKm);
+    const equivalentsCard = document.createElement('div');
+    equivalentsCard.className = 'result-card';
+
+    const equivalentsTitle = document.createElement('h3');
+    equivalentsTitle.className = 'result-card__title';
+    equivalentsTitle.textContent = 'Equivalent Paces & Speeds';
+
+    const equivalentsGrid = document.createElement('div');
+    equivalentsGrid.className = 'equivalencies-grid';
+    equivalentsGrid.innerHTML = `
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per km</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perKm)}/km</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per mile</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perMile)}/mile</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per m</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perMeter)}/m</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per yard</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perYard)}/yard</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per foot</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perFoot)}/ft</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (km/h)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.kmh, 'km/h')}</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (mph)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.mph, 'mph')}</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (m/s)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.metersPerSecond, 'm/s')}</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (ft/s)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.feetPerSecond, 'ft/s')}</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (yd/s)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.yardsPerSecond, 'yd/s')}</div>
+      </div>
+    `;
+
+    equivalentsCard.appendChild(equivalentsTitle);
+    equivalentsCard.appendChild(equivalentsGrid);
+    this.resultsContent.appendChild(equivalentsCard);
+
+    // Make the equivalent section collapsible
+    makeCollapsible(equivalentsTitle, equivalentsGrid, 'paceCalculator.equivalentPaces.collapsed', true);
+
+    // Splits - create interval based on speed unit
+    const speedIntervalInfo = getSpeedUnitSplitInterval(speedUnit);
+    const splits = calculateSmartSplits(distanceMetres, pacePerKm, eventConfig, speedIntervalInfo.metres, speedIntervalInfo);
+    this.displaySplits(splits);
+
+    this.showResults();
+  }
+
+  /**
+   * Display speed time calculation results
+   */
+  displaySpeedTimeResults(totalTimeSeconds, speed, speedUnit, distanceMetres, eventConfig) {
+    this.resultsContent.innerHTML = '';
+
+    const speedDisplayText = formatSpeedWithUnit(speed, speedUnit);
+
+    // Convert speed to pace per km for equivalents calculation
+    const pacePerKm = convertSpeedToPace(speed, speedUnit);
+
+    // Main result card
+    const mainCard = document.createElement('div');
+    mainCard.className = 'result-card';
+    mainCard.innerHTML = `
+      <h3 class="result-card__title">Projected Finish Time</h3>
+      <div class="result-card__points">${formatTotalTime(totalTimeSeconds)}</div>
+      <p class="result-card__content">For ${eventConfig.displayName} at ${speedDisplayText}</p>
+    `;
+    this.resultsContent.appendChild(mainCard);
+
+    // Equivalent paces & speeds (all 10 conversions)
+    const equivalents = getEquivalentPaces(pacePerKm);
+    const equivalentsCard = document.createElement('div');
+    equivalentsCard.className = 'result-card';
+
+    const equivalentsTitle = document.createElement('h3');
+    equivalentsTitle.className = 'result-card__title';
+    equivalentsTitle.textContent = 'Equivalent Paces & Speeds';
+
+    const equivalentsGrid = document.createElement('div');
+    equivalentsGrid.className = 'equivalencies-grid';
+    equivalentsGrid.innerHTML = `
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per km</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perKm)}/km</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per mile</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perMile)}/mile</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per m</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perMeter)}/m</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per yard</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perYard)}/yard</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Pace per foot</div>
+        <div class="equivalency-item__performance">${formatPaceTime(equivalents.perFoot)}/ft</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (km/h)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.kmh, 'km/h')}</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (mph)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.mph, 'mph')}</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (m/s)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.metersPerSecond, 'm/s')}</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (ft/s)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.feetPerSecond, 'ft/s')}</div>
+      </div>
+      <div class="equivalency-item">
+        <div class="equivalency-item__event">Speed (yd/s)</div>
+        <div class="equivalency-item__performance">${formatSpeed(equivalents.yardsPerSecond, 'yd/s')}</div>
+      </div>
+    `;
+
+    equivalentsCard.appendChild(equivalentsTitle);
+    equivalentsCard.appendChild(equivalentsGrid);
+    this.resultsContent.appendChild(equivalentsCard);
+
+    // Make the equivalent section collapsible
+    makeCollapsible(equivalentsTitle, equivalentsGrid, 'paceCalculator.equivalentPaces.collapsed', true);
+
+    // Splits - create interval based on speed unit
+    const speedIntervalInfo = getSpeedUnitSplitInterval(speedUnit);
+    const splits = calculateSmartSplits(distanceMetres, pacePerKm, eventConfig, speedIntervalInfo.metres, speedIntervalInfo);
+    this.displaySplits(splits);
+
+    this.showResults();
+  }
+
+  /**
    * Calculate split times at custom intervals
    */
   calculateCustomSplits(distanceMetres, pacePerKm, eventConfig, splitIntervalMetres, paceIntervalInfo) {
@@ -1122,7 +1875,17 @@ class PaceCalculator extends PaceCalculatorBase {
   getHistory() {
     try {
       const data = localStorage.getItem(this.historyStorageKey);
-      return data ? JSON.parse(data) : [];
+      let history = data ? JSON.parse(data) : [];
+
+      // Migrate old entries without measurementMode
+      history = history.map(entry => {
+        if (!entry.measurementMode) {
+          entry.measurementMode = 'pace'; // Default old entries to pace mode
+        }
+        return entry;
+      });
+
+      return history;
     } catch (error) {
       console.error('Error loading history:', error);
       return [];
@@ -1157,10 +1920,15 @@ class PaceCalculator extends PaceCalculatorBase {
       row.dataset.id = entry.id;
       row.dataset.index = index;
 
+      // Show speed if speed mode entry, else show pace
+      const paceOrSpeed = (entry.measurementMode === 'speed' && entry.speed)
+        ? entry.speed
+        : entry.pace;
+
       row.innerHTML = `
         <td>${entry.distance}</td>
         <td class="history-row__performance">${entry.totalTime}</td>
-        <td class="history-row__performance">${entry.pace}</td>
+        <td class="history-row__performance">${paceOrSpeed}</td>
         <td>
           <button class="history-delete-btn" data-id="${entry.id}" aria-label="Delete"></button>
         </td>

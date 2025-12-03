@@ -50,6 +50,17 @@
   -moz-appearance: textfield;
 }
 
+/* Hide spinner buttons on speed inputs */
+input[id^="speed-input-time"]::-webkit-inner-spin-button,
+input[id^="speed-input-time"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[id^="speed-input-time"] {
+  -moz-appearance: textfield;
+}
+
 /* Responsive: Horizontal layout on wider screens */
 @media (min-width: 640px) {
   /* Ensure mode toggle spans full width */

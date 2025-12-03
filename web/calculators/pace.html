@@ -43,12 +43,13 @@
         </div>
 
         <div class="calculator__controls">
+          <!-- PRIMARY TOGGLE: Pace vs Speed -->
           <div class="form-group">
-            <label>Calculate:</label>
+            <label>Measurement Type:</label>
             <div class="mode-toggle">
               <button
                 type="button"
-                id="mode-toggle-pace"
+                id="mode-toggle-measurement-pace"
                 class="mode-toggle__option mode-toggle__option--active"
                 data-mode="pace"
               >
@@ -56,15 +57,39 @@
               </button>
               <button
                 type="button"
-                id="mode-toggle-time"
+                id="mode-toggle-measurement-speed"
                 class="mode-toggle__option"
-                data-mode="totalTime"
+                data-mode="speed"
               >
-                Total Time
+                Speed
               </button>
             </div>
           </div>
 
+          <!-- SECONDARY TOGGLE: Calculate vs Time (dynamic labels) -->
+          <div class="form-group">
+            <label>Calculate:</label>
+            <div class="mode-toggle">
+              <button
+                type="button"
+                id="mode-toggle-calculate"
+                class="mode-toggle__option mode-toggle__option--active"
+                data-mode="calculate"
+              >
+                <span id="calculate-label">Pace</span>
+              </button>
+              <button
+                type="button"
+                id="mode-toggle-time"
+                class="mode-toggle__option"
+                data-mode="totalTime"
+              >
+                <span id="time-label">Total Time</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- TERTIARY TOGGLE: Standard vs Advanced -->
           <div class="form-group">
             <label>Mode:</label>
             <div class="mode-toggle">
@@ -282,6 +307,186 @@
               <button type="button" id="calculate-btn-time-advanced" class="btn btn-primary">Calculate</button>
             </div>
           </div>
+
+          <!-- Speed Standard Mode Controls (dist + time → speed) -->
+          <div id="speed-standard-controls" class="mode-controls hidden">
+            <div class="form-group">
+              <label for="distance-select-speed-standard">Distance</label>
+              <select id="distance-select-speed-standard" class="form-select">
+                <option value="">Select distance...</option>
+              </select>
+              <small class="form-help" id="distance-equivalent-speed-standard"></small>
+            </div>
+
+            <div class="form-group">
+              <label for="time-input-speed-standard">Total Time</label>
+              <input
+                type="text"
+                id="time-input-speed-standard"
+                class="form-input"
+                placeholder="e.g., 30:00"
+              >
+              <small class="form-help">Enter time in HH:MM:SS or MM:SS format</small>
+            </div>
+
+            <div class="form-group">
+              <label for="speed-unit-select-standard">Speed Unit</label>
+              <select id="speed-unit-select-standard" class="form-select">
+                <option value="kmh">km/h</option>
+                <option value="mph">mph</option>
+                <option value="ms">m/s</option>
+                <option value="fts">ft/s</option>
+                <option value="yds">yd/s</option>
+              </select>
+            </div>
+
+            <div class="form-group form-group--button">
+              <button type="button" id="calculate-btn-speed-standard" class="btn btn-primary">Calculate</button>
+            </div>
+          </div>
+
+          <!-- Speed Advanced Mode Controls (custom dist + time → speed) -->
+          <div id="speed-advanced-controls" class="mode-controls hidden">
+            <div class="form-group">
+              <label>Distance</label>
+              <div class="distance-input-group">
+                <input
+                  type="number"
+                  id="distance-input-speed-advanced"
+                  class="form-input"
+                  placeholder="e.g., 5 or 10.5"
+                  step="0.01"
+                  min="0.01"
+                >
+                <select id="distance-unit-select-speed-advanced" class="form-select">
+                  <option value="km">km</option>
+                  <option value="m">m</option>
+                  <option value="miles">miles</option>
+                  <option value="yards">yards</option>
+                  <option value="feet">feet</option>
+                </select>
+              </div>
+              <small class="form-help" id="distance-equivalent-speed-advanced"></small>
+            </div>
+
+            <div class="form-group">
+              <label for="time-input-speed-advanced">Total Time</label>
+              <input
+                type="text"
+                id="time-input-speed-advanced"
+                class="form-input"
+                placeholder="e.g., 30:00"
+              >
+              <small class="form-help">Enter time in HH:MM:SS or MM:SS format</small>
+            </div>
+
+            <div class="form-group">
+              <label for="speed-unit-select-advanced">Speed Unit</label>
+              <select id="speed-unit-select-advanced" class="form-select">
+                <option value="kmh">km/h</option>
+                <option value="mph">mph</option>
+                <option value="ms">m/s</option>
+                <option value="fts">ft/s</option>
+                <option value="yds">yd/s</option>
+              </select>
+            </div>
+
+            <div class="form-group form-group--button">
+              <button type="button" id="calculate-btn-speed-advanced" class="btn btn-primary">Calculate</button>
+            </div>
+          </div>
+
+          <!-- Speed Time Standard Mode Controls (dist + speed → time) -->
+          <div id="speed-time-standard-controls" class="mode-controls hidden">
+            <div class="form-group">
+              <label for="distance-select-speed-time-standard">Distance</label>
+              <select id="distance-select-speed-time-standard" class="form-select">
+                <option value="">Select distance...</option>
+              </select>
+              <small class="form-help" id="distance-equivalent-speed-time-standard"></small>
+            </div>
+
+            <div class="form-group">
+              <label for="speed-input-time-standard">Speed</label>
+              <input
+                type="number"
+                id="speed-input-time-standard"
+                class="form-input"
+                placeholder="e.g., 12.5"
+                step="0.1"
+                min="0.1"
+              >
+              <small class="form-help">Enter speed as a decimal number</small>
+            </div>
+
+            <div class="form-group">
+              <label for="speed-unit-select-time-standard">Speed Unit</label>
+              <select id="speed-unit-select-time-standard" class="form-select">
+                <option value="kmh">km/h</option>
+                <option value="mph">mph</option>
+                <option value="ms">m/s</option>
+                <option value="fts">ft/s</option>
+                <option value="yds">yd/s</option>
+              </select>
+            </div>
+
+            <div class="form-group form-group--button">
+              <button type="button" id="calculate-btn-speed-time-standard" class="btn btn-primary">Calculate</button>
+            </div>
+          </div>
+
+          <!-- Speed Time Advanced Mode Controls (custom dist + speed → time) -->
+          <div id="speed-time-advanced-controls" class="mode-controls hidden">
+            <div class="form-group">
+              <label>Distance</label>
+              <div class="distance-input-group">
+                <input
+                  type="number"
+                  id="distance-input-speed-time-advanced"
+                  class="form-input"
+                  placeholder="e.g., 5 or 10.5"
+                  step="0.01"
+                  min="0.01"
+                >
+                <select id="distance-unit-select-speed-time-advanced" class="form-select">
+                  <option value="km">km</option>
+                  <option value="m">m</option>
+                  <option value="miles">miles</option>
+                  <option value="yards">yards</option>
+                  <option value="feet">feet</option>
+                </select>
+              </div>
+              <small class="form-help" id="distance-equivalent-speed-time-advanced"></small>
+            </div>
+
+            <div class="form-group">
+              <label for="speed-input-time-advanced">Speed</label>
+              <input
+                type="number"
+                id="speed-input-time-advanced"
+                class="form-input"
+                placeholder="e.g., 12.5"
+                step="0.1"
+                min="0.1"
+              >
+              <small class="form-help">Enter speed as a decimal number</small>
+            </div>
+
+            <div class="form-group">
+              <label for="speed-unit-select-time-advanced">Speed Unit</label>
+              <select id="speed-unit-select-time-advanced" class="form-select">
+                <option value="kmh">km/h</option>
+                <option value="mph">mph</option>
+                <option value="ms">m/s</option>
+                <option value="fts">ft/s</option>
+                <option value="yds">yd/s</option>
+              </select>
+            </div>
+
+            <div class="form-group form-group--button">
+              <button type="button" id="calculate-btn-speed-time-advanced" class="btn btn-primary">Calculate</button>
+            </div>
+          </div>
         </div>
 
         <div id="results-container" class="calculator__results hidden">
@@ -303,7 +508,7 @@
                 <tr>
                   <th>Distance</th>
                   <th>Total Time</th>
-                  <th>Pace</th>
+                  <th>Pace / Speed</th>
                   <th></th>
                 </tr>
               </thead>
