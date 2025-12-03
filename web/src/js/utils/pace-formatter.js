@@ -70,7 +70,7 @@ export function formatSpeed(value, unit) {
 }
 
 /**
- * Parse user pace input (MM:SS format) to seconds
+ * Parse user pace input (MM:SS format or plain seconds) to seconds
  * @param {string} input - User input string
  * @returns {number|null} Pace in seconds, or null if invalid
  */
@@ -81,6 +81,15 @@ export function parsePaceInput(input) {
 
   // Remove whitespace
   const trimmed = input.trim();
+
+  // Try to match plain seconds first (e.g., "30" or "45")
+  const secondsMatch = trimmed.match(/^\d+$/);
+  if (secondsMatch) {
+    const seconds = parseInt(trimmed, 10);
+    if (seconds > 0) {
+      return seconds;
+    }
+  }
 
   // Try to match MM:SS or M:SS format
   const paceMatch = trimmed.match(/^(\d+):([0-5]?\d)$/);

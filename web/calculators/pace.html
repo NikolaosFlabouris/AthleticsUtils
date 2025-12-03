@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Running Pace Calculator - Calculate your running pace per km or mile, or determine finish times based on your pace.">
+  <meta name="description" content="Running Pace & Speed Calculator - Calculate your running pace per km or mile, or determine finish times based on your pace.">
   <meta name="keywords" content="pace calculator, running pace, pace per km, pace per mile, running calculator, marathon pace, 5k pace, 10k pace, half marathon pace">
   <meta name="theme-color" content="#1a73e8">
-  <title>Athletics Utilities | Pace Calculator</title>
+  <title>Athletics Utilities | Pace & Speed Calculator</title>
   <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
   <link rel="stylesheet" href="../src/styles/main.css">
@@ -16,7 +16,7 @@
     <div class="container">
       <div class="header__brand">
         <h1 class="header__title"><a href="/" class="header__title-link">Athletics Utilities</a></h1>
-        <p class="header__subtitle">Pace Calculator</p>
+        <p class="header__subtitle">Pace & Speed Calculator</p>
       </div>
     </div>
   </header>
@@ -36,9 +36,9 @@
     <div class="container">
       <section class="calculator">
         <div class="calculator__header">
-          <h2>Pace Calculator</h2>
+          <h2>Pace & Speed Calculator</h2>
           <p class="calculator__description">
-            Calculate the required pace based on the target time, or calculate the total time based on the target pace. Use Advanced mode for custom distances and pace intervals.
+            Calculate the required pace or speed based on the target time, or calculate the total time based on the target pace or speed. Use Advanced mode for custom distances and pace intervals.
           </p>
         </div>
 
@@ -157,8 +157,9 @@
                   id="distance-input-pace-advanced"
                   class="form-input"
                   placeholder="e.g., 5 or 10.5"
-                  step="0.01"
-                  min="0.01"
+                  step="any"
+                  min="0"
+                  lang="en"
                 >
                 <select id="distance-unit-select-pace-advanced" class="form-select">
                   <option value="km">km</option>
@@ -190,9 +191,10 @@
                   id="pace-interval-input-pace-advanced"
                   class="form-input"
                   placeholder="e.g., 1 or 2"
-                  step="0.01"
-                  min="0.01"
+                  step="any"
+                  min="0"
                   value="1"
+                  lang="en"
                 >
                 <select id="pace-interval-unit-select-pace-advanced" class="form-select">
                   <option value="km">km</option>
@@ -226,9 +228,9 @@
                 type="text"
                 id="pace-input-time-standard"
                 class="form-input"
-                placeholder="e.g., 5:00 or 4:30"
+                placeholder="e.g., 5:00, 4:30, or 30"
               >
-              <small class="form-help">Enter pace in MM:SS format</small>
+              <small class="form-help">Enter pace in MM:SS format or seconds</small>
             </div>
 
             <div class="form-group">
@@ -255,8 +257,9 @@
                   id="distance-input-time-advanced"
                   class="form-input"
                   placeholder="e.g., 5 or 10.5"
-                  step="0.01"
-                  min="0.01"
+                  step="any"
+                  min="0"
+                  lang="en"
                 >
                 <select id="distance-unit-select-time-advanced" class="form-select">
                   <option value="km">km</option>
@@ -275,9 +278,9 @@
                 type="text"
                 id="pace-input-time-advanced"
                 class="form-input"
-                placeholder="e.g., 5:00 or 4:30"
+                placeholder="e.g., 5:00, 4:30, or 30"
               >
-              <small class="form-help">Enter pace in MM:SS format</small>
+              <small class="form-help">Enter pace in MM:SS format or seconds</small>
             </div>
 
             <div class="form-group">
@@ -288,9 +291,10 @@
                   id="pace-interval-input-time-advanced"
                   class="form-input"
                   placeholder="e.g., 1 or 2"
-                  step="0.01"
-                  min="0.01"
+                  step="any"
+                  min="0"
                   value="1"
+                  lang="en"
                 >
                 <select id="pace-interval-unit-select-time-advanced" class="form-select">
                   <option value="km">km</option>
@@ -355,8 +359,9 @@
                   id="distance-input-speed-advanced"
                   class="form-input"
                   placeholder="e.g., 5 or 10.5"
-                  step="0.01"
-                  min="0.01"
+                  step="any"
+                  min="0"
+                  lang="en"
                 >
                 <select id="distance-unit-select-speed-advanced" class="form-select">
                   <option value="km">km</option>
@@ -413,8 +418,9 @@
                 id="speed-input-time-standard"
                 class="form-input"
                 placeholder="e.g., 12.5"
-                step="0.1"
-                min="0.1"
+                step="any"
+                min="0"
+                lang="en"
               >
               <small class="form-help">Enter speed as a decimal number</small>
             </div>
@@ -445,8 +451,9 @@
                   id="distance-input-speed-time-advanced"
                   class="form-input"
                   placeholder="e.g., 5 or 10.5"
-                  step="0.01"
-                  min="0.01"
+                  step="any"
+                  min="0"
+                  lang="en"
                 >
                 <select id="distance-unit-select-speed-time-advanced" class="form-select">
                   <option value="km">km</option>
@@ -466,8 +473,9 @@
                 id="speed-input-time-advanced"
                 class="form-input"
                 placeholder="e.g., 12.5"
-                step="0.1"
-                min="0.1"
+                step="any"
+                min="0"
+                lang="en"
               >
               <small class="form-help">Enter speed as a decimal number</small>
             </div>
@@ -522,10 +530,6 @@
         <div id="loading-indicator" class="loading hidden">
           <div class="loading__spinner"></div>
           <p>Loading...</p>
-        </div>
-
-        <div id="error-message" class="error-message hidden">
-          <!-- Error messages will appear here -->
         </div>
       </section>
 

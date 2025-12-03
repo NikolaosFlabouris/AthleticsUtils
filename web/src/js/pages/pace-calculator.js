@@ -40,7 +40,6 @@ class PaceCalculator extends PaceCalculatorBase {
   constructor() {
     super({
       loading: '#loading-indicator',
-      error: '#error-message',
       results: '#results-container'
     });
 
@@ -422,14 +421,24 @@ class PaceCalculator extends PaceCalculatorBase {
     this.paceUnitSelectStandard.addEventListener('change', () => {
       this.updateDistanceEquivalent('pace', 'standard');
     });
+    this.timeInputPaceStandard.addEventListener('input', () => {
+      this.clearInputError(this.timeInputPaceStandard);
+    });
 
     // Pace Advanced mode
     this.calculateBtnPaceAdvanced.addEventListener('click', () => this.handlePaceModeCalculate('advanced'));
     this.distanceInputPaceAdvanced.addEventListener('input', () => {
+      this.clearInputError(this.distanceInputPaceAdvanced);
       this.updateDistanceEquivalent('pace', 'advanced');
     });
     this.distanceUnitSelectPaceAdvanced.addEventListener('change', () => {
       this.updateDistanceEquivalent('pace', 'advanced');
+    });
+    this.timeInputPaceAdvanced.addEventListener('input', () => {
+      this.clearInputError(this.timeInputPaceAdvanced);
+    });
+    this.paceIntervalInputPaceAdvanced.addEventListener('input', () => {
+      this.clearInputError(this.paceIntervalInputPaceAdvanced);
     });
 
     // Time Standard mode
@@ -440,14 +449,24 @@ class PaceCalculator extends PaceCalculatorBase {
     this.distanceSelectTimeStandard.addEventListener('change', () => {
       this.updateDistanceEquivalent('time', 'standard');
     });
+    this.paceInputTimeStandard.addEventListener('input', () => {
+      this.clearInputError(this.paceInputTimeStandard);
+    });
 
     // Time Advanced mode
     this.calculateBtnTimeAdvanced.addEventListener('click', () => this.handleTimeModeCalculate('advanced'));
     this.distanceInputTimeAdvanced.addEventListener('input', () => {
+      this.clearInputError(this.distanceInputTimeAdvanced);
       this.updateDistanceEquivalent('time', 'advanced');
     });
     this.distanceUnitSelectTimeAdvanced.addEventListener('change', () => {
       this.updateDistanceEquivalent('time', 'advanced');
+    });
+    this.paceInputTimeAdvanced.addEventListener('input', () => {
+      this.clearInputError(this.paceInputTimeAdvanced);
+    });
+    this.paceIntervalInputTimeAdvanced.addEventListener('input', () => {
+      this.clearInputError(this.paceIntervalInputTimeAdvanced);
     });
 
     // Speed Standard mode
@@ -458,14 +477,21 @@ class PaceCalculator extends PaceCalculatorBase {
     this.speedUnitSelectStandard.addEventListener('change', () => {
       this.updateDistanceEquivalent('speed', 'standard');
     });
+    this.timeInputSpeedStandard.addEventListener('input', () => {
+      this.clearInputError(this.timeInputSpeedStandard);
+    });
 
     // Speed Advanced mode
     this.calculateBtnSpeedAdvanced.addEventListener('click', () => this.handleSpeedModeCalculate('advanced'));
     this.distanceInputSpeedAdvanced.addEventListener('input', () => {
+      this.clearInputError(this.distanceInputSpeedAdvanced);
       this.updateDistanceEquivalent('speed', 'advanced');
     });
     this.distanceUnitSelectSpeedAdvanced.addEventListener('change', () => {
       this.updateDistanceEquivalent('speed', 'advanced');
+    });
+    this.timeInputSpeedAdvanced.addEventListener('input', () => {
+      this.clearInputError(this.timeInputSpeedAdvanced);
     });
 
     // Speed Time Standard mode
@@ -476,15 +502,44 @@ class PaceCalculator extends PaceCalculatorBase {
     this.speedUnitSelectTimeStandard.addEventListener('change', () => {
       this.updateDistanceEquivalent('speedTime', 'standard');
     });
+    this.speedInputTimeStandard.addEventListener('input', () => {
+      this.clearInputError(this.speedInputTimeStandard);
+    });
 
     // Speed Time Advanced mode
     this.calculateBtnSpeedTimeAdvanced.addEventListener('click', () => this.handleSpeedTimeModeCalculate('advanced'));
     this.distanceInputSpeedTimeAdvanced.addEventListener('input', () => {
+      this.clearInputError(this.distanceInputSpeedTimeAdvanced);
       this.updateDistanceEquivalent('speedTime', 'advanced');
     });
     this.distanceUnitSelectSpeedTimeAdvanced.addEventListener('change', () => {
       this.updateDistanceEquivalent('speedTime', 'advanced');
     });
+    this.speedInputTimeAdvanced.addEventListener('input', () => {
+      this.clearInputError(this.speedInputTimeAdvanced);
+    });
+  }
+
+  /**
+   * Clear error state from input field
+   * @param {HTMLElement} input - Input element to clear error from
+   */
+  clearInputError(input) {
+    if (input) {
+      input.classList.remove('input-error');
+      input.setAttribute('aria-invalid', 'false');
+    }
+  }
+
+  /**
+   * Set error state on input field
+   * @param {HTMLElement} input - Input element to mark as invalid
+   */
+  setInputError(input) {
+    if (input) {
+      input.classList.add('input-error');
+      input.setAttribute('aria-invalid', 'true');
+    }
   }
 
   /**
@@ -656,6 +711,16 @@ class PaceCalculator extends PaceCalculatorBase {
       this.measurementPaceBtn.classList.remove('mode-toggle__option--active');
     }
 
+    // Update Standard/Advanced toggle button visual state based on new mode's sub-mode
+    const currentSubMode = this.getCurrentSubMode();
+    if (currentSubMode === 'standard') {
+      this.standardModeBtn.classList.add('mode-toggle__option--active');
+      this.advancedModeBtn.classList.remove('mode-toggle__option--active');
+    } else {
+      this.advancedModeBtn.classList.add('mode-toggle__option--active');
+      this.standardModeBtn.classList.remove('mode-toggle__option--active');
+    }
+
     this.updateDynamicLabels();
     this.updateControlVisibility();
     this.saveState();
@@ -750,12 +815,12 @@ class PaceCalculator extends PaceCalculatorBase {
         distanceInput = this.distanceInputPaceAdvanced;
         distanceUnitSelect = this.distanceUnitSelectPaceAdvanced;
         display = this.distanceEquivalentPaceAdvanced;
-        paceUnit = this.paceUnitSelectAdvanced.value;
+        paceUnit = this.paceIntervalUnitSelectPaceAdvanced.value;
       } else {
         distanceInput = this.distanceInputTimeAdvanced;
         distanceUnitSelect = this.distanceUnitSelectTimeAdvanced;
         display = this.distanceEquivalentTimeAdvanced;
-        paceUnit = this.paceUnitSelectTimeAdvanced.value;
+        paceUnit = this.paceIntervalUnitSelectTimeAdvanced.value;
       }
 
       distanceValue = distanceInput.value.trim();
@@ -797,8 +862,6 @@ class PaceCalculator extends PaceCalculatorBase {
    */
   handlePaceModeCalculate(subMode) {
     try {
-      this.hideError();
-
       let timeInput, paceUnitSelect, distanceMetres, distanceDisplayName;
 
       if (subMode === 'standard') {
@@ -806,9 +869,6 @@ class PaceCalculator extends PaceCalculatorBase {
         timeInput = this.timeInputPaceStandard;
         const distanceSelect = this.distanceSelectPaceStandard;
         paceUnitSelect = this.paceUnitSelectStandard;
-
-        timeInput.classList.remove('input-error');
-        distanceSelect.classList.remove('input-error');
 
         const timeInputValue = timeInput.value.trim();
         const distanceKey = distanceSelect.value;
@@ -820,8 +880,7 @@ class PaceCalculator extends PaceCalculatorBase {
 
         const totalTimeSeconds = parseTimeInput(timeInputValue);
         if (!this.validateTime(totalTimeSeconds)) {
-          timeInput.classList.add('input-error');
-          this.showError('Please enter a valid time (e.g., 25:00 or 1:23:45)');
+          this.setInputError(timeInput);
           this.hideResults();
           return;
         }
@@ -850,45 +909,37 @@ class PaceCalculator extends PaceCalculatorBase {
         const paceIntervalInput = this.paceIntervalInputPaceAdvanced;
         const paceIntervalUnitSelect = this.paceIntervalUnitSelectPaceAdvanced;
 
-        timeInput.classList.remove('input-error');
-        distanceInput.classList.remove('input-error');
-        paceIntervalInput.classList.remove('input-error');
-
         const timeInputValue = timeInput.value.trim();
         const distanceValue = distanceInput.value.trim();
         const distanceUnit = distanceUnitSelect.value;
         const paceIntervalValue = paceIntervalInput.value.trim();
         const paceIntervalUnit = paceIntervalUnitSelect.value;
 
-        if (!timeInputValue || !distanceValue || !paceIntervalValue) {
-          this.hideResults();
-          return;
-        }
+        let error = false;
 
         // Validate distance
         if (!this.validateDistance(distanceValue)) {
-          distanceInput.classList.add('input-error');
-          this.showError('Please enter a valid distance greater than zero');
+          this.setInputError(distanceInput);
           this.hideResults();
-          return;
+          error = true;
         }
 
         // Validate pace interval
         if (!this.validateDistance(paceIntervalValue)) {
-          paceIntervalInput.classList.add('input-error');
-          this.showError('Please enter a valid pace interval greater than zero');
+          this.setInputError(paceIntervalInput);
           this.hideResults();
-          return;
+          error = true;
         }
 
         // Validate time
         const totalTimeSeconds = parseTimeInput(timeInputValue);
         if (!this.validateTime(totalTimeSeconds)) {
-          timeInput.classList.add('input-error');
-          this.showError('Please enter a valid time (e.g., 25:00 or 1:23:45)');
+          this.setInputError(timeInput);
           this.hideResults();
-          return;
+          error = true;
         }
+
+        if (error) return;
 
         // Convert custom distance and pace interval to metres
         distanceMetres = this.convertDistanceToMetres(parseFloat(distanceValue), distanceUnit);
@@ -926,7 +977,6 @@ class PaceCalculator extends PaceCalculatorBase {
 
     } catch (error) {
       console.error('Calculation error:', error);
-      this.showError('Unable to calculate pace. Please check your inputs.');
       this.hideResults();
     }
   }
@@ -936,8 +986,6 @@ class PaceCalculator extends PaceCalculatorBase {
    */
   handleTimeModeCalculate(subMode) {
     try {
-      this.hideError();
-
       let paceInput, paceUnitSelect, distanceMetres, distanceDisplayName;
 
       if (subMode === 'standard') {
@@ -946,24 +994,25 @@ class PaceCalculator extends PaceCalculatorBase {
         const distanceSelect = this.distanceSelectTimeStandard;
         paceUnitSelect = this.paceUnitSelectTimeStandard;
 
-        paceInput.classList.remove('input-error');
-        distanceSelect.classList.remove('input-error');
-
         const paceInputValue = paceInput.value.trim();
         const distanceKey = distanceSelect.value;
 
-        if (!paceInputValue || !distanceKey) {
+        let error = false;
+
+        if (!distanceKey) {
           this.hideResults();
-          return;
+          error = true;
         }
 
         const paceSeconds = parsePaceInput(paceInputValue);
         if (!this.validatePace(paceSeconds)) {
-          paceInput.classList.add('input-error');
-          this.showError('Please enter a valid pace (e.g., 5:00 or 4:30)');
+          this.setInputError(paceInput);
           this.hideResults();
-          return;
+          error = true;
+          console.log('Invalid pace input');
         }
+
+        if (error) return;
 
         distanceMetres = getDistanceInMetres(distanceKey, this.eventsConfig);
         const eventConfig = this.getEventConfig(distanceKey);
@@ -989,50 +1038,42 @@ class PaceCalculator extends PaceCalculatorBase {
         const paceIntervalInput = this.paceIntervalInputTimeAdvanced;
         const paceIntervalUnitSelect = this.paceIntervalUnitSelectTimeAdvanced;
 
-        paceInput.classList.remove('input-error');
-        distanceInput.classList.remove('input-error');
-        paceIntervalInput.classList.remove('input-error');
-
         const paceInputValue = paceInput.value.trim();
         const distanceValue = distanceInput.value.trim();
         const distanceUnit = distanceUnitSelect.value;
         const paceIntervalValue = paceIntervalInput.value.trim();
         const paceIntervalUnit = paceIntervalUnitSelect.value;
 
-        if (!paceInputValue || !distanceValue || !paceIntervalValue) {
-          this.hideResults();
-          return;
-        }
+        let error = false;
 
         // Validate distance
         if (!this.validateDistance(distanceValue)) {
-          distanceInput.classList.add('input-error');
-          this.showError('Please enter a valid distance greater than zero');
+          this.setInputError(distanceInput);
           this.hideResults();
-          return;
+          error = true;
         }
 
         // Validate pace interval
         if (!this.validateDistance(paceIntervalValue)) {
-          paceIntervalInput.classList.add('input-error');
-          this.showError('Please enter a valid pace interval greater than zero');
+          this.setInputError(paceIntervalInput);
           this.hideResults();
-          return;
+          error = true;
         }
 
         // Validate pace
         const paceSeconds = parsePaceInput(paceInputValue);
         if (!this.validatePace(paceSeconds)) {
-          paceInput.classList.add('input-error');
-          this.showError('Please enter a valid pace (e.g., 5:00 or 4:30)');
+          this.setInputError(paceInput);
           this.hideResults();
-          return;
+          error = true;
         }
+
+        if (error) return;
 
         // Convert custom distance and pace interval to metres
         distanceMetres = this.convertDistanceToMetres(parseFloat(distanceValue), distanceUnit);
         const paceIntervalMetres = this.convertDistanceToMetres(parseFloat(paceIntervalValue), paceIntervalUnit);
-        distanceDisplayName = `${distanceValue} ${distanceUnit}`;
+        distanceDisplayName = `${distanceValue}${distanceUnit}`;
 
         // Calculate total time using custom pace interval
         // Formula: totalTime = pace * (distance / paceInterval)
@@ -1065,7 +1106,6 @@ class PaceCalculator extends PaceCalculatorBase {
 
     } catch (error) {
       console.error('Calculation error:', error);
-      this.showError('Unable to calculate total time. Please check your inputs.');
       this.hideResults();
     }
   }
@@ -1075,8 +1115,6 @@ class PaceCalculator extends PaceCalculatorBase {
    */
   handleSpeedModeCalculate(subMode) {
     try {
-      this.hideError();
-
       let timeInput, speedUnitSelect, distanceMetres, distanceDisplayName;
 
       if (subMode === 'standard') {
@@ -1084,9 +1122,6 @@ class PaceCalculator extends PaceCalculatorBase {
         timeInput = this.timeInputSpeedStandard;
         const distanceSelect = this.distanceSelectSpeedStandard;
         speedUnitSelect = this.speedUnitSelectStandard;
-
-        timeInput.classList.remove('input-error');
-        distanceSelect.classList.remove('input-error');
 
         const timeInputValue = timeInput.value.trim();
         const distanceKey = distanceSelect.value;
@@ -1098,8 +1133,7 @@ class PaceCalculator extends PaceCalculatorBase {
 
         const totalTimeSeconds = parseTimeInput(timeInputValue);
         if (!this.validateTime(totalTimeSeconds)) {
-          timeInput.classList.add('input-error');
-          this.showError('Please enter a valid time (e.g., 25:00 or 1:23:45)');
+          this.setInputError(timeInput);
           this.hideResults();
           return;
         }
@@ -1128,35 +1162,29 @@ class PaceCalculator extends PaceCalculatorBase {
         const distanceUnitSelect = this.distanceUnitSelectSpeedAdvanced;
         speedUnitSelect = this.speedUnitSelectAdvanced;
 
-        timeInput.classList.remove('input-error');
-        distanceInput.classList.remove('input-error');
-
         const timeInputValue = timeInput.value.trim();
         const distanceValue = distanceInput.value.trim();
         const distanceUnit = distanceUnitSelect.value;
         const speedUnit = speedUnitSelect.value;
 
-        if (!timeInputValue || !distanceValue) {
-          this.hideResults();
-          return;
-        }
+        let error = false;
 
         // Validate distance
         if (!this.validateDistance(distanceValue)) {
-          distanceInput.classList.add('input-error');
-          this.showError('Please enter a valid distance greater than zero');
+          this.setInputError(distanceInput);
           this.hideResults();
-          return;
+          error = true;
         }
 
         // Validate time
         const totalTimeSeconds = parseTimeInput(timeInputValue);
         if (!this.validateTime(totalTimeSeconds)) {
-          timeInput.classList.add('input-error');
-          this.showError('Please enter a valid time (e.g., 25:00 or 1:23:45)');
+          this.setInputError(timeInput);
           this.hideResults();
-          return;
+          error = true;
         }
+
+        if (error) return;
 
         // Convert custom distance to metres
         distanceMetres = this.convertDistanceToMetres(parseFloat(distanceValue), distanceUnit);
@@ -1185,7 +1213,6 @@ class PaceCalculator extends PaceCalculatorBase {
 
     } catch (error) {
       console.error('Calculation error:', error);
-      this.showError('Unable to calculate speed. Please check your inputs.');
       this.hideResults();
     }
   }
@@ -1195,8 +1222,6 @@ class PaceCalculator extends PaceCalculatorBase {
    */
   handleSpeedTimeModeCalculate(subMode) {
     try {
-      this.hideError();
-
       let speedInput, speedUnitSelect, distanceMetres, distanceDisplayName;
 
       if (subMode === 'standard') {
@@ -1205,21 +1230,17 @@ class PaceCalculator extends PaceCalculatorBase {
         const distanceSelect = this.distanceSelectSpeedTimeStandard;
         speedUnitSelect = this.speedUnitSelectTimeStandard;
 
-        speedInput.classList.remove('input-error');
-        distanceSelect.classList.remove('input-error');
-
         const speedInputValue = speedInput.value.trim();
         const distanceKey = distanceSelect.value;
 
-        if (!speedInputValue || !distanceKey) {
+        if (!distanceKey) {
           this.hideResults();
           return;
         }
 
         const speed = parseSpeedInput(speedInputValue);
         if (speed === null || speed <= 0) {
-          speedInput.classList.add('input-error');
-          this.showError('Please enter a valid speed greater than zero');
+          this.setInputError(speedInput);
           this.hideResults();
           return;
         }
@@ -1248,35 +1269,29 @@ class PaceCalculator extends PaceCalculatorBase {
         const distanceUnitSelect = this.distanceUnitSelectSpeedTimeAdvanced;
         speedUnitSelect = this.speedUnitSelectTimeAdvanced;
 
-        speedInput.classList.remove('input-error');
-        distanceInput.classList.remove('input-error');
-
         const speedInputValue = speedInput.value.trim();
         const distanceValue = distanceInput.value.trim();
         const distanceUnit = distanceUnitSelect.value;
         const speedUnit = speedUnitSelect.value;
 
-        if (!speedInputValue || !distanceValue) {
-          this.hideResults();
-          return;
-        }
+        let error = false;
 
         // Validate distance
         if (!this.validateDistance(distanceValue)) {
-          distanceInput.classList.add('input-error');
-          this.showError('Please enter a valid distance greater than zero');
+          this.setInputError(distanceInput);
           this.hideResults();
-          return;
+          error = true;
         }
 
         // Validate speed
         const speed = parseSpeedInput(speedInputValue);
         if (speed === null || speed <= 0) {
-          speedInput.classList.add('input-error');
-          this.showError('Please enter a valid speed greater than zero');
+          this.setInputError(speedInput);
           this.hideResults();
-          return;
+          error = true;
         }
+
+        if (error) return;
 
         // Convert custom distance to metres
         distanceMetres = this.convertDistanceToMetres(parseFloat(distanceValue), distanceUnit);
@@ -1305,7 +1320,6 @@ class PaceCalculator extends PaceCalculatorBase {
 
     } catch (error) {
       console.error('Calculation error:', error);
-      this.showError('Unable to calculate total time. Please check your inputs.');
       this.hideResults();
     }
   }
