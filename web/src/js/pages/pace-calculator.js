@@ -296,14 +296,16 @@ class PaceCalculator extends PaceCalculatorBase {
 
   /**
    * Get equivalent speed unit for pace unit
-   * @param {string} paceUnit - Pace unit ('km', 'mile', '400m')
+   * @param {string} paceUnit - Pace unit ('km', 'mile', '400m', '200m', '100m')
    * @returns {string} Equivalent speed unit
    */
   getEquivalentSpeedUnit(paceUnit) {
     const mapping = {
       'km': 'kmh',
       'mile': 'mph',
-      '400m': 'ms'
+      '400m': 'ms',
+      '200m': 'ms',
+      '100m': 'ms'
     };
     return mapping[paceUnit] || 'kmh';
   }
@@ -773,7 +775,7 @@ class PaceCalculator extends PaceCalculatorBase {
   /**
    * Convert pace to pace per km
    * @param {number} paceSeconds - Pace in seconds
-   * @param {string} paceUnit - Pace unit ('km', 'mile', '400m')
+   * @param {string} paceUnit - Pace unit ('km', 'mile', '400m', '200m', '100m')
    * @returns {number} Pace in seconds per km
    */
   convertPaceToPerKm(paceSeconds, paceUnit) {
@@ -781,6 +783,10 @@ class PaceCalculator extends PaceCalculatorBase {
       return paceSeconds / 1.609344;
     } else if (paceUnit === '400m') {
       return paceSeconds * 2.5;
+    } else if (paceUnit === '200m') {
+      return paceSeconds * 5;
+    } else if (paceUnit === '100m') {
+      return paceSeconds * 10;
     } else {
       return paceSeconds;
     }
@@ -789,7 +795,7 @@ class PaceCalculator extends PaceCalculatorBase {
   /**
    * Convert pace from per km to target unit
    * @param {number} pacePerKm - Pace in seconds per km
-   * @param {string} paceUnit - Target pace unit ('km', 'mile', '400m')
+   * @param {string} paceUnit - Target pace unit ('km', 'mile', '400m', '200m', '100m')
    * @returns {number} Pace in seconds per target unit
    */
   convertPaceFromPerKm(pacePerKm, paceUnit) {
@@ -797,6 +803,10 @@ class PaceCalculator extends PaceCalculatorBase {
       return pacePerKm * 1.609344;
     } else if (paceUnit === '400m') {
       return pacePerKm / 2.5;
+    } else if (paceUnit === '200m') {
+      return pacePerKm / 5;
+    } else if (paceUnit === '100m') {
+      return pacePerKm / 10;
     } else {
       return pacePerKm;
     }
@@ -837,7 +847,7 @@ class PaceCalculator extends PaceCalculatorBase {
       let targetUnit;
       if (paceUnit === 'mile') {
         targetUnit = 'miles';
-      } else if (paceUnit === '400m') {
+      } else if (paceUnit === '400m' || paceUnit === '200m' || paceUnit === '100m') {
         targetUnit = 'm';
       } else {
         targetUnit = 'km';
@@ -1391,6 +1401,10 @@ class PaceCalculator extends PaceCalculatorBase {
         pacePerKm = paceSeconds / 1.609344;
       } else if (paceUnit === '400m') {
         pacePerKm = paceSeconds * 2.5; // 400m * 2.5 = 1000m = 1km
+      } else if (paceUnit === '200m') {
+        pacePerKm = paceSeconds * 5; // 200m * 5 = 1000m = 1km
+      } else if (paceUnit === '100m') {
+        pacePerKm = paceSeconds * 10; // 100m * 10 = 1000m = 1km
       } else {
         pacePerKm = paceSeconds;
       }
@@ -1483,6 +1497,12 @@ class PaceCalculator extends PaceCalculatorBase {
       } else if (paceUnit === '400m') {
         splitIntervalMetres = 400;
         splitIntervalInfo = { value: 400, unit: 'm', metres: 400 };
+      } else if (paceUnit === '200m') {
+        splitIntervalMetres = 200;
+        splitIntervalInfo = { value: 200, unit: 'm', metres: 200 };
+      } else if (paceUnit === '100m') {
+        splitIntervalMetres = 100;
+        splitIntervalInfo = { value: 100, unit: 'm', metres: 100 };
       } else {
         splitIntervalMetres = 1000;
         splitIntervalInfo = { value: 1, unit: 'km', metres: 1000 };
@@ -1519,6 +1539,10 @@ class PaceCalculator extends PaceCalculatorBase {
         pacePerKm = paceSeconds / 1.609344;
       } else if (paceUnit === '400m') {
         pacePerKm = paceSeconds * 2.5; // 400m * 2.5 = 1000m = 1km
+      } else if (paceUnit === '200m') {
+        pacePerKm = paceSeconds * 5; // 200m * 5 = 1000m = 1km
+      } else if (paceUnit === '100m') {
+        pacePerKm = paceSeconds * 10; // 100m * 10 = 1000m = 1km
       } else {
         pacePerKm = paceSeconds;
       }
@@ -1611,6 +1635,12 @@ class PaceCalculator extends PaceCalculatorBase {
       } else if (paceUnit === '400m') {
         splitIntervalMetres = 400;
         splitIntervalInfo = { value: 400, unit: 'm', metres: 400 };
+      } else if (paceUnit === '200m') {
+        splitIntervalMetres = 200;
+        splitIntervalInfo = { value: 200, unit: 'm', metres: 200 };
+      } else if (paceUnit === '100m') {
+        splitIntervalMetres = 100;
+        splitIntervalInfo = { value: 100, unit: 'm', metres: 100 };
       } else {
         splitIntervalMetres = 1000;
         splitIntervalInfo = { value: 1, unit: 'km', metres: 1000 };
