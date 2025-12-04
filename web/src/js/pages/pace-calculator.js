@@ -398,6 +398,35 @@ class PaceCalculator extends PaceCalculatorBase {
   }
 
   /**
+   * Handle Enter key press in input fields to trigger calculation
+   * @param {KeyboardEvent} event - The keyboard event
+   */
+  handleEnterKeyPress(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+
+      // Determine which calculate handler to call based on current mode
+      const key = `${this.currentMeasurementMode}-${this.currentMode}`;
+      const subMode = this.getCurrentSubMode();
+
+      switch (key) {
+        case 'pace-calculate':
+          this.handlePaceModeCalculate(subMode);
+          break;
+        case 'pace-totalTime':
+          this.handleTimeModeCalculate(subMode);
+          break;
+        case 'speed-calculate':
+          this.handleSpeedModeCalculate(subMode);
+          break;
+        case 'speed-totalTime':
+          this.handleSpeedTimeModeCalculate(subMode);
+          break;
+      }
+    }
+  }
+
+  /**
    * Setup event listeners
    */
   setupEventListeners() {
@@ -424,6 +453,7 @@ class PaceCalculator extends PaceCalculatorBase {
     this.timeInputPaceStandard.addEventListener('input', () => {
       this.clearInputError(this.timeInputPaceStandard);
     });
+    this.timeInputPaceStandard.addEventListener('keydown', (e) => this.handleEnterKeyPress(e));
 
     // Pace Advanced mode
     this.calculateBtnPaceAdvanced.addEventListener('click', () => this.handlePaceModeCalculate('advanced'));
@@ -440,6 +470,9 @@ class PaceCalculator extends PaceCalculatorBase {
     this.paceIntervalInputPaceAdvanced.addEventListener('input', () => {
       this.clearInputError(this.paceIntervalInputPaceAdvanced);
     });
+    this.distanceInputPaceAdvanced.addEventListener('keydown', (e) => this.handleEnterKeyPress(e));
+    this.timeInputPaceAdvanced.addEventListener('keydown', (e) => this.handleEnterKeyPress(e));
+    this.paceIntervalInputPaceAdvanced.addEventListener('keydown', (e) => this.handleEnterKeyPress(e));
 
     // Time Standard mode
     this.calculateBtnTimeStandard.addEventListener('click', () => this.handleTimeModeCalculate('standard'));
@@ -452,6 +485,7 @@ class PaceCalculator extends PaceCalculatorBase {
     this.paceInputTimeStandard.addEventListener('input', () => {
       this.clearInputError(this.paceInputTimeStandard);
     });
+    this.paceInputTimeStandard.addEventListener('keydown', (e) => this.handleEnterKeyPress(e));
 
     // Time Advanced mode
     this.calculateBtnTimeAdvanced.addEventListener('click', () => this.handleTimeModeCalculate('advanced'));
@@ -468,6 +502,9 @@ class PaceCalculator extends PaceCalculatorBase {
     this.paceIntervalInputTimeAdvanced.addEventListener('input', () => {
       this.clearInputError(this.paceIntervalInputTimeAdvanced);
     });
+    this.distanceInputTimeAdvanced.addEventListener('keydown', (e) => this.handleEnterKeyPress(e));
+    this.paceInputTimeAdvanced.addEventListener('keydown', (e) => this.handleEnterKeyPress(e));
+    this.paceIntervalInputTimeAdvanced.addEventListener('keydown', (e) => this.handleEnterKeyPress(e));
 
     // Speed Standard mode
     this.calculateBtnSpeedStandard.addEventListener('click', () => this.handleSpeedModeCalculate('standard'));
@@ -480,6 +517,7 @@ class PaceCalculator extends PaceCalculatorBase {
     this.timeInputSpeedStandard.addEventListener('input', () => {
       this.clearInputError(this.timeInputSpeedStandard);
     });
+    this.timeInputSpeedStandard.addEventListener('keydown', (e) => this.handleEnterKeyPress(e));
 
     // Speed Advanced mode
     this.calculateBtnSpeedAdvanced.addEventListener('click', () => this.handleSpeedModeCalculate('advanced'));
@@ -493,6 +531,8 @@ class PaceCalculator extends PaceCalculatorBase {
     this.timeInputSpeedAdvanced.addEventListener('input', () => {
       this.clearInputError(this.timeInputSpeedAdvanced);
     });
+    this.distanceInputSpeedAdvanced.addEventListener('keydown', (e) => this.handleEnterKeyPress(e));
+    this.timeInputSpeedAdvanced.addEventListener('keydown', (e) => this.handleEnterKeyPress(e));
 
     // Speed Time Standard mode
     this.calculateBtnSpeedTimeStandard.addEventListener('click', () => this.handleSpeedTimeModeCalculate('standard'));
@@ -505,6 +545,7 @@ class PaceCalculator extends PaceCalculatorBase {
     this.speedInputTimeStandard.addEventListener('input', () => {
       this.clearInputError(this.speedInputTimeStandard);
     });
+    this.speedInputTimeStandard.addEventListener('keydown', (e) => this.handleEnterKeyPress(e));
 
     // Speed Time Advanced mode
     this.calculateBtnSpeedTimeAdvanced.addEventListener('click', () => this.handleSpeedTimeModeCalculate('advanced'));
@@ -518,6 +559,8 @@ class PaceCalculator extends PaceCalculatorBase {
     this.speedInputTimeAdvanced.addEventListener('input', () => {
       this.clearInputError(this.speedInputTimeAdvanced);
     });
+    this.distanceInputSpeedTimeAdvanced.addEventListener('keydown', (e) => this.handleEnterKeyPress(e));
+    this.speedInputTimeAdvanced.addEventListener('keydown', (e) => this.handleEnterKeyPress(e));
   }
 
   /**
