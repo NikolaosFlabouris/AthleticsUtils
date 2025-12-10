@@ -37,7 +37,8 @@ export class Navigation {
       '/index.html': 'home',
       '/calculators/pace.html': 'timer',
       '/calculators/score.html': 'trophy',
-      '/calculators/combined-events.html': 'layers'
+      '/calculators/combined-events.html': 'layers',
+      '/calculators/track-distance.html': 'track'
     };
 
     const links = document.querySelectorAll('.navigation__link');

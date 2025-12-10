@@ -1,0 +1,325 @@
+/**
+ * Track SVG Component Styles
+ */
+
+/* Container */
+.track-svg-container {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border);
+  position: relative;
+}
+
+/* SVG Element */
+.track-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.track-svg:active {
+  cursor: grabbing;
+}
+
+/* Track Surface */
+.track-svg__surface {
+  /* Track red/brown is set via fill in JS */
+}
+
+.track-svg__lane {
+  stroke: none;
+}
+
+/* Infield */
+.track-svg__infield {
+  /* Green grass color set via fill in JS */
+}
+
+/* Lane Lines */
+.track-svg__lane-lines {
+  pointer-events: none;
+}
+
+.track-svg__lane-line {
+  stroke: white;
+  stroke-width: 0.5;
+  fill: none;
+  opacity: 0.8;
+}
+
+/* Markings */
+.track-svg__markings {
+  /* Container for all markings */
+}
+
+.track-svg__marking {
+  cursor: pointer;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.track-svg__marking:hover {
+  opacity: 0.8;
+}
+
+.track-svg__mark-line {
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke var(--transition-fast), stroke-width var(--transition-fast);
+}
+
+.track-svg__mark-dot {
+  transition: fill var(--transition-fast), r var(--transition-fast);
+}
+
+.track-svg__marking:hover .track-svg__mark-dot {
+  r: 6;
+}
+
+/* Selected States */
+.track-svg__marking--selected .track-svg__mark-line {
+  stroke-width: 4;
+}
+
+.track-svg__marking--selected .track-svg__mark-dot {
+  r: 8;
+}
+
+/* Start marking (green with glow) */
+.track-svg__marking--start .track-svg__mark-line {
+  stroke: #22c55e;
+  filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.6));
+}
+
+.track-svg__marking--start .track-svg__mark-dot {
+  fill: #22c55e;
+  filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.6));
+}
+
+/* End marking (red with glow) */
+.track-svg__marking--end .track-svg__mark-line {
+  stroke: #ef4444;
+  filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.6));
+}
+
+.track-svg__marking--end .track-svg__mark-dot {
+  fill: #ef4444;
+  filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.6));
+}
+
+/* Highlight Layer */
+.track-svg__highlights {
+  pointer-events: none;
+}
+
+.track-svg__route-path {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 10, 5;
+  animation: track-svg-dash 0.5s linear infinite;
+}
+
+@keyframes track-svg-dash {
+  to {
+    stroke-dashoffset: -15;
+  }
+}
+
+/* Labels */
+.track-svg__labels {
+  pointer-events: none;
+}
+
+.track-svg__label {
+  /* Label container */
+}
+
+.track-svg__label-text {
+  font-size: 12px;
+  font-weight: var(--font-weight-semibold);
+  fill: var(--color-text);
+  text-shadow:
+    1px 1px 0 var(--color-background),
+    -1px 1px 0 var(--color-background),
+    1px -1px 0 var(--color-background),
+    -1px -1px 0 var(--color-background);
+}
+
+/* Distance Label (shown on route) */
+.track-svg__distance-label {
+  font-size: 14px;
+  font-weight: var(--font-weight-bold);
+  fill: var(--color-primary);
+}
+
+.track-svg__distance-label-bg {
+  fill: var(--color-background);
+  rx: 4;
+  ry: 4;
+}
+
+/* Category Colors (for legend and visual consistency) */
+.track-svg__marking[data-category="start"] .track-svg__mark-line,
+.track-svg__marking[data-category="start"] .track-svg__mark-dot {
+  stroke: #22c55e;
+  fill: #22c55e;
+}
+
+.track-svg__marking[data-category="finish"] .track-svg__mark-line,
+.track-svg__marking[data-category="finish"] .track-svg__mark-dot {
+  stroke: #ffffff;
+  fill: #ffffff;
+}
+
+.track-svg__marking[data-category="hurdle"] .track-svg__mark-line,
+.track-svg__marking[data-category="hurdle"] .track-svg__mark-dot {
+  stroke: #f59e0b;
+  fill: #f59e0b;
+}
+
+.track-svg__marking[data-category="relay"] .track-svg__mark-line,
+.track-svg__marking[data-category="relay"] .track-svg__mark-dot {
+  stroke: #3b82f6;
+  fill: #3b82f6;
+}
+
+.track-svg__marking[data-category="steeple"] .track-svg__mark-line,
+.track-svg__marking[data-category="steeple"] .track-svg__mark-dot {
+  stroke: #a855f7;
+  fill: #a855f7;
+}
+
+.track-svg__marking[data-category="marker"] .track-svg__mark-line,
+.track-svg__marking[data-category="marker"] .track-svg__mark-dot {
+  stroke: #ffffff;
+  fill: #ffffff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .track-svg-container {
+    margin-left: calc(-1 * var(--container-padding));
+    margin-right: calc(-1 * var(--container-padding));
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+
+  .track-svg__label-text {
+    font-size: 10px;
+  }
+
+  .track-svg__mark-dot {
+    r: 3;
+  }
+
+  .track-svg__marking:hover .track-svg__mark-dot {
+    r: 5;
+  }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .track-svg__label-text {
+    fill: var(--color-text);
+    text-shadow:
+      1px 1px 0 var(--color-background),
+      -1px 1px 0 var(--color-background),
+      1px -1px 0 var(--color-background),
+      -1px -1px 0 var(--color-background);
+  }
+
+  .track-svg__distance-label-bg {
+    fill: var(--color-background-secondary);
+  }
+}
+
+/* Track Legend */
+.track-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background: var(--color-background-secondary);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+}
+
+.track-legend__item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.track-legend__color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  border: 1px solid var(--color-border);
+}
+
+.track-legend__color--start {
+  background: #22c55e;
+}
+
+.track-legend__color--finish {
+  background: #ffffff;
+}
+
+.track-legend__color--hurdle {
+  background: #f59e0b;
+}
+
+.track-legend__color--relay {
+  background: #3b82f6;
+}
+
+.track-legend__color--steeple {
+  background: #a855f7;
+}
+
+.track-legend__color--marker {
+  background: #ffffff;
+}
+
+/* Zoom controls */
+.track-zoom-controls {
+  position: absolute;
+  bottom: var(--spacing-sm);
+  right: var(--spacing-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.track-zoom-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+  transition: background var(--transition-fast);
+}
+
+.track-zoom-btn:hover {
+  background: var(--color-background-secondary);
+}
+
+.track-zoom-btn:active {
+  background: var(--color-background-tertiary);
+}

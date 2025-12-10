@@ -1,0 +1,327 @@
+/**
+ * Track Distance Calculator Page Styles
+ */
+
+/* Form row for side-by-side inputs */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+@media (max-width: 480px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Distance input group with unit */
+.distance-input-group {
+  display: flex;
+  align-items: center;
+}
+
+.distance-input-group .form-input {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  flex: 1;
+}
+
+.input-unit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--spacing-md);
+  height: 42px;
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border);
+  border-left: none;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* Track Section Layout */
+.track-section {
+  margin: var(--spacing-lg) 0;
+}
+
+.track-layout {
+  display: grid;
+  grid-template-columns: 1fr 200px;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .track-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Selection Panel */
+.selection-panel {
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+}
+
+.selection-panel__title {
+  margin: 0 0 var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.selection-panel__content {
+  margin-bottom: var(--spacing-md);
+}
+
+.selection-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-xs) 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.selection-item:last-child {
+  border-bottom: none;
+}
+
+.selection-item__label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.selection-item__value {
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selection-distance {
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 2px solid var(--color-primary);
+  text-align: center;
+}
+
+.selection-distance__label {
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.selection-distance__value {
+  display: block;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  font-family: var(--font-family-mono);
+}
+
+/* Small button variant */
+.btn-small {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
+/* Results Section */
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.results-count {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* Results Table */
+.results-table-container {
+  overflow-x: auto;
+  margin: 0 calc(-1 * var(--spacing-md));
+  padding: 0 var(--spacing-md);
+}
+
+.results-table {
+  width: 100%;
+  min-width: 400px;
+}
+
+.results-table tbody tr {
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.results-table tbody tr:hover {
+  background-color: var(--color-background-tertiary);
+}
+
+.results-table tbody tr.selected {
+  background-color: rgba(26, 115, 232, 0.1);
+  border-left: 3px solid var(--color-primary);
+}
+
+.results-table td {
+  vertical-align: middle;
+}
+
+/* Marking name in table */
+.marking-name {
+  font-weight: var(--font-weight-medium);
+}
+
+.marking-lane {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+/* Distance cell */
+.distance-value {
+  font-family: var(--font-family-mono);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Difference cell */
+.diff-value {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+}
+
+.diff-value--exact {
+  color: var(--color-success);
+}
+
+.diff-value--close {
+  color: var(--color-text-secondary);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.pagination__info {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* Track Legend on page */
+.track-section .track-legend {
+  margin-top: var(--spacing-md);
+}
+
+/* Info section adjustments */
+.info-section h4 {
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+}
+
+.info-section ol,
+.info-section ul {
+  margin: 0 0 var(--spacing-md);
+  padding-left: var(--spacing-lg);
+}
+
+.info-section li {
+  margin-bottom: var(--spacing-xs);
+  color: var(--color-text-secondary);
+}
+
+.info-section li strong {
+  color: var(--color-text);
+}
+
+/* Loading state for track */
+.track-svg-container.loading {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Error state */
+.track-error {
+  padding: var(--spacing-lg);
+  text-align: center;
+  color: var(--color-error);
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .selection-panel {
+    order: -1;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .track-layout {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .selection-panel {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--spacing-md);
+    align-items: center;
+  }
+
+  .selection-panel__title {
+    grid-column: 1 / -1;
+  }
+
+  .selection-panel__content {
+    margin-bottom: 0;
+  }
+
+  .selection-distance {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+    border-left: 2px solid var(--color-primary);
+    padding-left: var(--spacing-md);
+  }
+
+  .results-table th,
+  .results-table td {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+  }
+}
+
+/* Result highlighting animation */
+@keyframes highlight-pulse {
+  0%, 100% {
+    background-color: rgba(26, 115, 232, 0.1);
+  }
+  50% {
+    background-color: rgba(26, 115, 232, 0.2);
+  }
+}
+
+.results-table tbody tr.highlighted {
+  animation: highlight-pulse 1s ease-in-out;
+}

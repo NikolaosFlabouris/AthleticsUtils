@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Track Distance Calculator - Find distances between common 400m track markings including start lines, hurdle marks, relay zones, and more.">
+  <meta name="keywords" content="track distance, athletics track, track markings, hurdle marks, relay zones, 400m track, running track calculator">
+  <meta name="theme-color" content="#1a73e8">
+  <title>Athletics Utilities | Track Distance Calculator</title>
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="stylesheet" href="../src/styles/main.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="header__brand">
+        <h1 class="header__title"><a href="/" class="header__title-link">Athletics Utilities</a></h1>
+        <p class="header__subtitle">Track Distance Calculator</p>
+      </div>
+    </div>
+  </header>
+
+  <nav class="navigation">
+    <div class="container">
+      <ul class="navigation__list">
+        <li><a href="/" class="navigation__link">Home</a></li>
+        <li><a href="/calculators/pace.html" class="navigation__link">Pace & Speed</a></li>
+        <li><a href="/calculators/score.html" class="navigation__link">World Athletics Score</a></li>
+        <li><a href="/calculators/combined-events.html" class="navigation__link">Combined Events</a></li>
+        <li><a href="/calculators/track-distance.html" class="navigation__link navigation__link--active">Track Distance</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="container">
+      <section class="calculator">
+        <div class="calculator__header">
+          <h2>Track Distance Calculator</h2>
+          <p class="calculator__description">
+            A tool for calculating distances between common track markings. Search for a specific distance or click markings directly on the track.
+          </p>
+        </div>
+
+        <div class="calculator__controls">
+          <!-- Distance Search Controls -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="distance-input">Target Distance</label>
+              <div class="distance-input-group">
+                <input
+                  type="number"
+                  id="distance-input"
+                  class="form-input"
+                  placeholder="e.g., 150"
+                  step="0.01"
+                  min="0"
+                  max="400"
+                  lang="en"
+                >
+                <span class="input-unit">m</span>
+              </div>
+              <small class="form-help">Enter distance to find matching marking pairs</small>
+            </div>
+
+            <div class="form-group">
+              <label for="tolerance-input">Tolerance</label>
+              <div class="distance-input-group">
+                <input
+                  type="number"
+                  id="tolerance-input"
+                  class="form-input"
+                  value="0.5"
+                  step="0.1"
+                  min="0"
+                  max="5"
+                  lang="en"
+                >
+                <span class="input-unit">m</span>
+              </div>
+              <small class="form-help">Allowed variance from target</small>
+            </div>
+          </div>
+
+          <!-- Steeplechase Water Jump Toggle -->
+          <div class="form-group">
+            <label>Water Jump Position</label>
+            <div class="mode-toggle">
+              <button
+                type="button"
+                id="water-jump-inside"
+                class="mode-toggle__option mode-toggle__option--active"
+                data-config="inside"
+              >
+                Inside
+              </button>
+              <button
+                type="button"
+                id="water-jump-outside"
+                class="mode-toggle__option"
+                data-config="outside"
+              >
+                Outside
+              </button>
+            </div>
+          </div>
+
+          <!-- Calculate Button -->
+          <div class="form-group form-group--button">
+            <button type="button" id="find-btn" class="btn btn-primary">Find Distances</button>
+          </div>
+        </div>
+
+        <!-- Track Visualization Section -->
+        <div class="track-section">
+          <div class="track-layout">
+            <div class="track-svg-container" id="track-container">
+              <!-- SVG will be injected here -->
+            </div>
+
+            <div class="selection-panel" id="selection-panel">
+              <h4 class="selection-panel__title">Selection</h4>
+              <div class="selection-panel__content">
+                <div class="selection-item" id="selection-start">
+                  <span class="selection-item__label">Start:</span>
+                  <span class="selection-item__value" id="selection-start-value">-</span>
+                </div>
+                <div class="selection-item" id="selection-end">
+                  <span class="selection-item__label">End:</span>
+                  <span class="selection-item__value" id="selection-end-value">-</span>
+                </div>
+                <div class="selection-distance" id="selection-distance">
+                  <span class="selection-distance__label">Distance:</span>
+                  <span class="selection-distance__value" id="selection-distance-value">-</span>
+                </div>
+              </div>
+              <button type="button" id="clear-selection-btn" class="btn btn-secondary btn-small">Clear Selection</button>
+            </div>
+          </div>
+
+          <!-- Track Legend -->
+          <div class="track-legend">
+            <div class="track-legend__item">
+              <div class="track-legend__color track-legend__color--start"></div>
+              <span>Start Lines</span>
+            </div>
+            <div class="track-legend__item">
+              <div class="track-legend__color track-legend__color--finish"></div>
+              <span>Finish Line</span>
+            </div>
+            <div class="track-legend__item">
+              <div class="track-legend__color track-legend__color--hurdle"></div>
+              <span>Hurdle Marks</span>
+            </div>
+            <div class="track-legend__item">
+              <div class="track-legend__color track-legend__color--relay"></div>
+              <span>Relay Zones</span>
+            </div>
+            <div class="track-legend__item">
+              <div class="track-legend__color track-legend__color--steeple"></div>
+              <span>Steeplechase</span>
+            </div>
+            <div class="track-legend__item">
+              <div class="track-legend__color track-legend__color--marker"></div>
+              <span>Distance Markers</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-container" class="calculator__results hidden">
+          <div class="results-header">
+            <h3>Results</h3>
+            <span class="results-count" id="results-count"></span>
+          </div>
+
+          <div id="results-content" class="results-content">
+            <!-- Summary Card -->
+            <div class="result-card">
+              <h4 class="result-card__title">Matches Found</h4>
+              <div class="result-card__points" id="match-count">0</div>
+              <p class="result-card__content" id="match-summary">
+                Enter a distance to find matching marking pairs
+              </p>
+            </div>
+
+            <!-- Results Table -->
+            <div class="result-card">
+              <h4 class="result-card__title">Matching Distances</h4>
+              <div class="results-table-container">
+                <table class="history-table results-table">
+                  <thead>
+                    <tr>
+                      <th>Start</th>
+                      <th>End</th>
+                      <th>Lane(s)</th>
+                      <th>Distance</th>
+                      <th>Diff</th>
+                    </tr>
+                  </thead>
+                  <tbody id="results-table-body">
+                    <!-- Rows injected here -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Pagination -->
+              <div class="pagination" id="pagination">
+                <button type="button" id="prev-page-btn" class="btn btn-secondary btn-small" disabled>
+                  &lt; Prev
+                </button>
+                <span class="pagination__info" id="pagination-info">Page 1 of 1</span>
+                <button type="button" id="next-page-btn" class="btn btn-secondary btn-small" disabled>
+                  Next &gt;
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="loading-indicator" class="loading hidden">
+          <div class="loading__spinner"></div>
+          <p>Calculating...</p>
+        </div>
+      </section>
+
+      <section class="info-section">
+        <h3>How to Use</h3>
+
+        <h4>Search Mode</h4>
+        <ol>
+          <li>Enter a target distance in meters (e.g., 150m)</li>
+          <li>Adjust tolerance if needed (default 0.5m allows for slight variations)</li>
+          <li>Click "Find Distances" to see all marking pairs that match</li>
+          <li>Click any result row to highlight it on the track</li>
+          <li>Use pagination to browse through results</li>
+        </ol>
+
+        <h4>Manual Selection Mode</h4>
+        <ol>
+          <li>Click directly on any marking on the track to select it</li>
+          <li>Click a second marking to see the running distance between them</li>
+          <li>Click a third marking to replace the first selection</li>
+          <li>Click a selected marking again to deselect it</li>
+          <li>Use "Clear Selection" to start over</li>
+        </ol>
+
+        <h4>Example Use Cases</h4>
+        <ul>
+          <li><strong>Training reps:</strong> Find where to start a 150m acceleration on the track</li>
+          <li><strong>Workout planning:</strong> Locate 200m segments that don't start at the standard 200m line</li>
+          <li><strong>Race preparation:</strong> Understand distances between relay zones and other markings</li>
+          <li><strong>Coaching:</strong> Identify landmarks for specific training distances</li>
+        </ul>
+
+        <h4>Tips</h4>
+        <ul>
+          <li>Double-click the track to reset the view</li>
+          <li>Use mouse wheel or pinch to zoom in/out</li>
+          <li>Drag to pan around the track when zoomed in</li>
+          <li>Toggle water jump position for steeplechase markings</li>
+        </ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+  </footer>
+
+  <script type="module" src="../src/js/pages/track-distance-calculator.js"></script>
+</body>
+</html>

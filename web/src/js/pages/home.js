@@ -13,7 +13,8 @@ function addToolCardIcons() {
   const iconMap = {
     'Pace Calculator': 'timer',
     'World Athletics Score Calculator': 'trophy',
-    'Combined Event Score Calculator': 'layers'
+    'Combined Event Score Calculator': 'layers',
+    'Track Distance Calculator': 'track'
   };
 
   const titles = document.querySelectorAll('.tool-card__title');
