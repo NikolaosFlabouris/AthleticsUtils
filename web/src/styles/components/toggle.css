@@ -55,3 +55,28 @@
     line-height: 1.3;
   }
 }
+
+/* Split format toggle specific styles */
+.split-format-toggle-container {
+  margin-top: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-background);
+  border-radius: var(--radius-sm);
+}
+
+.split-format-toggle-label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+/* Responsive: Smaller buttons on mobile */
+@media (max-width: 640px) {
+  .split-format-toggle .mode-toggle__option {
+    font-size: 0.75rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+}

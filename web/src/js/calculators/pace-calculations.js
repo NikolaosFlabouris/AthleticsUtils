@@ -385,6 +385,8 @@ export function calculateSmartSplits(distanceMetres, pacePerKm, eventConfig, ini
   // Generate splits
   const splits = [];
   let currentDistanceMetres = 0;
+  let previousDistanceMetres = 0;
+  let previousTime = 0;
 
   while (currentDistanceMetres < distanceMetres) {
     currentDistanceMetres += splitIntervalMetres;
@@ -395,19 +397,34 @@ export function calculateSmartSplits(distanceMetres, pacePerKm, eventConfig, ini
     }
 
     // Calculate cumulative time for this split
-    const splitTime = (currentDistanceMetres / 1000) * pacePerKm;
+    const cumulativeTime = (currentDistanceMetres / 1000) * pacePerKm;
 
-    // Format distance label
+    // Calculate split distance and split time (delta from previous)
+    const splitDistanceMetres = currentDistanceMetres - previousDistanceMetres;
+    const splitTime = cumulativeTime - previousTime;
+
+    // Format cumulative distance label
     const distanceInIntervalUnits = currentDistanceMetres / splitIntervalMetres * adjustedIntervalInfo.value;
     const formattedValue = parseFloat(distanceInIntervalUnits.toFixed(2));
 
     // Use formatDistanceWithUnit from pace-formatter.js (imported at top)
     const distanceLabel = `${formattedValue}${adjustedIntervalInfo.unit}`;
 
+    // Format split distance label
+    const splitDistanceInIntervalUnits = splitDistanceMetres / splitIntervalMetres * adjustedIntervalInfo.value;
+    const splitFormattedValue = parseFloat(splitDistanceInIntervalUnits.toFixed(2));
+    const splitDistanceLabel = `${splitFormattedValue}${adjustedIntervalInfo.unit}`;
+
     splits.push({
       distanceLabel,
-      time: splitTime
+      splitDistanceLabel,
+      splitTime,
+      time: cumulativeTime
     });
+
+    // Update previous values for next iteration
+    previousDistanceMetres = currentDistanceMetres;
+    previousTime = cumulativeTime;
   }
 
   return splits;

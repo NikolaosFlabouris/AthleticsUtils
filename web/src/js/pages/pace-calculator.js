@@ -46,6 +46,9 @@ class PaceCalculator extends PaceCalculatorBase {
     // History storage key
     this.historyStorageKey = 'athleticsUtils.paceHistory';
     this.maxHistoryEntries = 10;
+
+    // Split format storage key
+    this.splitFormatStorageKey = 'paceCalculatorSplitFormat';
   }
 
   /**
@@ -175,6 +178,9 @@ class PaceCalculator extends PaceCalculatorBase {
     this.currentSpeedMode = sessionStorage.getItem('paceCalculatorSpeedSubMode') || 'standard';
     this.currentSpeedTimeMode = sessionStorage.getItem('paceCalculatorSpeedTimeSubMode') || 'standard';
 
+    // Load split format
+    this.currentSplitFormat = sessionStorage.getItem(this.splitFormatStorageKey) || 'default';
+
     // Apply initial mode state
     this.applyModeState();
   }
@@ -189,6 +195,7 @@ class PaceCalculator extends PaceCalculatorBase {
     sessionStorage.setItem('paceCalculatorTimeSubMode', this.currentTimeMode);
     sessionStorage.setItem('paceCalculatorSpeedSubMode', this.currentSpeedMode);
     sessionStorage.setItem('paceCalculatorSpeedTimeSubMode', this.currentSpeedTimeMode);
+    sessionStorage.setItem(this.splitFormatStorageKey, this.currentSplitFormat);
   }
 
   /**
@@ -1509,7 +1516,16 @@ class PaceCalculator extends PaceCalculatorBase {
       }
     }
 
-    const splits = this.calculateCustomSplits(distanceMetres, pacePerKm, eventConfig, splitIntervalMetres, splitIntervalInfo);
+    // Store calculation context for recalculation
+    this.lastCalculation = {
+      distanceMetres,
+      pacePerKm,
+      eventConfig,
+      intervalMetres: splitIntervalMetres,
+      intervalInfo: splitIntervalInfo
+    };
+
+    const splits = this.calculateSplitsWithFormat(distanceMetres, pacePerKm, eventConfig, splitIntervalMetres, splitIntervalInfo);
     this.displaySplits(splits);
 
     this.showResults();
@@ -1647,7 +1663,16 @@ class PaceCalculator extends PaceCalculatorBase {
       }
     }
 
-    const splits = this.calculateCustomSplits(distanceMetres, pacePerKm, eventConfig, splitIntervalMetres, splitIntervalInfo);
+    // Store calculation context for recalculation
+    this.lastCalculation = {
+      distanceMetres,
+      pacePerKm,
+      eventConfig,
+      intervalMetres: splitIntervalMetres,
+      intervalInfo: splitIntervalInfo
+    };
+
+    const splits = this.calculateSplitsWithFormat(distanceMetres, pacePerKm, eventConfig, splitIntervalMetres, splitIntervalInfo);
     this.displaySplits(splits);
 
     this.showResults();
@@ -1737,7 +1762,17 @@ class PaceCalculator extends PaceCalculatorBase {
 
     // Splits - create interval based on speed unit
     const speedIntervalInfo = getSpeedUnitSplitInterval(speedUnit);
-    const splits = calculateSmartSplits(distanceMetres, pacePerKm, eventConfig, speedIntervalInfo.metres, speedIntervalInfo);
+
+    // Store calculation context for recalculation
+    this.lastCalculation = {
+      distanceMetres,
+      pacePerKm,
+      eventConfig,
+      intervalMetres: speedIntervalInfo.metres,
+      intervalInfo: speedIntervalInfo
+    };
+
+    const splits = this.calculateSplitsWithFormat(distanceMetres, pacePerKm, eventConfig, speedIntervalInfo.metres, speedIntervalInfo);
     this.displaySplits(splits);
 
     this.showResults();
@@ -1827,10 +1862,128 @@ class PaceCalculator extends PaceCalculatorBase {
 
     // Splits - create interval based on speed unit
     const speedIntervalInfo = getSpeedUnitSplitInterval(speedUnit);
-    const splits = calculateSmartSplits(distanceMetres, pacePerKm, eventConfig, speedIntervalInfo.metres, speedIntervalInfo);
+
+    // Store calculation context for recalculation
+    this.lastCalculation = {
+      distanceMetres,
+      pacePerKm,
+      eventConfig,
+      intervalMetres: speedIntervalInfo.metres,
+      intervalInfo: speedIntervalInfo
+    };
+
+    const splits = this.calculateSplitsWithFormat(distanceMetres, pacePerKm, eventConfig, speedIntervalInfo.metres, speedIntervalInfo);
     this.displaySplits(splits);
 
     this.showResults();
+  }
+
+  /**
+   * Calculate splits based on selected format
+   * @param {number} distanceMetres - Total distance in metres
+   * @param {number} pacePerKm - Pace in seconds per km
+   * @param {Object} eventConfig - Event configuration
+   * @param {number} defaultIntervalMetres - Default interval for smart mode
+   * @param {Object} defaultIntervalInfo - Default interval display info
+   * @returns {Array} Array of split objects
+   */
+  calculateSplitsWithFormat(distanceMetres, pacePerKm, eventConfig, defaultIntervalMetres, defaultIntervalInfo) {
+    switch (this.currentSplitFormat) {
+      case '1km':
+        return this.calculateFixedSplits(distanceMetres, pacePerKm, 1000,
+          { value: 1, unit: 'km', metres: 1000 }, false);
+
+      case '5km':
+        return this.calculateFixedSplits(distanceMetres, pacePerKm, 5000,
+          { value: 5, unit: 'km', metres: 5000 }, false);
+
+      case '400m-track':
+        return this.calculateFixedSplits(distanceMetres, pacePerKm, 400,
+          { value: 400, unit: 'm', metres: 400 }, true);
+
+      case '200m-track':
+        return this.calculateFixedSplits(distanceMetres, pacePerKm, 200,
+          { value: 200, unit: 'm', metres: 200 }, true);
+
+      case 'default':
+      default:
+        return this.calculateCustomSplits(distanceMetres, pacePerKm, eventConfig,
+          defaultIntervalMetres, defaultIntervalInfo);
+    }
+  }
+
+  /**
+   * Calculate splits with fixed intervals
+   * @param {number} distanceMetres - Total distance in metres
+   * @param {number} pacePerKm - Pace in seconds per km
+   * @param {number} intervalMetres - Fixed interval in metres
+   * @param {Object} intervalInfo - Interval display info { value, unit, metres }
+   * @param {boolean} remainderFirst - If true, put remainder at start (track mode)
+   * @returns {Array} Array of split objects
+   */
+  calculateFixedSplits(distanceMetres, pacePerKm, intervalMetres, intervalInfo, remainderFirst) {
+    const splits = [];
+
+    // Calculate remainder
+    const numFullIntervals = Math.floor(distanceMetres / intervalMetres);
+    const remainderMetres = distanceMetres % intervalMetres;
+
+    let currentDistanceMetres = 0;
+    let previousTime = 0;
+
+    // Track mode: Remainder first
+    if (remainderFirst && remainderMetres > 0) {
+      currentDistanceMetres = remainderMetres;
+      const cumulativeTime = (currentDistanceMetres / 1000) * pacePerKm;
+      const splitTime = cumulativeTime;
+
+      splits.push({
+        distanceLabel: `${remainderMetres.toFixed(0)}m`,
+        splitDistanceLabel: `${remainderMetres.toFixed(0)}m`,
+        splitTime: splitTime,
+        time: cumulativeTime
+      });
+
+      previousTime = cumulativeTime;
+    }
+
+    // Add full intervals
+    for (let i = 0; i < numFullIntervals; i++) {
+      currentDistanceMetres += intervalMetres;
+      const cumulativeTime = (currentDistanceMetres / 1000) * pacePerKm;
+      const splitTime = cumulativeTime - previousTime;
+
+      const distanceLabel = formatDistanceWithUnit(
+        currentDistanceMetres / intervalMetres * intervalInfo.value,
+        intervalInfo.unit
+      );
+      const splitDistanceLabel = formatDistanceWithUnit(intervalInfo.value, intervalInfo.unit);
+
+      splits.push({
+        distanceLabel,
+        splitDistanceLabel,
+        splitTime,
+        time: cumulativeTime
+      });
+
+      previousTime = cumulativeTime;
+    }
+
+    // Non-track mode: Remainder last
+    if (!remainderFirst && remainderMetres > 0) {
+      currentDistanceMetres += remainderMetres;
+      const cumulativeTime = (currentDistanceMetres / 1000) * pacePerKm;
+      const splitTime = cumulativeTime - previousTime;
+
+      splits.push({
+        distanceLabel: `${currentDistanceMetres.toFixed(0)}m`,
+        splitDistanceLabel: `${remainderMetres.toFixed(0)}m`,
+        splitTime: splitTime,
+        time: cumulativeTime
+      });
+    }
+
+    return splits;
   }
 
   /**
@@ -1839,6 +1992,8 @@ class PaceCalculator extends PaceCalculatorBase {
   calculateCustomSplits(distanceMetres, pacePerKm, eventConfig, splitIntervalMetres, paceIntervalInfo) {
     const splits = [];
     let currentDistanceMetres = 0;
+    let previousDistanceMetres = 0;
+    let previousTime = 0;
 
     // Calculate split interval unit for display
     const splitUnit = paceIntervalInfo ? paceIntervalInfo.unit : 'km';
@@ -1851,10 +2006,14 @@ class PaceCalculator extends PaceCalculatorBase {
         currentDistanceMetres = distanceMetres;
       }
 
-      // Calculate time for this split
-      const splitTime = (currentDistanceMetres / 1000) * pacePerKm;
+      // Calculate cumulative time for this split
+      const cumulativeTime = (currentDistanceMetres / 1000) * pacePerKm;
 
-      // Format distance label
+      // Calculate split distance and split time (delta from previous)
+      const splitDistanceMetres = currentDistanceMetres - previousDistanceMetres;
+      const splitTime = cumulativeTime - previousTime;
+
+      // Format cumulative distance label
       let distanceLabel;
       if (paceIntervalInfo) {
         // Custom interval - show in the interval units
@@ -1867,10 +2026,29 @@ class PaceCalculator extends PaceCalculatorBase {
         distanceLabel = formatDistanceWithUnit(distanceInKm, 'km');
       }
 
+      // Format split distance label
+      let splitDistanceLabel;
+      if (paceIntervalInfo) {
+        // Custom interval - show in the interval units
+        const splitDistanceInIntervalUnits = splitDistanceMetres / splitIntervalMetres * paceIntervalInfo.value;
+        const formattedValue = parseFloat(splitDistanceInIntervalUnits.toFixed(2));
+        splitDistanceLabel = formatDistanceWithUnit(formattedValue, splitUnit);
+      } else {
+        // Standard 1km intervals
+        const splitDistanceInKm = parseFloat((splitDistanceMetres / 1000).toFixed(2));
+        splitDistanceLabel = formatDistanceWithUnit(splitDistanceInKm, 'km');
+      }
+
       splits.push({
         distanceLabel: distanceLabel,
-        time: splitTime
+        splitDistanceLabel: splitDistanceLabel,
+        splitTime: splitTime,
+        time: cumulativeTime
       });
+
+      // Update previous values for next iteration
+      previousDistanceMetres = currentDistanceMetres;
+      previousTime = cumulativeTime;
     }
 
     return splits;
@@ -1891,6 +2069,35 @@ class PaceCalculator extends PaceCalculatorBase {
     splitsTitle.className = 'result-card__title';
     splitsTitle.textContent = 'Split Times';
 
+    // Create toggle group for split format selection
+    const toggleContainer = document.createElement('div');
+    toggleContainer.className = 'split-format-toggle-container';
+    toggleContainer.innerHTML = `
+      <label class="split-format-toggle-label">Split Format:</label>
+      <div class="mode-toggle split-format-toggle">
+        <button type="button" class="mode-toggle__option" data-format="default">Default</button>
+        <button type="button" class="mode-toggle__option" data-format="1km">1km</button>
+        <button type="button" class="mode-toggle__option" data-format="5km">5km</button>
+        <button type="button" class="mode-toggle__option" data-format="400m-track">400m Track</button>
+        <button type="button" class="mode-toggle__option" data-format="200m-track">200m Track</button>
+      </div>
+    `;
+
+    // Set active state based on current format
+    toggleContainer.querySelectorAll('.mode-toggle__option').forEach(btn => {
+      if (btn.dataset.format === this.currentSplitFormat) {
+        btn.classList.add('mode-toggle__option--active');
+      }
+    });
+
+    // Add event listener for toggle changes (event delegation)
+    toggleContainer.addEventListener('click', (e) => {
+      const button = e.target.closest('.mode-toggle__option');
+      if (button) {
+        this.handleSplitFormatChange(button.dataset.format);
+      }
+    });
+
     const splitsContent = document.createElement('div');
     splitsContent.className = 'history-table-container';
 
@@ -1899,6 +2106,8 @@ class PaceCalculator extends PaceCalculatorBase {
         <thead>
           <tr>
             <th>Distance</th>
+            <th>Split Distance</th>
+            <th>Split Time</th>
             <th>Cumulative Time</th>
           </tr>
         </thead>
@@ -1909,6 +2118,8 @@ class PaceCalculator extends PaceCalculatorBase {
       tableHTML += `
         <tr class="history-row">
           <td>${split.distanceLabel}</td>
+          <td>${split.splitDistanceLabel}</td>
+          <td class="history-row__performance">${formatTotalTime(split.splitTime)}</td>
           <td class="history-row__performance">${formatTotalTime(split.time)}</td>
         </tr>
       `;
@@ -1920,12 +2131,63 @@ class PaceCalculator extends PaceCalculatorBase {
     `;
 
     splitsContent.innerHTML = tableHTML;
+
+    // Wrap toggle and table together for collapsing
+    const collapsibleWrapper = document.createElement('div');
+    collapsibleWrapper.appendChild(toggleContainer);
+    collapsibleWrapper.appendChild(splitsContent);
+
     splitsCard.appendChild(splitsTitle);
-    splitsCard.appendChild(splitsContent);
+    splitsCard.appendChild(collapsibleWrapper);
     this.resultsContent.appendChild(splitsCard);
 
     // Make the split times section collapsible and start collapsed by default
-    makeCollapsible(splitsTitle, splitsContent, 'paceCalculator.splitTimes.collapsed', false);
+    makeCollapsible(splitsTitle, collapsibleWrapper, 'paceCalculator.splitTimes.collapsed', false);
+  }
+
+  /**
+   * Handle split format toggle change
+   * @param {string} format - New format value
+   */
+  handleSplitFormatChange(format) {
+    if (format === this.currentSplitFormat) return;
+
+    this.currentSplitFormat = format;
+    this.saveState();
+
+    // Update toggle button states
+    const buttons = document.querySelectorAll('.split-format-toggle .mode-toggle__option');
+    buttons.forEach(btn => {
+      if (btn.dataset.format === format) {
+        btn.classList.add('mode-toggle__option--active');
+      } else {
+        btn.classList.remove('mode-toggle__option--active');
+      }
+    });
+
+    // Recalculate and redisplay splits
+    this.recalculateSplits();
+  }
+
+  /**
+   * Recalculate and redisplay splits with current format
+   */
+  recalculateSplits() {
+    if (!this.lastCalculation) return;
+
+    const { distanceMetres, pacePerKm, eventConfig, intervalMetres, intervalInfo } = this.lastCalculation;
+
+    const splits = this.calculateSplitsWithFormat(
+      distanceMetres, pacePerKm, eventConfig, intervalMetres, intervalInfo
+    );
+
+    // Remove existing splits card
+    const existingSplitsCard = this.resultsContent.querySelector('.result-card:has(.split-format-toggle)');
+    if (existingSplitsCard) {
+      existingSplitsCard.remove();
+    }
+
+    this.displaySplits(splits);
   }
 
   /**
