@@ -11,7 +11,7 @@ import { createIcon } from '../components/icon.js';
  */
 function addToolCardIcons() {
   const iconMap = {
-    'Pace Calculator': 'timer',
+    'Pace & Speed Calculator': 'timer',
     'World Athletics Score Calculator': 'trophy',
     'Combined Event Score Calculator': 'layers'
   };
