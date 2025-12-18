@@ -82,8 +82,14 @@ body {
   background: var(--color-background);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);      /* 16px on mobile */
   margin-bottom: var(--spacing-xl);
+}
+
+@media (min-width: 640px) {
+  .calculator {
+    padding: var(--spacing-lg);    /* 24px on desktop */
+  }
 }
 
 .calculator__header {
