@@ -498,8 +498,7 @@ class PerformanceCalculator extends BaseCalculator {
         const history = HistoryManager.load();
         const entry = history.find(h => h.id === id);
         if (entry && entry.params) {
-          this.applyCalculationParams(entry.params, { skipSave: true });
-          this.resultsContainer?.scrollIntoView({ behavior: 'smooth' });
+          this.applyCalculationParams(entry.params, { skipSave: true, scrollToResults: true });
         }
       }
     });
@@ -577,9 +576,19 @@ class PerformanceCalculator extends BaseCalculator {
     if (!eventInfo) return;
     this.selectEvent(params.event, eventInfo.displayName);
 
-    // Set calculation mode
+    // Set calculation mode (update UI without clearing input/hiding results)
     if (params.mode && params.mode !== this.calculationMode) {
-      this.switchMode(params.mode);
+      this.calculationMode = params.mode;
+      if (params.mode === 'performance') {
+        this.modeTogglePerformance.classList.add('mode-toggle__option--active');
+        this.modeToggleScore.classList.remove('mode-toggle__option--active');
+        this.inputLabel.textContent = 'Performance';
+      } else {
+        this.modeToggleScore.classList.add('mode-toggle__option--active');
+        this.modeTogglePerformance.classList.remove('mode-toggle__option--active');
+        this.inputLabel.textContent = 'Score';
+      }
+      this.updateInputPlaceholder();
     }
 
     // Set hand timing
@@ -600,6 +609,13 @@ class PerformanceCalculator extends BaseCalculator {
 
     // Trigger calculation
     this.handleCalculate();
+
+    // Scroll to results after DOM updates
+    if (options.scrollToResults) {
+      requestAnimationFrame(() => {
+        this.resultsContainer?.scrollIntoView({ behavior: 'smooth' });
+      });
+    }
   }
 
   createShareButton() {

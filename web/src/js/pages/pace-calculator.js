@@ -2454,8 +2454,7 @@ class PaceCalculator extends PaceCalculatorBase {
       row.addEventListener('click', (e) => {
         if (e.target.closest('.history-delete-btn')) return;
         if (entry.params) {
-          this.applyCalculationParams(entry.params, { skipSave: true });
-          document.querySelector('#results-container')?.scrollIntoView({ behavior: 'smooth' });
+          this.applyCalculationParams(entry.params, { skipSave: true, scrollToResults: true });
         }
       });
 
@@ -2523,6 +2522,13 @@ class PaceCalculator extends PaceCalculatorBase {
       case 'speed-totalTime':
         this.handleSpeedTimeModeCalculate(subMode);
         break;
+    }
+
+    // Scroll to results after DOM updates
+    if (options.scrollToResults) {
+      requestAnimationFrame(() => {
+        document.querySelector(this.selectors.results)?.scrollIntoView({ behavior: 'smooth' });
+      });
     }
   }
 
