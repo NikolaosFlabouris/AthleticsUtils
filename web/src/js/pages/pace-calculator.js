@@ -2455,7 +2455,7 @@ class PaceCalculator extends PaceCalculatorBase {
         if (e.target.closest('.history-delete-btn')) return;
         if (entry.params) {
           this.applyCalculationParams(entry.params, { skipSave: true });
-          document.querySelector('.calculator')?.scrollIntoView({ behavior: 'smooth' });
+          document.querySelector('#results-container')?.scrollIntoView({ behavior: 'smooth' });
         }
       });
 

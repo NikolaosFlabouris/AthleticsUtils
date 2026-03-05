@@ -499,7 +499,7 @@ class PerformanceCalculator extends BaseCalculator {
         const entry = history.find(h => h.id === id);
         if (entry && entry.params) {
           this.applyCalculationParams(entry.params, { skipSave: true });
-          document.querySelector('.calculator')?.scrollIntoView({ behavior: 'smooth' });
+          this.resultsContainer?.scrollIntoView({ behavior: 'smooth' });
         }
       }
     });
