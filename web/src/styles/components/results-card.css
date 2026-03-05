@@ -93,3 +93,64 @@
   max-height: 0;
   opacity: 0;
 }
+
+/* Title row with share button */
+.result-card__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  position: relative;
+}
+
+.result-card__title-row .result-card__title {
+  margin-bottom: 0;
+}
+
+/* Share button */
+.share-btn {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.share-btn:hover {
+  background: var(--color-background-tertiary);
+  color: var(--color-primary);
+  border-color: var(--color-primary-light);
+}
+
+.share-btn:active {
+  transform: scale(0.95);
+}
+
+/* Share feedback toast */
+.share-toast {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: var(--spacing-xs);
+  background: var(--color-text);
+  color: var(--color-background);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+  animation: shareToastFade 2s ease-out forwards;
+  z-index: var(--z-tooltip);
+  pointer-events: none;
+}
+
+@keyframes shareToastFade {
+  0%, 70% { opacity: 1; }
+  100% { opacity: 0; }
+}

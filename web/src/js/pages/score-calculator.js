@@ -10,6 +10,7 @@ import { eventConfigLoader } from '../data/event-config-loader.js';
 import { HistoryManager } from '../utils/history-manager.js';
 import { makeCollapsible } from '../utils/collapsible-section.js';
 import { createIcon } from '../components/icon.js';
+import { buildShareUrl, parseUrlParams, clearUrlParams, copyToClipboard, SCORE_PARAM_MAP } from '../utils/url-params.js';
 
 class PerformanceCalculator extends BaseCalculator {
   constructor(selectors) {
@@ -51,6 +52,15 @@ class PerformanceCalculator extends BaseCalculator {
     Navigation.initialize();
     this.renderHistory();
     this.setupHistoryEventListeners();
+
+    // Check for URL params (shared link)
+    const params = parseUrlParams(SCORE_PARAM_MAP);
+    if (params) {
+      requestAnimationFrame(() => {
+        this.applyCalculationParams(params);
+        clearUrlParams();
+      });
+    }
   }
 
   switchMode(mode) {
@@ -207,10 +217,24 @@ class PerformanceCalculator extends BaseCalculator {
     const mainCard = document.createElement('div');
     mainCard.className = 'result-card';
 
+    this.currentCalcParams = {
+      gender: this.currentGender,
+      event: this.currentEvent,
+      mode: 'performance',
+      value: originalInput,
+      handTimed: this.isHandTimed ? '1' : '0'
+    };
+
+    const titleRow = document.createElement('div');
+    titleRow.className = 'result-card__title-row';
+
     const title = document.createElement('div');
     title.className = 'result-card__title';
     const eventDisplayName = eventConfigLoader.getEventInfo(this.currentEvent)?.displayName || this.currentEvent;
     title.textContent = `${eventDisplayName} - ${this.capitalizeFirst(this.currentGender)}`;
+
+    titleRow.appendChild(title);
+    titleRow.appendChild(this.createShareButton());
 
     const points = document.createElement('div');
     points.className = 'result-card__points';
@@ -234,7 +258,7 @@ class PerformanceCalculator extends BaseCalculator {
       `;
     }
 
-    mainCard.appendChild(title);
+    mainCard.appendChild(titleRow);
     mainCard.appendChild(points);
     mainCard.appendChild(content);
     this.resultsContent.appendChild(mainCard);
@@ -285,21 +309,36 @@ class PerformanceCalculator extends BaseCalculator {
       event: this.currentEvent,
       eventDisplayName: eventConfigLoader.getEventInfo(this.currentEvent)?.displayName || this.currentEvent,
       performance: formatPerformance(result.closestPerformance, this.currentEvent),
-      score: result.points
+      score: result.points,
+      params: this.currentCalcParams
     });
   }
 
   displayScoreResults(result, equivalents, submittedScore) {
     this.resultsContent.innerHTML = '';
 
+    this.currentCalcParams = {
+      gender: this.currentGender,
+      event: this.currentEvent,
+      mode: 'score',
+      value: String(submittedScore),
+      handTimed: this.isHandTimed ? '1' : '0'
+    };
+
     // Main result card
     const mainCard = document.createElement('div');
     mainCard.className = 'result-card';
+
+    const titleRow = document.createElement('div');
+    titleRow.className = 'result-card__title-row';
 
     const title = document.createElement('div');
     title.className = 'result-card__title';
     const eventDisplayName = eventConfigLoader.getEventInfo(this.currentEvent)?.displayName || this.currentEvent;
     title.textContent = `${eventDisplayName} - ${this.capitalizeFirst(this.currentGender)}`;
+
+    titleRow.appendChild(title);
+    titleRow.appendChild(this.createShareButton());
 
     const performanceElement = document.createElement('div');
     performanceElement.className = 'result-card__points';
@@ -320,7 +359,7 @@ class PerformanceCalculator extends BaseCalculator {
       performanceElement.textContent = performance;
     }
 
-    mainCard.appendChild(title);
+    mainCard.appendChild(titleRow);
     mainCard.appendChild(performanceElement);
     mainCard.appendChild(scoreElement);
     this.resultsContent.appendChild(mainCard);
@@ -371,11 +410,16 @@ class PerformanceCalculator extends BaseCalculator {
       event: this.currentEvent,
       eventDisplayName: eventConfigLoader.getEventInfo(this.currentEvent)?.displayName || this.currentEvent,
       performance: formatPerformance(result.performance, this.currentEvent),
-      score: submittedScore
+      score: submittedScore,
+      params: this.currentCalcParams
     });
   }
 
   saveToHistory(entry) {
+    if (this._skipNextHistorySave) {
+      this._skipNextHistorySave = false;
+      return;
+    }
     HistoryManager.addEntry(entry);
     this.renderHistory();
   }
@@ -427,11 +471,15 @@ class PerformanceCalculator extends BaseCalculator {
   }
 
   setupHistoryEventListeners() {
-    // Delete button clicks
+    let isDragging = false;
+
+    // Click handling (delete and replay)
     this.historyTableBody?.addEventListener('click', (e) => {
-      if (e.target.classList.contains('history-delete-btn')) {
-        const id = e.target.dataset.historyId;
-        const row = e.target.closest('tr');
+      // Delete button
+      const deleteBtn = e.target.closest('.history-delete-btn');
+      if (deleteBtn) {
+        const id = deleteBtn.dataset.historyId;
+        const row = deleteBtn.closest('tr');
 
         // Animate removal
         row.classList.add('history-row--removing');
@@ -439,6 +487,20 @@ class PerformanceCalculator extends BaseCalculator {
           HistoryManager.removeEntry(id);
           this.renderHistory();
         }, 200);
+        return;
+      }
+
+      // Row click -> replay (skip if dragging)
+      if (isDragging) return;
+      const row = e.target.closest('.history-row');
+      if (row) {
+        const id = row.dataset.historyId;
+        const history = HistoryManager.load();
+        const entry = history.find(h => h.id === id);
+        if (entry && entry.params) {
+          this.applyCalculationParams(entry.params, { skipSave: true });
+          document.querySelector('.calculator')?.scrollIntoView({ behavior: 'smooth' });
+        }
       }
     });
 
@@ -447,6 +509,7 @@ class PerformanceCalculator extends BaseCalculator {
 
     this.historyTableBody?.addEventListener('dragstart', (e) => {
       if (e.target.classList.contains('history-row')) {
+        isDragging = true;
         draggedElement = e.target;
         e.target.classList.add('dragging');
       }
@@ -456,6 +519,7 @@ class PerformanceCalculator extends BaseCalculator {
       if (e.target.classList.contains('history-row')) {
         e.target.classList.remove('dragging');
         draggedElement = null;
+        setTimeout(() => { isDragging = false; }, 0);
       }
     });
 
@@ -497,6 +561,81 @@ class PerformanceCalculator extends BaseCalculator {
         this.saveHistoryOrder();
       }
     });
+  }
+
+  applyCalculationParams(params, options = {}) {
+    if (!params || !params.gender || !params.event || !params.value) return;
+
+    // Set gender (force re-toggle by clearing current)
+    if (this.currentGender !== params.gender) {
+      this.currentGender = null;
+      this.handleGenderToggle(params.gender);
+    }
+
+    // Select event
+    const eventInfo = eventConfigLoader.getEventInfo(params.event);
+    if (!eventInfo) return;
+    this.selectEvent(params.event, eventInfo.displayName);
+
+    // Set calculation mode
+    if (params.mode && params.mode !== this.calculationMode) {
+      this.switchMode(params.mode);
+    }
+
+    // Set hand timing
+    if (params.handTimed === '1' && eventConfigLoader.supportsHandTiming(params.event)) {
+      this.handTimingCheckbox.checked = true;
+      this.isHandTimed = true;
+      this.handTimingContainer.style.display = 'block';
+    }
+
+    // Set input value and enable calculate
+    this.performanceInput.value = params.value;
+    this.calculateBtn.disabled = false;
+
+    // Skip save if replaying from history
+    if (options.skipSave) {
+      this._skipNextHistorySave = true;
+    }
+
+    // Trigger calculation
+    this.handleCalculate();
+  }
+
+  createShareButton() {
+    const shareBtn = document.createElement('button');
+    shareBtn.className = 'share-btn';
+    shareBtn.setAttribute('aria-label', 'Share this result');
+    shareBtn.title = 'Copy link to clipboard';
+    const shareIcon = createIcon('share', 'icon--sm');
+    shareBtn.appendChild(shareIcon);
+    shareBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.handleShare(e.currentTarget);
+    });
+    return shareBtn;
+  }
+
+  async handleShare(btnElement) {
+    if (!this.currentCalcParams) return;
+    const url = buildShareUrl(
+      '/calculators/score.html',
+      this.currentCalcParams,
+      SCORE_PARAM_MAP
+    );
+    const success = await copyToClipboard(url);
+    this.showShareFeedback(btnElement, success);
+  }
+
+  showShareFeedback(anchorElement, success) {
+    const existing = document.querySelector('.share-toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'share-toast';
+    toast.textContent = success ? 'Link copied!' : 'Failed to copy';
+    anchorElement.closest('.result-card__title-row')?.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
   }
 
   saveHistoryOrder() {
