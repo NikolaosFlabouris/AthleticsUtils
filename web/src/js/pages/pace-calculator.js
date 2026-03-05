@@ -35,6 +35,7 @@ import {
   formatDistanceWithUnit
 } from '../utils/pace-formatter.js';
 import { makeCollapsible } from '../utils/collapsible-section.js';
+import { buildShareUrl, parseUrlParams, clearUrlParams, copyToClipboard, PACE_PARAM_MAP } from '../utils/url-params.js';
 
 class PaceCalculator extends PaceCalculatorBase {
   constructor() {
@@ -160,6 +161,15 @@ class PaceCalculator extends PaceCalculatorBase {
 
     // Load and display history
     this.loadHistory();
+
+    // Check for URL params (shared link)
+    const urlParams = parseUrlParams(PACE_PARAM_MAP);
+    if (urlParams) {
+      requestAnimationFrame(() => {
+        this.applyCalculationParams(urlParams);
+        clearUrlParams();
+      });
+    }
   }
 
   /**
@@ -958,7 +968,15 @@ class PaceCalculator extends PaceCalculatorBase {
           distance: distanceDisplayName,
           totalTime: formatTotalTime(totalTimeSeconds),
           pace: `${formatPaceTime(paceSeconds)}/${paceUnit}`,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          params: {
+            measurementMode: 'pace',
+            calculateMode: 'calculate',
+            subMode: 'standard',
+            distanceKey: distanceSelect.value,
+            time: timeInput.value.trim(),
+            paceUnit: paceUnitSelect.value
+          }
         });
 
       } else {
@@ -1031,7 +1049,17 @@ class PaceCalculator extends PaceCalculatorBase {
           distance: distanceDisplayName,
           totalTime: formatTotalTime(totalTimeSeconds),
           pace: `${formatPaceTime(paceSeconds)}${paceIntervalText}`,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          params: {
+            measurementMode: 'pace',
+            calculateMode: 'calculate',
+            subMode: 'advanced',
+            distance: distanceValue,
+            distanceUnit,
+            time: timeInputValue,
+            paceInterval: paceIntervalValue,
+            paceIntervalUnit
+          }
         });
       }
 
@@ -1087,7 +1115,15 @@ class PaceCalculator extends PaceCalculatorBase {
           distance: distanceDisplayName,
           totalTime: formatTotalTime(totalTimeSeconds),
           pace: `${formatPaceTime(paceSeconds)}/${paceUnit}`,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          params: {
+            measurementMode: 'pace',
+            calculateMode: 'totalTime',
+            subMode: 'standard',
+            distanceKey: distanceSelect.value,
+            pace: paceInput.value.trim(),
+            paceUnit: paceUnitSelect.value
+          }
         });
 
       } else {
@@ -1160,7 +1196,17 @@ class PaceCalculator extends PaceCalculatorBase {
           distance: distanceDisplayName,
           totalTime: formatTotalTime(totalTimeSeconds),
           pace: `${formatPaceTime(paceSeconds)}${paceIntervalText}`,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          params: {
+            measurementMode: 'pace',
+            calculateMode: 'totalTime',
+            subMode: 'advanced',
+            distance: distanceValue,
+            distanceUnit,
+            pace: paceInputValue,
+            paceInterval: paceIntervalValue,
+            paceIntervalUnit
+          }
         });
       }
 
@@ -1212,7 +1258,15 @@ class PaceCalculator extends PaceCalculatorBase {
           distance: distanceDisplayName,
           totalTime: formatTotalTime(totalTimeSeconds),
           speed: formatSpeedWithUnit(speed, speedUnit),
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          params: {
+            measurementMode: 'speed',
+            calculateMode: 'calculate',
+            subMode: 'standard',
+            distanceKey: distanceSelect.value,
+            time: timeInput.value.trim(),
+            speedUnit: speedUnitSelect.value
+          }
         });
 
       } else {
@@ -1267,7 +1321,16 @@ class PaceCalculator extends PaceCalculatorBase {
           distance: distanceDisplayName,
           totalTime: formatTotalTime(totalTimeSeconds),
           speed: formatSpeedWithUnit(speed, speedUnit),
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          params: {
+            measurementMode: 'speed',
+            calculateMode: 'calculate',
+            subMode: 'advanced',
+            distance: distanceValue,
+            distanceUnit,
+            time: timeInputValue,
+            speedUnit
+          }
         });
       }
 
@@ -1319,7 +1382,15 @@ class PaceCalculator extends PaceCalculatorBase {
           distance: distanceDisplayName,
           totalTime: formatTotalTime(totalTimeSeconds),
           speed: formatSpeedWithUnit(speed, speedUnit),
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          params: {
+            measurementMode: 'speed',
+            calculateMode: 'totalTime',
+            subMode: 'standard',
+            distanceKey: distanceSelect.value,
+            speed: speedInput.value.trim(),
+            speedUnit: speedUnitSelect.value
+          }
         });
 
       } else {
@@ -1374,7 +1445,16 @@ class PaceCalculator extends PaceCalculatorBase {
           distance: distanceDisplayName,
           totalTime: formatTotalTime(totalTimeSeconds),
           speed: formatSpeedWithUnit(speed, speedUnit),
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          params: {
+            measurementMode: 'speed',
+            calculateMode: 'totalTime',
+            subMode: 'advanced',
+            distance: distanceValue,
+            distanceUnit,
+            speed: speedInputValue,
+            speedUnit
+          }
         });
       }
 
@@ -1420,11 +1500,26 @@ class PaceCalculator extends PaceCalculatorBase {
     // Main result card
     const mainCard = document.createElement('div');
     mainCard.className = 'result-card';
-    mainCard.innerHTML = `
-      <h3 class="result-card__title">Your Pace</h3>
-      <div class="result-card__points">${paceDisplayText}</div>
-      <p class="result-card__content">To complete ${eventConfig.displayName} in ${formatTotalTime(totalTimeSeconds)}</p>
-    `;
+
+    const titleRow = document.createElement('div');
+    titleRow.className = 'result-card__title-row';
+    const title = document.createElement('h3');
+    title.className = 'result-card__title';
+    title.textContent = 'Your Pace';
+    titleRow.appendChild(title);
+    titleRow.appendChild(this.createShareButton());
+    mainCard.appendChild(titleRow);
+
+    const pointsEl = document.createElement('div');
+    pointsEl.className = 'result-card__points';
+    pointsEl.textContent = paceDisplayText;
+    mainCard.appendChild(pointsEl);
+
+    const contentEl = document.createElement('p');
+    contentEl.className = 'result-card__content';
+    contentEl.textContent = `To complete ${eventConfig.displayName} in ${formatTotalTime(totalTimeSeconds)}`;
+    mainCard.appendChild(contentEl);
+
     this.resultsContent.appendChild(mainCard);
 
     // Equivalent paces (always show standard per km and per mile)
@@ -1567,11 +1662,26 @@ class PaceCalculator extends PaceCalculatorBase {
     // Main result card
     const mainCard = document.createElement('div');
     mainCard.className = 'result-card';
-    mainCard.innerHTML = `
-      <h3 class="result-card__title">Projected Finish Time</h3>
-      <div class="result-card__points">${formatTotalTime(totalTimeSeconds)}</div>
-      <p class="result-card__content">For ${eventConfig.displayName} at ${paceDisplayText} pace</p>
-    `;
+
+    const titleRowTime = document.createElement('div');
+    titleRowTime.className = 'result-card__title-row';
+    const titleTime = document.createElement('h3');
+    titleTime.className = 'result-card__title';
+    titleTime.textContent = 'Projected Finish Time';
+    titleRowTime.appendChild(titleTime);
+    titleRowTime.appendChild(this.createShareButton());
+    mainCard.appendChild(titleRowTime);
+
+    const pointsElTime = document.createElement('div');
+    pointsElTime.className = 'result-card__points';
+    pointsElTime.textContent = formatTotalTime(totalTimeSeconds);
+    mainCard.appendChild(pointsElTime);
+
+    const contentElTime = document.createElement('p');
+    contentElTime.className = 'result-card__content';
+    contentElTime.textContent = `For ${eventConfig.displayName} at ${paceDisplayText} pace`;
+    mainCard.appendChild(contentElTime);
+
     this.resultsContent.appendChild(mainCard);
 
     // Equivalent paces (always show standard per km and per mile)
@@ -1692,11 +1802,25 @@ class PaceCalculator extends PaceCalculatorBase {
     // Main result card
     const mainCard = document.createElement('div');
     mainCard.className = 'result-card';
-    mainCard.innerHTML = `
-      <h3 class="result-card__title">Your Speed</h3>
-      <div class="result-card__points">${speedDisplayText}</div>
-      <p class="result-card__content">To complete ${eventConfig.displayName} in ${formatTotalTime(totalTimeSeconds)}</p>
-    `;
+
+    const titleRowSpeed = document.createElement('div');
+    titleRowSpeed.className = 'result-card__title-row';
+    const titleSpeed = document.createElement('h3');
+    titleSpeed.className = 'result-card__title';
+    titleSpeed.textContent = 'Your Speed';
+    titleRowSpeed.appendChild(titleSpeed);
+    titleRowSpeed.appendChild(this.createShareButton());
+    mainCard.appendChild(titleRowSpeed);
+
+    const pointsElSpeed = document.createElement('div');
+    pointsElSpeed.className = 'result-card__points';
+    pointsElSpeed.textContent = speedDisplayText;
+    mainCard.appendChild(pointsElSpeed);
+
+    const contentElSpeed = document.createElement('p');
+    contentElSpeed.className = 'result-card__content';
+    contentElSpeed.textContent = `To complete ${eventConfig.displayName} in ${formatTotalTime(totalTimeSeconds)}`;
+    mainCard.appendChild(contentElSpeed);
     this.resultsContent.appendChild(mainCard);
 
     // Equivalent paces & speeds (all 10 conversions)
@@ -1792,11 +1916,25 @@ class PaceCalculator extends PaceCalculatorBase {
     // Main result card
     const mainCard = document.createElement('div');
     mainCard.className = 'result-card';
-    mainCard.innerHTML = `
-      <h3 class="result-card__title">Projected Finish Time</h3>
-      <div class="result-card__points">${formatTotalTime(totalTimeSeconds)}</div>
-      <p class="result-card__content">For ${eventConfig.displayName} at ${speedDisplayText}</p>
-    `;
+
+    const titleRowST = document.createElement('div');
+    titleRowST.className = 'result-card__title-row';
+    const titleST = document.createElement('h3');
+    titleST.className = 'result-card__title';
+    titleST.textContent = 'Projected Finish Time';
+    titleRowST.appendChild(titleST);
+    titleRowST.appendChild(this.createShareButton());
+    mainCard.appendChild(titleRowST);
+
+    const pointsElST = document.createElement('div');
+    pointsElST.className = 'result-card__points';
+    pointsElST.textContent = formatTotalTime(totalTimeSeconds);
+    mainCard.appendChild(pointsElST);
+
+    const contentElST = document.createElement('p');
+    contentElST.className = 'result-card__content';
+    contentElST.textContent = `For ${eventConfig.displayName} at ${speedDisplayText}`;
+    mainCard.appendChild(contentElST);
     this.resultsContent.appendChild(mainCard);
 
     // Equivalent paces & speeds (all 10 conversions)
@@ -2194,6 +2332,16 @@ class PaceCalculator extends PaceCalculatorBase {
    * Save calculation to history
    */
   saveToHistory(entry) {
+    // Store current params for share button
+    if (entry.params) {
+      this.currentCalcParams = entry.params;
+    }
+
+    if (this._skipNextHistorySave) {
+      this._skipNextHistorySave = false;
+      return;
+    }
+
     try {
       let history = this.getHistory();
 
@@ -2302,6 +2450,14 @@ class PaceCalculator extends PaceCalculatorBase {
         this.deleteHistoryEntry(entry.id);
       });
 
+      // Add row click -> replay
+      row.addEventListener('click', (e) => {
+        if (e.target.closest('.history-delete-btn')) return;
+        if (entry.params) {
+          this.applyCalculationParams(entry.params, { skipSave: true, scrollToResults: true });
+        }
+      });
+
       this.historyTableBody.appendChild(row);
     });
   }
@@ -2314,6 +2470,162 @@ class PaceCalculator extends PaceCalculatorBase {
     const filtered = history.filter(entry => entry.id !== id);
     localStorage.setItem(this.historyStorageKey, JSON.stringify(filtered));
     this.renderHistory();
+  }
+
+  applyCalculationParams(params, options = {}) {
+    if (!params || !params.measurementMode || !params.calculateMode || !params.subMode) return;
+
+    // Set mode state
+    this.currentMeasurementMode = params.measurementMode;
+    this.currentMode = params.calculateMode;
+
+    // Set the correct sub-mode property
+    if (params.measurementMode === 'pace') {
+      if (params.calculateMode === 'calculate') {
+        this.currentPaceMode = params.subMode;
+      } else {
+        this.currentTimeMode = params.subMode;
+      }
+    } else {
+      if (params.calculateMode === 'calculate') {
+        this.currentSpeedMode = params.subMode;
+      } else {
+        this.currentSpeedTimeMode = params.subMode;
+      }
+    }
+
+    // Apply visual state (buttons, visibility)
+    this.applyModeState();
+    this.saveState();
+
+    // Populate form fields
+    this.populateFields(params);
+
+    // Skip save if replaying from history
+    if (options.skipSave) {
+      this._skipNextHistorySave = true;
+    }
+
+    // Trigger calculation
+    const subMode = params.subMode;
+    const key = `${params.measurementMode}-${params.calculateMode}`;
+    switch (key) {
+      case 'pace-calculate':
+        this.handlePaceModeCalculate(subMode);
+        break;
+      case 'pace-totalTime':
+        this.handleTimeModeCalculate(subMode);
+        break;
+      case 'speed-calculate':
+        this.handleSpeedModeCalculate(subMode);
+        break;
+      case 'speed-totalTime':
+        this.handleSpeedTimeModeCalculate(subMode);
+        break;
+    }
+
+    // Scroll to results after DOM updates
+    if (options.scrollToResults) {
+      requestAnimationFrame(() => {
+        document.querySelector(this.selectors.results)?.scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+  }
+
+  populateFields(params) {
+    const key = `${params.measurementMode}-${params.calculateMode}-${params.subMode}`;
+
+    switch (key) {
+      case 'pace-calculate-standard':
+        if (params.distanceKey) this.distanceSelectPaceStandard.value = params.distanceKey;
+        if (params.time) this.timeInputPaceStandard.value = params.time;
+        if (params.paceUnit) this.paceUnitSelectStandard.value = params.paceUnit;
+        break;
+
+      case 'pace-calculate-advanced':
+        if (params.distance) this.distanceInputPaceAdvanced.value = params.distance;
+        if (params.distanceUnit) this.distanceUnitSelectPaceAdvanced.value = params.distanceUnit;
+        if (params.time) this.timeInputPaceAdvanced.value = params.time;
+        if (params.paceInterval) this.paceIntervalInputPaceAdvanced.value = params.paceInterval;
+        if (params.paceIntervalUnit) this.paceIntervalUnitSelectPaceAdvanced.value = params.paceIntervalUnit;
+        break;
+
+      case 'pace-totalTime-standard':
+        if (params.distanceKey) this.distanceSelectTimeStandard.value = params.distanceKey;
+        if (params.pace) this.paceInputTimeStandard.value = params.pace;
+        if (params.paceUnit) this.paceUnitSelectTimeStandard.value = params.paceUnit;
+        break;
+
+      case 'pace-totalTime-advanced':
+        if (params.distance) this.distanceInputTimeAdvanced.value = params.distance;
+        if (params.distanceUnit) this.distanceUnitSelectTimeAdvanced.value = params.distanceUnit;
+        if (params.pace) this.paceInputTimeAdvanced.value = params.pace;
+        if (params.paceInterval) this.paceIntervalInputTimeAdvanced.value = params.paceInterval;
+        if (params.paceIntervalUnit) this.paceIntervalUnitSelectTimeAdvanced.value = params.paceIntervalUnit;
+        break;
+
+      case 'speed-calculate-standard':
+        if (params.distanceKey) this.distanceSelectSpeedStandard.value = params.distanceKey;
+        if (params.time) this.timeInputSpeedStandard.value = params.time;
+        if (params.speedUnit) this.speedUnitSelectStandard.value = params.speedUnit;
+        break;
+
+      case 'speed-calculate-advanced':
+        if (params.distance) this.distanceInputSpeedAdvanced.value = params.distance;
+        if (params.distanceUnit) this.distanceUnitSelectSpeedAdvanced.value = params.distanceUnit;
+        if (params.time) this.timeInputSpeedAdvanced.value = params.time;
+        if (params.speedUnit) this.speedUnitSelectAdvanced.value = params.speedUnit;
+        break;
+
+      case 'speed-totalTime-standard':
+        if (params.distanceKey) this.distanceSelectSpeedTimeStandard.value = params.distanceKey;
+        if (params.speed) this.speedInputTimeStandard.value = params.speed;
+        if (params.speedUnit) this.speedUnitSelectTimeStandard.value = params.speedUnit;
+        break;
+
+      case 'speed-totalTime-advanced':
+        if (params.distance) this.distanceInputSpeedTimeAdvanced.value = params.distance;
+        if (params.distanceUnit) this.distanceUnitSelectSpeedTimeAdvanced.value = params.distanceUnit;
+        if (params.speed) this.speedInputTimeAdvanced.value = params.speed;
+        if (params.speedUnit) this.speedUnitSelectTimeAdvanced.value = params.speedUnit;
+        break;
+    }
+  }
+
+  createShareButton() {
+    const shareBtn = document.createElement('button');
+    shareBtn.className = 'share-btn';
+    shareBtn.setAttribute('aria-label', 'Share this result');
+    shareBtn.title = 'Copy link to clipboard';
+    const shareIcon = createIcon('share', 'icon--sm');
+    shareBtn.appendChild(shareIcon);
+    shareBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.handleShare(e.currentTarget);
+    });
+    return shareBtn;
+  }
+
+  async handleShare(btnElement) {
+    if (!this.currentCalcParams) return;
+    const url = buildShareUrl(
+      '/calculators/pace.html',
+      this.currentCalcParams,
+      PACE_PARAM_MAP
+    );
+    const success = await copyToClipboard(url);
+    this.showShareFeedback(btnElement, success);
+  }
+
+  showShareFeedback(anchorElement, success) {
+    const existing = document.querySelector('.share-toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'share-toast';
+    toast.textContent = success ? 'Link copied!' : 'Failed to copy';
+    anchorElement.closest('.result-card__title-row')?.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
   }
 
   /**
