@@ -10,7 +10,7 @@
   margin-bottom: var(--spacing-md);
 }
 
-.history-header h3 {
+.history-header h2 {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text);

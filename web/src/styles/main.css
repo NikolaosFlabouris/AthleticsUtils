@@ -449,7 +449,7 @@ main:focus-visible {
   border-top: 2px solid var(--color-border-light);
 }
 
-.results-header h3 {
+.results-header h2 {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
   margin-bottom: var(--spacing-lg);
@@ -505,10 +505,17 @@ main:focus-visible {
   margin-bottom: var(--spacing-xl);
 }
 
-.info-section h2,
-.info-section h3 {
+.info-section h2 {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-md);
+  color: var(--color-text);
+}
+
+.info-section h3 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  margin-top: var(--spacing-lg);
   margin-bottom: var(--spacing-md);
   color: var(--color-text);
 }

@@ -206,7 +206,7 @@
   border-top: 2px solid var(--color-border, #dee2e6);
 }
 
-.running-totals h4 {
+.running-totals h2 {
   font-size: var(--font-size-lg, 1.125rem);
   font-weight: var(--font-weight-semibold, 600);
   color: var(--color-text, #212529);
@@ -329,7 +329,7 @@
     border-top-color: var(--color-border-dark, #444);
   }
 
-  .running-totals h4 {
+  .running-totals h2 {
     color: var(--color-text-dark, #f8f9fa);
   }
 
