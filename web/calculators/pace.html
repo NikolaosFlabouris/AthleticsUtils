@@ -3,19 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Running Pace & Speed Calculator - Calculate your running pace per km or mile, or determine finish times based on your pace.">
-  <meta name="keywords" content="pace calculator, running pace, pace per km, pace per mile, running calculator, marathon pace, 5k pace, 10k pace, half marathon pace">
+  <meta name="description" content="Free running pace & speed calculator. Convert between pace (min/km, min/mile) and speed (km/h, mph, m/s), get split times, and calculate finish times for 5K, 10K, half marathon, and marathon.">
   <meta name="theme-color" content="#1a73e8">
-  <title>Athletics Utilities | Pace & Speed Calculator</title>
+  <title>Running Pace & Speed Calculator — min/km, min/mile, Splits</title>
+  <link rel="canonical" href="https://athleticsutils.com/calculators/pace.html">
   <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Athletics Utilities">
+  <meta property="og:url" content="https://athleticsutils.com/calculators/pace.html">
+  <meta property="og:title" content="Running Pace & Speed Calculator — min/km, min/mile, Splits">
+  <meta property="og:description" content="Free running pace & speed calculator with splits and unit conversions for 5K, 10K, half marathon, and marathon.">
+  <meta property="og:image" content="https://athleticsutils.com/icons/og-pace.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Running Pace & Speed Calculator — min/km, min/mile, Splits">
+  <meta name="twitter:description" content="Free running pace & speed calculator with splits and unit conversions.">
+  <meta name="twitter:image" content="https://athleticsutils.com/icons/og-pace.png">
+
   <link rel="stylesheet" href="../src/styles/main.css">
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Running Pace & Speed Calculator",
+    "url": "https://athleticsutils.com/calculators/pace.html",
+    "applicationCategory": "SportsApplication",
+    "operatingSystem": "Any (web browser)",
+    "browserRequirements": "Requires JavaScript",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "description": "Free calculator that converts between pace and speed, produces split times, and computes finish times for any distance including 5K, 10K, half marathon, and marathon.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Athletics Utilities",
+      "url": "https://athleticsutils.com/"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://athleticsutils.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Pace & Speed Calculator", "item": "https://athleticsutils.com/calculators/pace.html" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I calculate my running pace?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Select the distance, enter your total time in MM:SS or HH:MM:SS format, and choose whether you want the pace shown per kilometre or per mile. The calculator returns your pace along with equivalent speeds."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I calculate finish time from a target pace?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Switch the Calculate toggle to Total Time, enter your target pace or speed, and pick the distance. The calculator returns the expected finish time and splits."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does the calculator support miles and kilometres?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. All inputs and outputs support both imperial and metric units, including min/km, min/mile, km/h, mph, m/s, ft/s, and yd/s."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <header class="header">
     <div class="container">
       <div class="header__brand">
-        <h1 class="header__title"><a href="/" class="header__title-link">Athletics Utilities</a></h1>
+        <p class="header__title"><a href="/" class="header__title-link">Athletics Utilities</a></p>
         <p class="header__subtitle">Pace & Speed Calculator</p>
       </div>
     </div>
@@ -36,7 +115,7 @@
     <div class="container">
       <section class="calculator">
         <div class="calculator__header">
-          <h2>Pace & Speed Calculator</h2>
+          <h1>Pace & Speed Calculator</h1>
           <p class="calculator__description">
             Calculate the required pace or speed based on the target time, or calculate the total time based on the target pace or speed. Use Advanced mode for custom distances and pace intervals.
           </p>
@@ -538,7 +617,7 @@
       </section>
 
       <section class="info-section">
-        <h3>How to Use</h3>
+        <h2>How to Use</h2>
         <p>
           <strong>Select Pace or Speed:</strong><br>
           Choose whether to calculate pace (time per distance) or speed (distance per time).
@@ -574,11 +653,29 @@
           &bull; Click the share button on a result to copy a shareable link to your clipboard<br>
           &bull; Click any row in the history table to re-run that calculation
         </p>
+
+        <h2>Related Calculators</h2>
+        <p>
+          Once you know your pace, convert any track or field performance into points with the
+          <a href="/calculators/score.html">World Athletics Score Calculator</a>, or total up a multi-event competition
+          using the <a href="/calculators/combined-events.html">Combined Event Score Calculator</a>.
+        </p>
       </section>
     </div>
   </main>
 
   <footer class="footer">
+    <div class="container">
+      <p class="footer__links">
+        <a href="/">Home</a>
+        &nbsp;·&nbsp;
+        <a href="/calculators/pace.html">Pace &amp; Speed</a>
+        &nbsp;·&nbsp;
+        <a href="/calculators/score.html">World Athletics Score</a>
+        &nbsp;·&nbsp;
+        <a href="/calculators/combined-events.html">Combined Events</a>
+      </p>
+    </div>
   </footer>
 
   <script type="module" src="../src/js/pages/pace-calculator.js"></script>

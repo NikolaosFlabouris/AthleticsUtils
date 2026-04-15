@@ -3,14 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Free athletics calculators including World Athletics Score Calculator (IAAF Points Calculator) for track and field performance analysis. Calculate points, compare performances, and more.">
-  <meta name="keywords" content="World Athletics calculator, IAAF calculator, athletics points, track and field calculator, World Athletics scoring tables, athletics performance calculator">
+  <meta name="description" content="Free athletics calculators: pace & speed, World Athletics / IAAF points, and combined events (decathlon, heptathlon, pentathlon). Uses the official 2025 scoring tables.">
   <meta name="theme-color" content="#1a73e8">
-  <title>Athletics Utilities</title>
+  <title>Free Athletics Calculators — Pace, World Athletics Score, Combined Events</title>
+  <link rel="canonical" href="https://athleticsutils.com/">
   <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Athletics Utilities">
+  <meta property="og:url" content="https://athleticsutils.com/">
+  <meta property="og:title" content="Free Athletics Calculators — Pace, World Athletics Score, Combined Events">
+  <meta property="og:description" content="Free calculators for track & field: pace & speed, World Athletics points, and decathlon / heptathlon / pentathlon scoring. 2025 tables. No signup.">
+  <meta property="og:image" content="https://athleticsutils.com/icons/og-default.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Free Athletics Calculators — Pace, World Athletics Score, Combined Events">
+  <meta name="twitter:description" content="Free calculators for track & field: pace, World Athletics points, decathlon, heptathlon, pentathlon. 2025 tables.">
+  <meta name="twitter:image" content="https://athleticsutils.com/icons/og-default.png">
+
   <link rel="stylesheet" href="./src/styles/main.css">
   <link rel="stylesheet" href="./src/styles/pages/home.css">
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Athletics Utilities",
+    "alternateName": "AthleticsUtils",
+    "url": "https://athleticsutils.com/",
+    "description": "Free athletics calculators for track and field athletes, coaches, and fans.",
+    "inLanguage": "en"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Athletics Utilities",
+    "url": "https://athleticsutils.com/",
+    "logo": "https://athleticsutils.com/icons/icon-512.png"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "url": "https://athleticsutils.com/calculators/pace.html",
+        "name": "Pace & Speed Calculator"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "url": "https://athleticsutils.com/calculators/score.html",
+        "name": "World Athletics Score Calculator"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "url": "https://athleticsutils.com/calculators/combined-events.html",
+        "name": "Combined Event Score Calculator"
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <header class="header">
@@ -38,7 +103,7 @@
 
       <section class="tools-grid">
         <div class="tool-card">
-          <h3 class="tool-card__title">Pace & Speed Calculator</h3>
+          <h2 class="tool-card__title">Pace & Speed Calculator</h2>
           <p class="tool-card__description">
             Calculate your required pace or speed based on your target time, or determine your finish time based on your target pace or speed.
             Includes split times and pace and speed conversions.
@@ -47,7 +112,7 @@
         </div>
 
         <div class="tool-card">
-          <h3 class="tool-card__title">World Athletics Score Calculator</h3>
+          <h2 class="tool-card__title">World Athletics Score Calculator</h2>
           <p class="tool-card__description">
             Calculate World Athletics points for any track and field performance using official scoring tables.
             Find your score and discover equivalent performances across all athletics events.
@@ -56,7 +121,7 @@
         </div>
 
         <div class="tool-card">
-          <h3 class="tool-card__title">Combined Event Score Calculator</h3>
+          <h2 class="tool-card__title">Combined Event Score Calculator</h2>
           <p class="tool-card__description">
             Calculate scores for combined events including Decathlon, Heptathlon, and Pentathlon.
             Enter performances for each discipline and get the total score based on official World Athletics scoring tables.
@@ -66,10 +131,17 @@
       </section>
 
       <section class="info-section">
-        <h3>About</h3>
+        <h2>About</h2>
         <h4>Athletics Utilities</h4>
         <p>
-          Handy calculators for track and field athletes, coaches, and fans.
+          Handy calculators for track and field athletes, coaches, and fans. Every tool is free, requires no signup,
+          works in your browser, and can be installed as a Progressive Web App for offline use.
+        </p>
+        <p>
+          Start with the <a href="/calculators/pace.html">Pace &amp; Speed Calculator</a> to plan training sessions and race splits,
+          use the <a href="/calculators/score.html">World Athletics Score Calculator</a> to convert any track or field performance into
+          World Athletics (formerly IAAF) points, or work out a multi-event total with the
+          <a href="/calculators/combined-events.html">Combined Event Score Calculator</a> for decathlon, heptathlon, and pentathlon.
         </p>
 
         <!-- <h4>Feedback & Source Code</h4>
@@ -88,13 +160,17 @@
   </main>
 
   <footer class="footer">
-    <!-- <div class="container">
+    <div class="container">
       <p class="footer__links">
-        <a href="https://github.com/NikolaosFlabouris/AthleticsUtils" target="_blank" rel="noopener">
-          Source
-        </a>
+        <a href="/">Home</a>
+        &nbsp;·&nbsp;
+        <a href="/calculators/pace.html">Pace &amp; Speed</a>
+        &nbsp;·&nbsp;
+        <a href="/calculators/score.html">World Athletics Score</a>
+        &nbsp;·&nbsp;
+        <a href="/calculators/combined-events.html">Combined Events</a>
       </p>
-    </div> -->
+    </div>
   </footer>
 
   <script type="module" src="./src/js/pages/home.js"></script>

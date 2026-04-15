@@ -96,6 +96,7 @@ body {
   margin-bottom: var(--spacing-xl);
 }
 
+.calculator__header h1,
 .calculator__header h2 {
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-semibold);
@@ -439,6 +440,7 @@ body {
   margin-bottom: var(--spacing-xl);
 }
 
+.info-section h2,
 .info-section h3 {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);

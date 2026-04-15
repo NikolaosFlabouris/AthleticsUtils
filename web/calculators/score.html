@@ -3,19 +3,106 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="World Athletics Score Calculator - Calculate points for track and field performances.">
-  <meta name="keywords" content="World Athletics calculator, IAAF calculator, athletics points calculator, track and field scoring, World Athletics points, IAAF points, athletics score calculator, decathlon calculator, heptathlon calculator">
+  <meta name="description" content="Free World Athletics / IAAF points calculator using the official 2025 scoring tables. Convert any track & field performance to points and find equivalent performances across every event.">
   <meta name="theme-color" content="#1a73e8">
-  <title>Athletics Utilities | Score Calculator</title>
+  <title>World Athletics Points Calculator (2025 IAAF Scoring Tables)</title>
+  <link rel="canonical" href="https://athleticsutils.com/calculators/score.html">
   <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Athletics Utilities">
+  <meta property="og:url" content="https://athleticsutils.com/calculators/score.html">
+  <meta property="og:title" content="World Athletics Points Calculator (2025 IAAF Scoring Tables)">
+  <meta property="og:description" content="Free calculator that converts any track & field performance to World Athletics points using the official 2025 scoring tables.">
+  <meta property="og:image" content="https://athleticsutils.com/icons/og-score.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="World Athletics Points Calculator (2025 IAAF Scoring Tables)">
+  <meta name="twitter:description" content="Free World Athletics / IAAF points calculator using the official 2025 scoring tables.">
+  <meta name="twitter:image" content="https://athleticsutils.com/icons/og-score.png">
+
   <link rel="stylesheet" href="../src/styles/main.css">
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "World Athletics Score Calculator",
+    "url": "https://athleticsutils.com/calculators/score.html",
+    "applicationCategory": "SportsApplication",
+    "operatingSystem": "Any (web browser)",
+    "browserRequirements": "Requires JavaScript",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "description": "Free calculator that converts any track and field performance to World Athletics (formerly IAAF) points using the official 2025 scoring tables, and finds equivalent performances across every event.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Athletics Utilities",
+      "url": "https://athleticsutils.com/"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://athleticsutils.com/" },
+      { "@type": "ListItem", "position": 2, "name": "World Athletics Score Calculator", "item": "https://athleticsutils.com/calculators/score.html" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What are World Athletics points?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "World Athletics points (formerly IAAF points) are a standard way to compare performances across different track and field events. Each performance is converted into a score using official World Athletics scoring tables so performances in different events can be compared on a common scale."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which scoring tables does the calculator use?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The calculator uses the official World Athletics Scoring Tables of Athletics (2025). Both outdoor (track) and Short Track (formerly indoor) events are supported."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I enter a hand-timed performance?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Tick the Hand Timed checkbox for sprint and hurdle events. The calculator automatically adds 0.24s for events up to and including 200m and 0.14s for 300m, 400m and 400m hurdles before looking up the score."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I find a performance that equals a given score?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Switch the calculation mode to Score \u2192 Performance, enter a target score, and the calculator returns the equivalent performance in the selected event as well as comparable performances in every other event."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <header class="header">
     <div class="container">
       <div class="header__brand">
-        <h1 class="header__title"><a href="/" class="header__title-link">Athletics Utilities</a></h1>
+        <p class="header__title"><a href="/" class="header__title-link">Athletics Utilities</a></p>
         <p class="header__subtitle">World Athletics Score Calculator</p>
       </div>
     </div>
@@ -36,7 +123,7 @@
     <div class="container">
       <section class="calculator">
         <div class="calculator__header">
-          <h2>World Athletics Score Calculator</h2>
+          <h1>World Athletics Score Calculator</h1>
           <p class="calculator__description">
             Calculate a score for any track and field performance using the official World Athletics 2025 Scoring Tables.
           </p>
@@ -188,7 +275,7 @@
       </section>
 
       <section class="info-section">
-        <h3>How to Use</h3>
+        <h2>How to Use</h2>
         <p>
           <strong>Performance → Score:</strong><br>
           1. Select your gender and event<br>
@@ -207,7 +294,7 @@
           &bull; Click any row in the history table to re-run that calculation
         </p>
 
-        <h3 style="margin-top: 2rem;">About World Athletics Scoring Tables</h3>
+        <h2 style="margin-top: 2rem;">About World Athletics Scoring Tables</h2>
         <p>
           This calculator uses the official <strong>World Athletics Scoring Tables</strong> (formerly IAAF scoring tables)
           to calculate points for track and field performances. Notes about the World Athletics Scoring tables:
@@ -223,11 +310,29 @@
             </ul>
           </li>
         </ul>
+
+        <h2 style="margin-top: 2rem;">Related Calculators</h2>
+        <p>
+          Totalling up a multi-event competition? Use the
+          <a href="/calculators/combined-events.html">Combined Event Score Calculator</a> for decathlon, heptathlon, and pentathlon.
+          Planning training paces? Try the <a href="/calculators/pace.html">Pace &amp; Speed Calculator</a>.
+        </p>
       </section>
     </div>
   </main>
 
   <footer class="footer">
+    <div class="container">
+      <p class="footer__links">
+        <a href="/">Home</a>
+        &nbsp;·&nbsp;
+        <a href="/calculators/pace.html">Pace &amp; Speed</a>
+        &nbsp;·&nbsp;
+        <a href="/calculators/score.html">World Athletics Score</a>
+        &nbsp;·&nbsp;
+        <a href="/calculators/combined-events.html">Combined Events</a>
+      </p>
+    </div>
   </footer>
 
   <script type="module" src="../src/js/pages/score-calculator.js"></script>
