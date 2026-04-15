@@ -4,11 +4,13 @@
  */
 
 import { createIcon } from './icon.js';
+import { initAriaToggleSync } from '../utils/aria-toggle-sync.js';
 
 export class Navigation {
   static initialize() {
     this.updateActiveLink();
     this.addNavigationIcons();
+    initAriaToggleSync();
   }
 
   static updateActiveLink() {
@@ -19,13 +21,16 @@ export class Navigation {
       const href = link.getAttribute('href');
 
       // Check if current path matches link
-      if (
+      const isActive =
         (href === '/' && (currentPath === '/' || currentPath === '/index.html')) ||
-        (href !== '/' && currentPath.includes(href.replace('.html', '')))
-      ) {
+        (href !== '/' && currentPath.includes(href.replace('.html', '')));
+
+      if (isActive) {
         link.classList.add('navigation__link--active');
+        link.setAttribute('aria-current', 'page');
       } else {
         link.classList.remove('navigation__link--active');
+        link.removeAttribute('aria-current');
       }
     });
   }

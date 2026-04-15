@@ -104,6 +104,7 @@
   </script>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   <header class="header">
     <div class="container">
       <div class="header__brand">
@@ -124,11 +125,11 @@
     </div>
   </nav>
 
-  <main class="main">
+  <main class="main" id="main-content" tabindex="-1">
     <div class="container">
-      <section class="calculator">
+      <section class="calculator" aria-labelledby="calculator-heading">
         <div class="calculator__header">
-          <h1>World Athletics Score Calculator</h1>
+          <h1 id="calculator-heading">World Athletics Score Calculator</h1>
           <p class="calculator__description">
             Calculate a score for any track and field performance using the official World Athletics 2025 Scoring Tables.
           </p>
@@ -136,13 +137,14 @@
 
         <div class="calculator__controls">
           <div class="form-group">
-            <label>Gender</label>
-            <div class="gender-toggle">
+            <label id="gender-toggle-label">Gender</label>
+            <div class="gender-toggle" role="group" aria-labelledby="gender-toggle-label">
               <button
                 type="button"
                 id="gender-toggle-men"
                 class="gender-toggle__option"
                 data-gender="men"
+                aria-pressed="false"
               >
                 Men
               </button>
@@ -151,6 +153,7 @@
                 id="gender-toggle-women"
                 class="gender-toggle__option"
                 data-gender="women"
+                aria-pressed="false"
               >
                 Women
               </button>
@@ -159,6 +162,7 @@
                 id="gender-toggle-mixed"
                 class="gender-toggle__option"
                 data-gender="mixed"
+                aria-pressed="false"
               >
                 Mixed
               </button>
@@ -172,6 +176,9 @@
                 type="button"
                 id="event-trigger"
                 class="event-trigger form-input"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+                aria-controls="event-list"
                 disabled
               >
                 <span id="event-trigger-text" class="event-trigger__text">Select event...</span>
@@ -184,9 +191,20 @@
                     class="event-dropdown__search"
                     placeholder="Search events..."
                     autocomplete="off"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-controls="event-list"
+                    aria-expanded="true"
+                    aria-label="Search events"
                   >
                 </div>
-                <div id="event-list" class="event-dropdown__list">
+                <div
+                  id="event-list"
+                  class="event-dropdown__list"
+                  role="listbox"
+                  aria-label="Events"
+                  tabindex="-1"
+                >
                   <!-- Filtered events will appear here -->
                 </div>
               </div>
@@ -194,13 +212,14 @@
           </div>
 
           <div class="form-group">
-            <label>Calculation Mode</label>
-            <div class="mode-toggle">
+            <label id="mode-toggle-label">Calculation Mode</label>
+            <div class="mode-toggle" role="group" aria-labelledby="mode-toggle-label">
               <button
                 type="button"
                 id="mode-toggle-performance"
                 class="mode-toggle__option mode-toggle__option--active"
                 data-mode="performance"
+                aria-pressed="true"
               >
                 Performance → Score
               </button>
@@ -209,6 +228,7 @@
                 id="mode-toggle-score"
                 class="mode-toggle__option"
                 data-mode="score"
+                aria-pressed="false"
               >
                 Score → Performance
               </button>

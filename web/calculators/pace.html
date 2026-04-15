@@ -92,6 +92,7 @@
   </script>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   <header class="header">
     <div class="container">
       <div class="header__brand">
@@ -112,11 +113,11 @@
     </div>
   </nav>
 
-  <main class="main">
+  <main class="main" id="main-content" tabindex="-1">
     <div class="container">
-      <section class="calculator">
+      <section class="calculator" aria-labelledby="calculator-heading">
         <div class="calculator__header">
-          <h1>Pace & Speed Calculator</h1>
+          <h1 id="calculator-heading">Pace & Speed Calculator</h1>
           <p class="calculator__description">
             Calculate the required pace or speed based on the target time, or calculate the total time based on the target pace or speed. Use Advanced mode for custom distances and pace intervals.
           </p>
@@ -125,13 +126,14 @@
         <div class="calculator__controls">
           <!-- PRIMARY TOGGLE: Pace vs Speed -->
           <div class="form-group">
-            <label>Measurement Type:</label>
-            <div class="mode-toggle">
+            <label id="measurement-toggle-label">Measurement Type:</label>
+            <div class="mode-toggle" role="group" aria-labelledby="measurement-toggle-label">
               <button
                 type="button"
                 id="mode-toggle-measurement-pace"
                 class="mode-toggle__option mode-toggle__option--active"
                 data-mode="pace"
+                aria-pressed="true"
               >
                 Pace
               </button>
@@ -140,6 +142,7 @@
                 id="mode-toggle-measurement-speed"
                 class="mode-toggle__option"
                 data-mode="speed"
+                aria-pressed="false"
               >
                 Speed
               </button>
@@ -148,13 +151,14 @@
 
           <!-- SECONDARY TOGGLE: Calculate vs Time (dynamic labels) -->
           <div class="form-group">
-            <label>Calculate:</label>
-            <div class="mode-toggle">
+            <label id="calculate-toggle-label">Calculate:</label>
+            <div class="mode-toggle" role="group" aria-labelledby="calculate-toggle-label">
               <button
                 type="button"
                 id="mode-toggle-calculate"
                 class="mode-toggle__option mode-toggle__option--active"
                 data-mode="calculate"
+                aria-pressed="true"
               >
                 <span id="calculate-label">Pace</span>
               </button>
@@ -163,6 +167,7 @@
                 id="mode-toggle-time"
                 class="mode-toggle__option"
                 data-mode="totalTime"
+                aria-pressed="false"
               >
                 <span id="time-label">Total Time</span>
               </button>
@@ -171,13 +176,14 @@
 
           <!-- TERTIARY TOGGLE: Standard vs Advanced -->
           <div class="form-group">
-            <label>Mode:</label>
-            <div class="mode-toggle">
+            <label id="advanced-toggle-label">Mode:</label>
+            <div class="mode-toggle" role="group" aria-labelledby="advanced-toggle-label">
               <button
                 type="button"
                 id="mode-toggle-standard"
                 class="mode-toggle__option mode-toggle__option--active"
                 data-mode="standard"
+                aria-pressed="true"
               >
                 Standard
               </button>
@@ -186,6 +192,7 @@
                 id="mode-toggle-advanced"
                 class="mode-toggle__option"
                 data-mode="advanced"
+                aria-pressed="false"
               >
                 Advanced
               </button>

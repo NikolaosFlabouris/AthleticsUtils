@@ -95,6 +95,7 @@
   </script>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   <header class="header">
     <div class="container">
       <div class="header__brand">
@@ -115,11 +116,11 @@
     </div>
   </nav>
 
-  <main class="main">
+  <main class="main" id="main-content" tabindex="-1">
     <div class="container">
-      <section class="calculator">
+      <section class="calculator" aria-labelledby="calculator-heading">
         <div class="calculator__header">
-          <h1>Combined Event Score Calculator</h1>
+          <h1 id="calculator-heading">Combined Event Score Calculator</h1>
           <p class="calculator__description">
             Calculate total scores for combined events (e.g Decathlon, Heptathlon, Pentathlon) using official World Athletics scoring tables.
           </p>
@@ -127,13 +128,14 @@
 
         <div class="calculator__controls">
           <div class="form-group">
-            <label>Gender</label>
-            <div class="gender-toggle">
+            <label id="gender-toggle-label">Gender</label>
+            <div class="gender-toggle" role="group" aria-labelledby="gender-toggle-label">
               <button
                 type="button"
                 id="gender-toggle-men"
                 class="gender-toggle__option"
                 data-gender="men"
+                aria-pressed="false"
               >
                 Men
               </button>
@@ -142,6 +144,7 @@
                 id="gender-toggle-women"
                 class="gender-toggle__option"
                 data-gender="women"
+                aria-pressed="false"
               >
                 Women
               </button>

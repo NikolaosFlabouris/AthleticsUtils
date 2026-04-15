@@ -68,7 +68,7 @@ class PerformanceCalculator extends BaseCalculator {
 
     this.calculationMode = mode;
 
-    // Update toggle button states
+    // Update toggle button states (aria-pressed mirrors via utils/aria-toggle-sync.js)
     if (mode === 'performance') {
       this.modeTogglePerformance.classList.add('mode-toggle__option--active');
       this.modeToggleScore.classList.remove('mode-toggle__option--active');
@@ -578,6 +578,7 @@ class PerformanceCalculator extends BaseCalculator {
     this.selectEvent(params.event, eventInfo.displayName);
 
     // Set calculation mode (update UI without clearing input/hiding results)
+    // (aria-pressed mirrors via utils/aria-toggle-sync.js)
     if (params.mode && params.mode !== this.calculationMode) {
       this.calculationMode = params.mode;
       if (params.mode === 'performance') {
