@@ -5,12 +5,14 @@
 
 import { createIcon } from './icon.js';
 import { initAriaToggleSync } from '../utils/aria-toggle-sync.js';
+import { initPwaAutoUpdate } from '../utils/pwa-updater.js';
 
 export class Navigation {
   static initialize() {
     this.updateActiveLink();
     this.addNavigationIcons();
     initAriaToggleSync();
+    initPwaAutoUpdate();
   }
 
   static updateActiveLink() {
