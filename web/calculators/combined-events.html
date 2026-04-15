@@ -8,7 +8,11 @@
   <title>Decathlon, Heptathlon & Pentathlon Score Calculator (2025)</title>
   <link rel="canonical" href="https://athleticsutils.com/calculators/combined-events.html">
   <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
+  <!-- Preload the small config file so it downloads in parallel with the JS bundle -->
+  <link rel="preload" as="fetch" href="/data/combined-event-config.min.json" crossorigin>
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
@@ -248,6 +252,47 @@
         <p>
           The formulas are calibrated to balance scoring across different event types, ensuring that no single
           discipline dominates the total score. All point values are rounded down to the nearest whole number.
+        </p>
+
+        <h2>Disciplines in each combined event</h2>
+        <p><strong>Men's Decathlon</strong> — contested over two consecutive days:</p>
+        <ul>
+          <li><strong>Day 1:</strong> 100&nbsp;m, Long Jump, Shot Put, High Jump, 400&nbsp;m</li>
+          <li><strong>Day 2:</strong> 110&nbsp;m Hurdles, Discus, Pole Vault, Javelin, 1500&nbsp;m</li>
+        </ul>
+        <p><strong>Women's Heptathlon</strong> — contested over two consecutive days:</p>
+        <ul>
+          <li><strong>Day 1:</strong> 100&nbsp;m Hurdles, High Jump, Shot Put, 200&nbsp;m</li>
+          <li><strong>Day 2:</strong> Long Jump, Javelin, 800&nbsp;m</li>
+        </ul>
+        <p>
+          <strong>Men's Heptathlon (Short Track)</strong> and <strong>Women's Pentathlon (Short Track)</strong>
+          are the indoor variants, contested in one or two days depending on the schedule.
+          Short Track events use different implement weights and hurdle heights — the calculator
+          handles this automatically once you pick the event.
+        </p>
+
+        <h2>What counts as a good score?</h2>
+        <p>
+          A few reference points to calibrate expectations. The calculator uses the 2025 tables, so
+          historical totals from earlier editions may differ by a handful of points.
+        </p>
+        <ul>
+          <li><strong>Decathlon (men):</strong> 8000 points is typically national-level, 8500 is international, and 9000+ is reserved for the handful of athletes on the all-time list. The world record sits just above 9100.</li>
+          <li><strong>Heptathlon (women):</strong> 6000 points is a strong national standard, 6500 is international, and 7000+ is world-class. The world record sits just above 7200.</li>
+          <li><strong>Pentathlon (Short Track):</strong> 4000 points (women) and 6000 points (men's heptathlon indoor) mark the top of the indoor season.</li>
+        </ul>
+        <p>
+          Use the calculator to see how each individual mark contributes to the total. Because the scoring
+          curves are non-linear, improving a weak event by 100 points is often easier than squeezing the
+          same improvement out of your best event — a handy way for coaches to prioritise training load.
+        </p>
+
+        <h2>Running total and progressive entry</h2>
+        <p>
+          You don't need to enter every discipline at once. The running total updates as you fill each field,
+          which makes the calculator useful during a live competition — follow along event by event and see
+          the projected total build. The <strong>Clear All</strong> button resets the form when you're done.
         </p>
 
         <h2>Related Calculators</h2>

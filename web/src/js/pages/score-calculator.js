@@ -562,13 +562,14 @@ class PerformanceCalculator extends BaseCalculator {
     });
   }
 
-  applyCalculationParams(params, options = {}) {
+  async applyCalculationParams(params, options = {}) {
     if (!params || !params.gender || !params.event || !params.value) return;
 
-    // Set gender (force re-toggle by clearing current)
+    // Set gender (force re-toggle by clearing current). This may lazily fetch
+    // the scoring data for that gender, so await it before continuing.
     if (this.currentGender !== params.gender) {
       this.currentGender = null;
-      this.handleGenderToggle(params.gender);
+      await this.handleGenderToggle(params.gender);
     }
 
     // Select event

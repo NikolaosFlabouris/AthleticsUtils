@@ -35,7 +35,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
-        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // 4 MiB for scoring tables JSON
+        maximumFileSizeToCacheInBytes: 2 * 1024 * 1024, // 2 MiB is enough for the per-gender scoring files
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -52,12 +52,12 @@ export default defineConfig({
             }
           },
           {
-            urlPattern: /\/data\/athletics_scoring_tables\.min\.json$/,
+            urlPattern: /\/data\/scoring-(men|women|mixed)\.min\.json$/,
             handler: 'CacheFirst',
             options: {
               cacheName: 'scoring-tables-cache',
               expiration: {
-                maxEntries: 1,
+                maxEntries: 3,
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
               }
             }

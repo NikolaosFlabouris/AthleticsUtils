@@ -1,117 +1,124 @@
 /**
  * Scoring Data Loader
- * Handles loading and caching of the athletics scoring tables JSON
+ * Handles lazy, per-gender loading and caching of the athletics scoring tables.
+ *
+ * The scoring tables are split by gender on disk (scoring-{gender}.min.json)
+ * so we only download the data the user actually needs. Each gender file is
+ * ~1.5 MB (men / women) or ~40 KB (mixed relays).
  */
+
+const GENDER_FILES = {
+  men: 'scoring-men.min.json',
+  women: 'scoring-women.min.json',
+  mixed: 'scoring-mixed.min.json'
+};
 
 class ScoringDataLoader {
   constructor() {
-    this.data = null;
-    this.isLoading = false;
-    this.loadPromise = null;
+    // Per-gender scoring tables merged into a single object as they are loaded.
+    // Shape after loading, e.g., 'men': { men: { sprints: { '100m': [[pts, perf], ...] } } }
+    this.data = {};
+    // Map of gender -> in-flight fetch promise (prevents duplicate concurrent fetches).
+    this.loadPromises = {};
   }
 
   /**
-   * Load the scoring tables data
-   * @returns {Promise<Object>} The scoring tables data
+   * Ensure the scoring data for a given gender is loaded and cached.
+   * @param {string} gender - 'men' | 'women' | 'mixed'
+   * @returns {Promise<Object>} The scoring data subtree for that gender.
    */
-  async load() {
-    // Return cached data if available
-    if (this.data) {
-      return this.data;
+  loadGender(gender) {
+    if (!gender || !(gender in GENDER_FILES)) {
+      return Promise.reject(new Error(`Unknown gender: ${gender}`));
     }
 
-    // Return existing load promise if already loading
-    if (this.isLoading) {
-      return this.loadPromise;
+    // Already cached
+    if (this.data[gender]) {
+      return Promise.resolve(this.data[gender]);
     }
 
-    this.isLoading = true;
+    // Already fetching
+    if (this.loadPromises[gender]) {
+      return this.loadPromises[gender];
+    }
 
-    this.loadPromise = this.fetchData()
-      .then(data => {
-        this.data = data;
-        this.isLoading = false;
-        return data;
+    const baseUrl = import.meta.env?.BASE_URL || '/';
+    const url = `${baseUrl}data/${GENDER_FILES[gender]}`;
+
+    const promise = fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to load scoring tables (${gender}): ${response.status} ${response.statusText}`);
+        }
+        return response.json();
       })
-      .catch(error => {
-        this.isLoading = false;
-        throw error;
+      .then((subtree) => {
+        if (!subtree || typeof subtree !== 'object') {
+          throw new Error(`Invalid scoring data format for ${gender}`);
+        }
+        this.data[gender] = subtree;
+        delete this.loadPromises[gender];
+        return subtree;
+      })
+      .catch((error) => {
+        delete this.loadPromises[gender];
+        console.error(`Error loading scoring tables for ${gender}:`, error);
+        throw new Error(`Could not load scoring data for ${gender}: ${error.message}`);
       });
 
-    return this.loadPromise;
+    this.loadPromises[gender] = promise;
+    return promise;
   }
 
   /**
-   * Fetch the scoring tables JSON
-   * @returns {Promise<Object>}
-   */
-  async fetchData() {
-    try {
-      // Use import.meta.env.BASE_URL to respect Vite's base configuration
-      const baseUrl = import.meta.env?.BASE_URL || '/';
-      const response = await fetch(`${baseUrl}data/athletics_scoring_tables.min.json`);
-
-      if (!response.ok) {
-        throw new Error(`Failed to load scoring tables: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-
-      // Validate data structure
-      if (!data || typeof data !== 'object') {
-        throw new Error('Invalid data format: expected object');
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error loading scoring tables:', error);
-      throw new Error(`Could not load scoring data: ${error.message}`);
-    }
-  }
-
-  /**
-   * Get all available genders
+   * Get all available genders (all genders that the app supports, not just loaded ones).
    * @returns {string[]}
    */
   getGenders() {
-    if (!this.data) {
-      return [];
-    }
-    return Object.keys(this.data);
+    return Object.keys(GENDER_FILES);
   }
 
   /**
-   * Get all categories for a given gender
+   * Check whether a gender's scoring data is currently loaded.
+   * @param {string} gender
+   * @returns {boolean}
+   */
+  isGenderLoaded(gender) {
+    return Boolean(this.data[gender]);
+  }
+
+  /**
+   * Get all categories for a given gender. Requires the gender to be loaded.
    * @param {string} gender
    * @returns {string[]}
    */
   getCategories(gender) {
-    if (!this.data || !this.data[gender]) {
+    if (!this.data[gender]) {
       return [];
     }
     return Object.keys(this.data[gender]);
   }
 
   /**
-   * Get all events for a given gender and category
+   * Get all events for a given gender and category. Requires the gender to be loaded.
    * @param {string} gender
    * @param {string} category
    * @returns {string[]}
    */
   getEvents(gender, category) {
-    if (!this.data || !this.data[gender] || !this.data[gender][category]) {
+    if (!this.data[gender] || !this.data[gender][category]) {
       return [];
     }
     return Object.keys(this.data[gender][category]);
   }
 
   /**
-   * Get all events across all categories for a gender
+   * Get all events across all categories for a gender. Requires the gender to be loaded.
    * @param {string} gender
    * @returns {Array<{event: string, category: string}>}
    */
   getAllEvents(gender) {
-    if (!this.data || !this.data[gender]) {
+    if (!this.data[gender]) {
       return [];
     }
 
@@ -129,27 +136,27 @@ class ScoringDataLoader {
   }
 
   /**
-   * Get scoring data for a specific event
+   * Get scoring data for a specific event. Requires the gender to be loaded.
    * @param {string} gender
    * @param {string} category
    * @param {string} event
-   * @returns {Array<[number, string]>} Array of [points, performance] pairs
+   * @returns {Array<[number, string]>|null}
    */
   getEventData(gender, category, event) {
-    if (!this.data || !this.data[gender] || !this.data[gender][category] || !this.data[gender][category][event]) {
+    if (!this.data[gender] || !this.data[gender][category] || !this.data[gender][category][event]) {
       return null;
     }
     return this.data[gender][category][event];
   }
 
   /**
-   * Find the category for a given event and gender
+   * Find the category for a given event and gender. Requires the gender to be loaded.
    * @param {string} gender
    * @param {string} eventName
    * @returns {string|null}
    */
   findCategory(gender, eventName) {
-    if (!this.data || !this.data[gender]) {
+    if (!this.data[gender]) {
       return null;
     }
 
@@ -165,20 +172,11 @@ class ScoringDataLoader {
   }
 
   /**
-   * Check if data is loaded
-   * @returns {boolean}
-   */
-  isDataLoaded() {
-    return this.data !== null;
-  }
-
-  /**
-   * Clear cached data
+   * Clear cached data (for tests).
    */
   clear() {
-    this.data = null;
-    this.isLoading = false;
-    this.loadPromise = null;
+    this.data = {};
+    this.loadPromises = {};
   }
 }
 

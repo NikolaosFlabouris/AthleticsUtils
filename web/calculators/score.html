@@ -8,7 +8,12 @@
   <title>World Athletics Points Calculator (2025 IAAF Scoring Tables)</title>
   <link rel="canonical" href="https://athleticsutils.com/calculators/score.html">
   <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
+  <!-- Preload the small always-needed config file so it downloads in parallel with the JS bundle.
+       The larger scoring table is fetched lazily based on the user's selected gender. -->
+  <link rel="preload" as="fetch" href="/data/events_config.json" crossorigin>
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
@@ -309,6 +314,54 @@
               <li>300m, 400m and 400m Hurdles: add 0.14 seconds</li>
             </ul>
           </li>
+        </ul>
+
+        <h2 style="margin-top: 2rem;">How the scoring formula works</h2>
+        <p>
+          The World Athletics scoring tables are generated from three simple formulas — one for track events,
+          one for jumps, and one for throws. Each has the same shape,
+          <code>Points = a &times; (performance &minus; b)<sup>c</sup></code>,
+          with per-event constants (<em>a</em>, <em>b</em>, and <em>c</em>) chosen so that roughly
+          equivalent performances produce roughly equal scores across disciplines.
+        </p>
+        <ul>
+          <li><strong>Track events</strong> use <code>Points = a &times; (b &minus; Time)<sup>c</sup></code>, because faster times should score higher.</li>
+          <li><strong>Jumps</strong> use <code>Points = a &times; (Distance &minus; b)<sup>c</sup></code>, where the threshold <em>b</em> represents a nominal zero-point performance.</li>
+          <li><strong>Throws</strong> use the same shape as jumps, calibrated for each implement weight.</li>
+        </ul>
+        <p>
+          World Athletics republishes the tables periodically (this calculator uses the 2025 edition).
+          Results are rounded down to the nearest whole point, which matches how they are reported for
+          combined events at World Championships and the Olympics.
+        </p>
+
+        <h2>Example calculations</h2>
+        <p>
+          A few reference points to sanity-check results. All values come from the official Men's Open tables.
+        </p>
+        <ul>
+          <li><strong>100&nbsp;m — 10.00s</strong> → 1206 points</li>
+          <li><strong>100&nbsp;m — 11.00s</strong> → 886 points</li>
+          <li><strong>400&nbsp;m — 45.00s</strong> → 1180 points</li>
+          <li><strong>1500&nbsp;m — 3:30.01</strong> → 1245 points</li>
+          <li><strong>Marathon — 2:04:59</strong> → 1223 points</li>
+          <li><strong>Long Jump — 8.00&nbsp;m</strong> → 1138 points</li>
+          <li><strong>High Jump — 2.30&nbsp;m</strong> → 1179 points</li>
+          <li><strong>Shot Put — 20.00&nbsp;m</strong> → 1121 points</li>
+        </ul>
+        <p>
+          Around 1000 points is an international-level performance. 1200+ points represents world-class
+          territory and is where the top of the all-time lists sit. The calculator also returns
+          <strong>equivalent performances</strong> — given your score, what you would need to run, jump, or
+          throw in every other event to match it — which is a quick way to benchmark a result across disciplines.
+        </p>
+
+        <h2>Glossary</h2>
+        <ul>
+          <li><strong>Open / age group:</strong> the calculator uses Open-age event specifications (standard implement weight, hurdle height, and steeple barrier height). Using Open tables for U18 or U20 performances will under-score them because the specifications are different.</li>
+          <li><strong>Short Track (indoor):</strong> events contested on a banked 200&nbsp;m oval. They have their own tables where the event is listed separately (e.g. "60&nbsp;m" and "60&nbsp;m Hurdles" are Short Track events).</li>
+          <li><strong>Hand timing:</strong> manual stopwatch timing, which consistently reads faster than fully automatic timing. Tick the Hand Timed checkbox and the calculator adds the official offset before looking up the score.</li>
+          <li><strong>Mixed events:</strong> currently limited to mixed-gender relays.</li>
         </ul>
 
         <h2 style="margin-top: 2rem;">Related Calculators</h2>

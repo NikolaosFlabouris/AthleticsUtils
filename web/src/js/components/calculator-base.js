@@ -93,12 +93,18 @@ export class BaseCalculator {
     try {
       this.showLoading(true);
       this.hideError();
+
+      // Event config is small (~20 KB) so always load it up front.
+      // Scoring tables are split by gender and loaded lazily — fetch the
+      // saved/default gender now so the initial UI is ready without a spinner.
+      const savedGender = sessionStorage.getItem('selectedGender') || 'men';
       await Promise.all([
-        scoringDataLoader.load(),
-        eventConfigLoader.load()
+        eventConfigLoader.load(),
+        scoringDataLoader.loadGender(savedGender)
       ]);
+
       this.allEvents = eventConfigLoader.getAllEvents();
-      this.initializeGenderToggle();
+      await this.initializeGenderToggle();
       this.showLoading(false);
     } catch (error) {
       console.error('Error loading scoring data:', error);
@@ -107,15 +113,15 @@ export class BaseCalculator {
     }
   }
 
-  initializeGenderToggle() {
+  async initializeGenderToggle() {
     // Load saved gender from session storage, default to 'men'
     const savedGender = sessionStorage.getItem('selectedGender') || 'men';
 
     // Set the initial gender and trigger UI update
-    this.handleGenderToggle(savedGender);
+    await this.handleGenderToggle(savedGender);
   }
 
-  handleGenderToggle(gender) {
+  async handleGenderToggle(gender) {
     // Don't do anything if clicking the already selected gender
     if (this.currentGender === gender) {
       return;
@@ -140,13 +146,37 @@ export class BaseCalculator {
       this.genderToggleMixed?.classList.add('gender-toggle__option--active');
     }
 
-    // Update available events and reset event selection
-    this.filterAvailableEvents(this.currentGender);
-    this.eventTrigger.disabled = false;
-    this.eventTriggerText.textContent = 'Select event...';
+    // Reset event selection UI while we (potentially) fetch this gender's data.
+    this.eventTrigger.disabled = true;
+    this.eventTriggerText.textContent = 'Loading…';
     this.performanceInput.disabled = true;
     this.calculateBtn.disabled = true;
     this.hideResults();
+
+    // Lazy-load the scoring data for this gender if not already cached.
+    if (!scoringDataLoader.isGenderLoaded(gender)) {
+      this.showLoading(true);
+      try {
+        await scoringDataLoader.loadGender(gender);
+      } catch (error) {
+        console.error('Error loading scoring data for gender:', error);
+        this.showError('Failed to load scoring tables. Please try again.');
+        this.showLoading(false);
+        return;
+      }
+      this.showLoading(false);
+    }
+
+    // If the user toggled to another gender while this one was loading,
+    // don't clobber the newer selection.
+    if (this.currentGender !== gender) {
+      return;
+    }
+
+    // Update available events and unlock the event picker.
+    this.filterAvailableEvents(this.currentGender);
+    this.eventTrigger.disabled = false;
+    this.eventTriggerText.textContent = 'Select event...';
   }
 
   filterAvailableEvents(gender) {
