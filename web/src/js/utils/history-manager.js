@@ -88,6 +88,27 @@ export class HistoryManager {
   }
 
   /**
+   * Move an entry one slot up or down (for keyboard-accessible reordering).
+   * No-op if the entry is already at the edge in that direction.
+   * @param {string} id - Entry ID to move
+   * @param {'up'|'down'} direction
+   * @returns {Array} Updated history
+   */
+  static moveEntry(id, direction) {
+    const history = this.load();
+    const idx = history.findIndex(e => e.id === id);
+    if (idx < 0) return history;
+
+    const newIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (newIdx < 0 || newIdx >= history.length) return history;
+
+    const [item] = history.splice(idx, 1);
+    history.splice(newIdx, 0, item);
+    this.save(history);
+    return history;
+  }
+
+  /**
    * Clear all history
    */
   static clear() {

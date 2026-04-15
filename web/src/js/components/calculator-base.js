@@ -224,6 +224,17 @@ export class BaseCalculator {
       e.preventDefault();
       this.hideEventDropdown();
       this.eventTrigger.focus();
+    } else if (e.key === 'Tab') {
+      // Focus trap: don't let Tab leak to elements behind the overlay.
+      // Close the dropdown and return focus to the trigger, then let the
+      // browser continue its normal tab traversal from there.
+      e.preventDefault();
+      this.hideEventDropdown();
+      this.eventTrigger.focus();
+      // Reissue a synthetic tab-move after the trigger regains focus so the
+      // user still progresses/regresses one field as they expected.
+      const moveBackward = e.shiftKey;
+      requestAnimationFrame(() => this.moveFocusFrom(this.eventTrigger, moveBackward));
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
       if (options.length === 0) return;
@@ -269,6 +280,38 @@ export class BaseCalculator {
   clearHighlightedOption() {
     this.highlightedOptionIndex = -1;
     this.eventSearch?.removeAttribute('aria-activedescendant');
+  }
+
+  /**
+   * Move keyboard focus one step forward or backward from a reference element,
+   * matching the browser's default Tab / Shift+Tab behaviour. Used after
+   * closing the event dropdown on Tab so the user still advances by one
+   * logical step instead of getting stuck on the trigger.
+   */
+  moveFocusFrom(fromElement, backward = false) {
+    if (!fromElement) return;
+
+    // Build a snapshot of the document's tabbable elements in tab order.
+    const candidates = Array.from(
+      document.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]),' +
+        ' select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+    ).filter(el => {
+      if (el.hasAttribute('disabled')) return false;
+      if (el.getAttribute('aria-hidden') === 'true') return false;
+      // Skip elements inside hidden containers. offsetParent is null when
+      // display:none is applied anywhere up the ancestor chain.
+      if (el.offsetParent === null && el !== document.activeElement) return false;
+      return true;
+    });
+
+    const idx = candidates.indexOf(fromElement);
+    if (idx === -1) return;
+
+    const nextIdx = backward ? idx - 1 : idx + 1;
+    if (nextIdx < 0 || nextIdx >= candidates.length) return;
+    candidates[nextIdx].focus();
   }
 
   selectEvent(eventKey, displayName) {

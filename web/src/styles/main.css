@@ -67,6 +67,31 @@ body {
   outline-offset: 2px;
 }
 
+/* Accessibility: global keyboard focus ring.
+   `:focus-visible` only triggers on keyboard focus (not mouse clicks), so
+   mouse users don't get a persistent halo, but tab-navigation always has
+   a clearly visible indicator. Individual components can opt out by
+   setting `outline: none` in their own `:focus-visible` rule. */
+:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Don't leave a stray outline on `main` when focused via the skip link. */
+main:focus-visible {
+  outline: none;
+}
+
+/* Form inputs already change their border on `:focus`; the global outline
+   is redundant next to the border, so suppress it on keyboard focus and
+   rely on the existing (now stronger) border-colour + box-shadow combo. */
+.form-select:focus-visible,
+.form-input:focus-visible,
+.event-dropdown__search:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.35);
+}
+
 /* Container */
 .container {
   max-width: var(--container-max-width);
