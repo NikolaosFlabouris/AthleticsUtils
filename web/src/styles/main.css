@@ -7,6 +7,8 @@
 @import './components/pwa-update-toast.css';
 @import './combined-events.css';
 @import './pages/pace.css';
+@import './pages/age.css';
+@import './pages/time.css';
 
 /* Reset and Base Styles */
 *,

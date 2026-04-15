@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Free age calculator. Calculate exact age in years, months, and days between any two dates, or work backwards from an age to find a resulting date.">
+  <meta name="theme-color" content="#1a73e8">
+  <title>Age Calculator — Years, Months, Days Between Dates</title>
+  <link rel="canonical" href="https://athleticsutils.com/calculators/age.html">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Athletics Utilities">
+  <meta property="og:url" content="https://athleticsutils.com/calculators/age.html">
+  <meta property="og:title" content="Age Calculator — Years, Months, Days Between Dates">
+  <meta property="og:description" content="Free age calculator for exact years, months, and days between dates. Includes a reverse mode and end-of-year age for athletics age groups.">
+  <meta property="og:image" content="https://athleticsutils.com/icons/og-default.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Age Calculator — Years, Months, Days Between Dates">
+  <meta name="twitter:description" content="Free age calculator with reverse mode and end-of-year age for athletics age groups.">
+  <meta name="twitter:image" content="https://athleticsutils.com/icons/og-default.png">
+
+  <link rel="stylesheet" href="../src/styles/main.css">
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Age Calculator",
+    "url": "https://athleticsutils.com/calculators/age.html",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any (web browser)",
+    "browserRequirements": "Requires JavaScript",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "description": "Free calculator that returns the exact age in years, months, and days between two dates, and a reverse mode for working from an age back to a date.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Athletics Utilities",
+      "url": "https://athleticsutils.com/"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://athleticsutils.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Age Calculator", "item": "https://athleticsutils.com/calculators/age.html" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How is age calculated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Enter a 'from' date (typically a date of birth) and a 'target' date (defaults to today). The calculator returns the difference in years, months, and days using the standard calendar convention — so on someone's 30th birthday, it reads exactly 30 years, 0 months, 0 days."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What does 'age at end of year (31st Dec)' mean?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "It is the age the person will be on 31 December of the year the target date falls in. Many athletics age-group competitions use this figure to decide which category an athlete competes in."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I calculate a date from an age?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes — switch to Reverse mode. Enter a date and an age, choose whether the date is the 'from' date (result is target) or the 'target' date (result is from), and the calculator returns the matching date."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <header class="header">
+    <div class="container">
+      <div class="header__brand">
+        <p class="header__title"><a href="/" class="header__title-link">Athletics Utilities</a></p>
+        <p class="header__subtitle">Age Calculator</p>
+      </div>
+    </div>
+  </header>
+
+  <nav class="navigation">
+    <div class="container">
+      <ul class="navigation__list">
+        <li><a href="/" class="navigation__link">Home</a></li>
+        <li><a href="/calculators/pace.html" class="navigation__link">Pace &amp; Speed</a></li>
+        <li><a href="/calculators/score.html" class="navigation__link">World Athletics Score</a></li>
+        <li><a href="/calculators/combined-events.html" class="navigation__link">Combined Events</a></li>
+        <li><a href="/calculators/age.html" class="navigation__link navigation__link--active">Age</a></li>
+        <li><a href="/calculators/time.html" class="navigation__link">Time</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="main" id="main-content" tabindex="-1">
+    <div class="container">
+      <section class="calculator" aria-labelledby="calculator-heading">
+        <div class="calculator__header">
+          <h1 id="calculator-heading">Age Calculator</h1>
+          <p class="calculator__description">
+            Calculate the exact age between any two dates, or work backwards from an age to find the resulting date.
+          </p>
+        </div>
+
+        <div class="calculator__controls">
+          <!-- PRIMARY TOGGLE: Forward vs Reverse -->
+          <div class="form-group">
+            <label id="age-mode-toggle-label">Mode:</label>
+            <div class="mode-toggle" role="group" aria-labelledby="age-mode-toggle-label">
+              <button
+                type="button"
+                id="age-mode-toggle-forward"
+                class="mode-toggle__option mode-toggle__option--active"
+                data-mode="forward"
+                aria-pressed="true"
+              >
+                Forward
+              </button>
+              <button
+                type="button"
+                id="age-mode-toggle-reverse"
+                class="mode-toggle__option"
+                data-mode="reverse"
+                aria-pressed="false"
+              >
+                Reverse
+              </button>
+            </div>
+            <small class="form-help" id="age-mode-help">Forward: from two dates, calculate an age. Reverse: from a date and an age, calculate the matching date.</small>
+          </div>
+
+          <!-- FORWARD MODE: two date inputs -->
+          <div id="age-forward-controls" class="mode-controls">
+            <div class="form-group">
+              <label for="age-from-date">From date</label>
+              <input type="date" id="age-from-date" class="form-input">
+              <small class="form-help">Usually a date of birth.</small>
+            </div>
+
+            <div class="form-group">
+              <label for="age-target-date">Target date</label>
+              <input type="date" id="age-target-date" class="form-input">
+              <small class="form-help">Defaults to today. The date to measure age on.</small>
+            </div>
+          </div>
+
+          <!-- REVERSE MODE: one date + age + sub-toggle -->
+          <div id="age-reverse-controls" class="mode-controls hidden">
+            <div class="form-group">
+              <label id="age-reverse-sub-toggle-label">Date is the:</label>
+              <div class="mode-toggle" role="group" aria-labelledby="age-reverse-sub-toggle-label">
+                <button
+                  type="button"
+                  id="age-reverse-from-btn"
+                  class="mode-toggle__option mode-toggle__option--active"
+                  data-sub-mode="from"
+                  aria-pressed="true"
+                >
+                  From Date
+                </button>
+                <button
+                  type="button"
+                  id="age-reverse-target-btn"
+                  class="mode-toggle__option"
+                  data-sub-mode="target"
+                  aria-pressed="false"
+                >
+                  Target Date
+                </button>
+              </div>
+              <small class="form-help" id="age-reverse-help">From Date: result = date + age. Target Date: result = date − age.</small>
+            </div>
+
+            <div class="form-group">
+              <label for="age-reverse-date">Date</label>
+              <input type="date" id="age-reverse-date" class="form-input">
+            </div>
+
+            <div class="form-group age-parts-group">
+              <label>Age</label>
+              <div class="age-parts">
+                <div class="age-parts__field">
+                  <input type="number" id="age-reverse-years" class="form-input" min="0" step="1" placeholder="0" aria-label="Years">
+                  <span class="age-parts__unit">years</span>
+                </div>
+                <div class="age-parts__field">
+                  <input type="number" id="age-reverse-months" class="form-input" min="0" step="1" placeholder="0" aria-label="Months">
+                  <span class="age-parts__unit">months</span>
+                </div>
+                <div class="age-parts__field">
+                  <input type="number" id="age-reverse-days" class="form-input" min="0" step="1" placeholder="0" aria-label="Days">
+                  <span class="age-parts__unit">days</span>
+                </div>
+              </div>
+              <small class="form-help">Leave fields empty to treat them as zero.</small>
+            </div>
+          </div>
+        </div>
+
+        <div id="error-message" class="error-message hidden" role="alert" aria-live="polite"></div>
+
+        <div id="results-container" class="calculator__results hidden">
+          <div class="results-header">
+            <h2>Result</h2>
+          </div>
+          <div id="results-content" class="results-content">
+            <!-- Results will be injected here -->
+          </div>
+        </div>
+
+        <section id="history-section" class="history-section hidden">
+          <div class="history-header">
+            <h2>Calculation History</h2>
+          </div>
+          <div class="history-table-container">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Mode</th>
+                  <th>Input</th>
+                  <th>Result</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body">
+                <!-- Rows injected here -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section class="info-section">
+        <h2>How to Use</h2>
+        <p>
+          <strong>Forward mode:</strong><br>
+          1. Enter a <em>From date</em> (typically a date of birth)<br>
+          2. Adjust the <em>Target date</em> if you need an age on a day other than today<br>
+          3. The result updates automatically and shows the exact age in years, months, and days
+        </p>
+        <p>
+          <strong>Reverse mode:</strong><br>
+          1. Enter a date<br>
+          2. Choose whether that date is the <em>From Date</em> (result = date + age) or the <em>Target Date</em> (result = date − age)<br>
+          3. Enter an age in years, months, and days and the matching date is calculated instantly
+        </p>
+        <p>
+          <strong>Add to History &amp; Share:</strong><br>
+          &bull; Results compute automatically — use <em>Add to History</em> when you want to keep one for reference<br>
+          &bull; The <em>Share</em> button copies a link that re-opens the calculator with the same inputs
+        </p>
+
+        <h2>Age at end of year (31 Dec)</h2>
+        <p>
+          Underneath each forward-mode result is a second line showing the age the person will be
+          on <strong>31 December of the target year</strong>. Most national and international
+          athletics federations assign athletes to age groups (U15, U17, U18, U20, etc.) based on
+          their age on the 31 December of the competition year, so this value is often more
+          relevant than the literal age on competition day.
+        </p>
+
+        <h2>How the diff is calculated</h2>
+        <p>
+          The calculator uses the standard calendar convention: on your 30th birthday you are
+          exactly 30 years, 0 months, 0 days old. Days that don't fit into a month are borrowed
+          from the previous month's length (e.g. going back through March borrows 31 days),
+          months below zero borrow from years. This matches how legal age is determined in most
+          jurisdictions and how every mainstream "birthday" calculator operates.
+        </p>
+
+        <h2>Reverse mode</h2>
+        <p>
+          Reverse mode answers questions like <em>"what date is 25 years, 3 months, and 10 days
+          after 5 April 2034?"</em> or <em>"if I'm 32 years and 4 months old today, when was I
+          born?"</em> — useful for filling in paperwork, planning birthday events, or working out
+          the cut-off dates for an age-group competition.
+        </p>
+        <p>
+          Month arithmetic clamps to the end of the target month, so for example 31 January + 1
+          month lands on 28/29 February rather than overflowing into March.
+        </p>
+
+        <h2>Related Calculators</h2>
+        <p>
+          Plan training paces with the <a href="/calculators/pace.html">Pace &amp; Speed Calculator</a>,
+          add or multiply times with the <a href="/calculators/time.html">Time Calculator</a>, or convert
+          performances into points with the <a href="/calculators/score.html">World Athletics Score Calculator</a>.
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p class="footer__links">
+        <a href="/">Home</a>
+        &nbsp;&middot;&nbsp;
+        <a href="/calculators/pace.html">Pace &amp; Speed</a>
+        &nbsp;&middot;&nbsp;
+        <a href="/calculators/score.html">World Athletics Score</a>
+        &nbsp;&middot;&nbsp;
+        <a href="/calculators/combined-events.html">Combined Events</a>
+        &nbsp;&middot;&nbsp;
+        <a href="/calculators/age.html">Age</a>
+        &nbsp;&middot;&nbsp;
+        <a href="/calculators/time.html">Time</a>
+      </p>
+    </div>
+  </footer>
+
+  <script type="module" src="../src/js/pages/age-calculator.js"></script>
+</body>
+</html>

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Free time calculator. Add, subtract, multiply, or divide multiple times with a running total and per-row operators. Supports MM:SS, HH:MM:SS, and decimal seconds.">
+  <meta name="theme-color" content="#1a73e8">
+  <title>Time Calculator — Add, Subtract, Multiply &amp; Divide Times</title>
+  <link rel="canonical" href="https://athleticsutils.com/calculators/time.html">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Athletics Utilities">
+  <meta property="og:url" content="https://athleticsutils.com/calculators/time.html">
+  <meta property="og:title" content="Time Calculator — Add, Subtract, Multiply &amp; Divide Times">
+  <meta property="og:description" content="Free time calculator with running totals, per-row operators, and step-by-step multiply/divide breakdowns.">
+  <meta property="og:image" content="https://athleticsutils.com/icons/og-default.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Time Calculator — Add, Subtract, Multiply &amp; Divide Times">
+  <meta name="twitter:description" content="Free time calculator with running totals and step-by-step multiply/divide breakdowns.">
+  <meta name="twitter:image" content="https://athleticsutils.com/icons/og-default.png">
+
+  <link rel="stylesheet" href="../src/styles/main.css">
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Time Calculator",
+    "url": "https://athleticsutils.com/calculators/time.html",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any (web browser)",
+    "browserRequirements": "Requires JavaScript",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "description": "Free calculator that adds, subtracts, multiplies, and divides times with a running-total display and support for MM:SS, HH:MM:SS, and decimal-second inputs.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Athletics Utilities",
+      "url": "https://athleticsutils.com/"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://athleticsutils.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Time Calculator", "item": "https://athleticsutils.com/calculators/time.html" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What time formats can I enter?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The calculator accepts bare seconds (112), MM:SS (1:52), HH:MM:SS (1:23:45), and decimal seconds (1:52.50) — the same permissive format as the pace calculator."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I add more than two times?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. In Add / Subtract mode you can add as many rows as you want and each row has its own plus or minus operator. A running subtotal is shown next to every row."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does the multiply and divide mode work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Enter a single time and a number. The calculator shows the step-by-step running total for multiply (e.g. 1:15 × 4 → 1:15, 2:30, 3:45, 5:00) or the reducing total for divide (e.g. 2:00 ÷ 4 → 2:00, 1:30, 1:00, 0:30)."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <header class="header">
+    <div class="container">
+      <div class="header__brand">
+        <p class="header__title"><a href="/" class="header__title-link">Athletics Utilities</a></p>
+        <p class="header__subtitle">Time Calculator</p>
+      </div>
+    </div>
+  </header>
+
+  <nav class="navigation">
+    <div class="container">
+      <ul class="navigation__list">
+        <li><a href="/" class="navigation__link">Home</a></li>
+        <li><a href="/calculators/pace.html" class="navigation__link">Pace &amp; Speed</a></li>
+        <li><a href="/calculators/score.html" class="navigation__link">World Athletics Score</a></li>
+        <li><a href="/calculators/combined-events.html" class="navigation__link">Combined Events</a></li>
+        <li><a href="/calculators/age.html" class="navigation__link">Age</a></li>
+        <li><a href="/calculators/time.html" class="navigation__link navigation__link--active">Time</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="main" id="main-content" tabindex="-1">
+    <div class="container">
+      <section class="calculator" aria-labelledby="calculator-heading">
+        <div class="calculator__header">
+          <h1 id="calculator-heading">Time Calculator</h1>
+          <p class="calculator__description">
+            Add, subtract, multiply, or divide multiple times with a running total. Supports MM:SS, HH:MM:SS, and decimal seconds.
+          </p>
+        </div>
+
+        <div class="calculator__controls">
+          <!-- PRIMARY TOGGLE: Add/Sub vs Mul/Div -->
+          <div class="form-group">
+            <label id="time-mode-toggle-label">Mode:</label>
+            <div class="mode-toggle" role="group" aria-labelledby="time-mode-toggle-label">
+              <button
+                type="button"
+                id="time-mode-addsub"
+                class="mode-toggle__option mode-toggle__option--active"
+                data-mode="addsub"
+                aria-pressed="true"
+              >
+                Add / Subtract
+              </button>
+              <button
+                type="button"
+                id="time-mode-muldiv"
+                class="mode-toggle__option"
+                data-mode="muldiv"
+                aria-pressed="false"
+              >
+                Multiply / Divide
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADD / SUBTRACT MODE -->
+        <div id="time-addsub-controls" class="mode-controls">
+          <div class="time-rows" id="time-rows" aria-label="Times to add or subtract">
+            <!-- Rows injected here -->
+          </div>
+          <div class="time-row-actions">
+            <button type="button" id="time-add-row-btn" class="btn btn-secondary" aria-label="Add another time row">+ Add Time</button>
+          </div>
+        </div>
+
+        <!-- MULTIPLY / DIVIDE MODE -->
+        <div id="time-muldiv-controls" class="mode-controls hidden">
+          <div class="form-group">
+            <label for="time-muldiv-time">Time</label>
+            <input
+              type="text"
+              id="time-muldiv-time"
+              class="form-input"
+              placeholder="e.g., 1:15"
+              autocomplete="off"
+              inputmode="text"
+            >
+            <small class="form-help">MM:SS, HH:MM:SS, or seconds (decimals allowed).</small>
+          </div>
+
+          <div class="form-group">
+            <label id="time-muldiv-op-label">Operator:</label>
+            <div class="mode-toggle" role="group" aria-labelledby="time-muldiv-op-label">
+              <button
+                type="button"
+                id="time-muldiv-op-mul"
+                class="mode-toggle__option mode-toggle__option--active"
+                data-op="mul"
+                aria-pressed="true"
+              >
+                &times; Multiply
+              </button>
+              <button
+                type="button"
+                id="time-muldiv-op-div"
+                class="mode-toggle__option"
+                data-op="div"
+                aria-pressed="false"
+              >
+                &divide; Divide
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="time-muldiv-number">Number</label>
+            <input
+              type="number"
+              id="time-muldiv-number"
+              class="form-input"
+              placeholder="e.g., 4 or 1.5"
+              step="any"
+              min="0"
+              inputmode="decimal"
+            >
+            <small class="form-help" id="time-muldiv-number-help">Decimals allowed for multiply; whole numbers give cleaner step lists.</small>
+          </div>
+        </div>
+
+        <div id="error-message" class="error-message hidden" role="alert" aria-live="polite"></div>
+
+        <div id="results-container" class="calculator__results hidden">
+          <div class="results-header">
+            <h2>Result</h2>
+          </div>
+          <div id="results-content" class="results-content">
+            <!-- Results injected here -->
+          </div>
+        </div>
+
+        <section id="history-section" class="history-section hidden">
+          <div class="history-header">
+            <h2>Calculation History</h2>
+          </div>
+          <div class="history-table-container">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Mode</th>
+                  <th>Expression</th>
+                  <th>Result</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body">
+                <!-- Rows injected here -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section class="info-section">
+        <h2>How to Use</h2>
+        <p>
+          <strong>Add / Subtract mode:</strong><br>
+          1. Type a time in each row — accepted formats: <code>112</code>, <code>1:52</code>, <code>1:52.50</code>, <code>1:23:45</code><br>
+          2. Click the small <code>+</code> button on a row to flip it to <code>−</code> (subtract)<br>
+          3. The running total updates next to every row as you type<br>
+          4. Click <em>+ Add Time</em> to add more rows (no limit), or the small ✕ button on a row to remove it
+        </p>
+        <p>
+          <strong>Multiply / Divide mode:</strong><br>
+          1. Enter a single time<br>
+          2. Toggle between × and ÷<br>
+          3. Enter a number — integer multipliers give a clean step list, decimals append a final "remainder" step (e.g. <code>1:15 × 1.5 → 1:15, 1:52.5</code>)<br>
+          4. Divide shows a reducing total (<code>2:00 ÷ 4 → 2:00, 1:30, 1:00, 0:30</code>)
+        </p>
+        <p>
+          <strong>Add to History &amp; Share:</strong><br>
+          &bull; Results compute automatically — use <em>Add to History</em> to keep an expression for later<br>
+          &bull; Click any row in the history table to replay it<br>
+          &bull; The <em>Share</em> button copies a link that re-opens the calculator with the same inputs
+        </p>
+
+        <h2>Supported time formats</h2>
+        <ul>
+          <li><code>112</code> — bare seconds, becomes <code>1:52</code></li>
+          <li><code>112.5</code> — bare seconds with decimal, becomes <code>1:52.5</code></li>
+          <li><code>1:52</code> — minutes and seconds</li>
+          <li><code>1:52.50</code> — minutes, seconds, and fractional seconds</li>
+          <li><code>1:23:45</code> — hours, minutes, and seconds</li>
+          <li><code>1:23:45.5</code> — full HH:MM:SS with decimal</li>
+          <li><code>-1:52</code> — leading minus for a negative time</li>
+        </ul>
+        <p>
+          Values beyond 59 in the seconds slot (e.g. <code>1:75</code>) are rejected because
+          they're almost always user error — type <code>2:15</code> instead. Unlimited hours are
+          allowed so you can add up training weeks and race programs without hitting a ceiling.
+        </p>
+
+        <h2>Negative totals</h2>
+        <p>
+          If a subtraction takes the running total below zero the calculator shows it with a
+          leading minus (e.g. <code>−2:00</code>). This is intentional — it's useful for working
+          out "how far ahead / behind the target" sessions and for checking negative split plans.
+        </p>
+
+        <h2>Add / Subtract running totals</h2>
+        <p>
+          The running-total column on the right of every row shows the value of the expression up
+          to and including that row. That makes it easy to see which specific row flips the total
+          past some threshold, which is handy when chaining together race splits, interval sets,
+          or training week totals.
+        </p>
+
+        <h2>Multiply / Divide step breakdown</h2>
+        <p>
+          Rather than just spitting out a final number, the calculator renders each integer step
+          of a multiplication or division:
+        </p>
+        <ul>
+          <li><code>1:15 × 4</code> → <code>1:15, 2:30, 3:45, 5:00</code></li>
+          <li><code>1:15 × 1.5</code> → <code>1:15, 1:52.5</code> (whole multiple, then final)</li>
+          <li><code>2:00 ÷ 4</code> → <code>2:00, 1:30, 1:00, 0:30</code> (ends on the quotient)</li>
+          <li><code>2:00 ÷ 4.5</code> → <code>2:00, 1:33.33, 1:06.67, 0:40, 0:13.33, 0:00</code> (final zero shows the remainder reaching zero)</li>
+        </ul>
+
+        <h2>Related Calculators</h2>
+        <p>
+          Work out the matching pace with the <a href="/calculators/pace.html">Pace &amp; Speed Calculator</a>,
+          calculate ages between any two dates with the <a href="/calculators/age.html">Age Calculator</a>, or
+          convert performances into points with the <a href="/calculators/score.html">World Athletics Score Calculator</a>.
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p class="footer__links">
+        <a href="/">Home</a>
+        &nbsp;&middot;&nbsp;
+        <a href="/calculators/pace.html">Pace &amp; Speed</a>
+        &nbsp;&middot;&nbsp;
+        <a href="/calculators/score.html">World Athletics Score</a>
+        &nbsp;&middot;&nbsp;
+        <a href="/calculators/combined-events.html">Combined Events</a>
+        &nbsp;&middot;&nbsp;
+        <a href="/calculators/age.html">Age</a>
+        &nbsp;&middot;&nbsp;
+        <a href="/calculators/time.html">Time</a>
+      </p>
+    </div>
+  </footer>
+
+  <script type="module" src="../src/js/pages/time-calculator.js"></script>
+</body>
+</html>
