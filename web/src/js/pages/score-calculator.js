@@ -68,7 +68,7 @@ class PerformanceCalculator extends BaseCalculator {
 
     this.calculationMode = mode;
 
-    // Update toggle button states
+    // Update toggle button states (aria-pressed mirrors via utils/aria-toggle-sync.js)
     if (mode === 'performance') {
       this.modeTogglePerformance.classList.add('mode-toggle__option--active');
       this.modeToggleScore.classList.remove('mode-toggle__option--active');
@@ -446,6 +446,12 @@ class PerformanceCalculator extends BaseCalculator {
     row.className = 'history-row history-row--adding';
     row.draggable = true;
     row.dataset.historyId = entry.id;
+    // Keyboard-reachable: Tab focuses the row, Enter/Space replays it.
+    row.tabIndex = 0;
+    row.setAttribute(
+      'aria-label',
+      `Replay ${entry.gender} ${entry.eventDisplayName} — ${entry.performance}, ${entry.score} points`
+    );
 
     row.innerHTML = `
       <td class="history-row__gender">${this.capitalizeFirst(entry.gender)}</td>
@@ -453,6 +459,8 @@ class PerformanceCalculator extends BaseCalculator {
       <td class="history-row__performance">${entry.performance}</td>
       <td class="history-row__score">${entry.score}</td>
       <td class="history-row__actions">
+        <button class="history-move-btn" aria-label="Move up" data-direction="up" data-history-id="${entry.id}">&#x25B2;</button>
+        <button class="history-move-btn" aria-label="Move down" data-direction="down" data-history-id="${entry.id}">&#x25BC;</button>
         <button class="history-delete-btn" aria-label="Delete" data-history-id="${entry.id}"></button>
       </td>
     `;
@@ -473,7 +481,7 @@ class PerformanceCalculator extends BaseCalculator {
   setupHistoryEventListeners() {
     let isDragging = false;
 
-    // Click handling (delete and replay)
+    // Click handling (delete, move, replay)
     this.historyTableBody?.addEventListener('click', (e) => {
       // Delete button
       const deleteBtn = e.target.closest('.history-delete-btn');
@@ -490,6 +498,23 @@ class PerformanceCalculator extends BaseCalculator {
         return;
       }
 
+      // Move up / move down buttons (keyboard alternative to drag-and-drop)
+      const moveBtn = e.target.closest('.history-move-btn');
+      if (moveBtn) {
+        e.stopPropagation();
+        const id = moveBtn.dataset.historyId;
+        const direction = moveBtn.dataset.direction;
+        HistoryManager.moveEntry(id, direction);
+        this.renderHistory();
+        // Restore focus to the same button on the (now moved) row so
+        // keyboard users can press it again.
+        requestAnimationFrame(() => {
+          const selector = `.history-move-btn[data-history-id="${id}"][data-direction="${direction}"]`;
+          this.historyTableBody?.querySelector(selector)?.focus();
+        });
+        return;
+      }
+
       // Row click -> replay (skip if dragging)
       if (isDragging) return;
       const row = e.target.closest('.history-row');
@@ -500,6 +525,20 @@ class PerformanceCalculator extends BaseCalculator {
         if (entry && entry.params) {
           this.applyCalculationParams(entry.params, { skipSave: true, scrollToResults: true });
         }
+      }
+    });
+
+    // Keyboard: Enter / Space on a focused row replays it.
+    this.historyTableBody?.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const row = e.target.closest('.history-row');
+      if (!row || e.target !== row) return; // only act when the row itself is focused
+      e.preventDefault();
+      const id = row.dataset.historyId;
+      const history = HistoryManager.load();
+      const entry = history.find(h => h.id === id);
+      if (entry && entry.params) {
+        this.applyCalculationParams(entry.params, { skipSave: true, scrollToResults: true });
       }
     });
 
@@ -562,13 +601,14 @@ class PerformanceCalculator extends BaseCalculator {
     });
   }
 
-  applyCalculationParams(params, options = {}) {
+  async applyCalculationParams(params, options = {}) {
     if (!params || !params.gender || !params.event || !params.value) return;
 
-    // Set gender (force re-toggle by clearing current)
+    // Set gender (force re-toggle by clearing current). This may lazily fetch
+    // the scoring data for that gender, so await it before continuing.
     if (this.currentGender !== params.gender) {
       this.currentGender = null;
-      this.handleGenderToggle(params.gender);
+      await this.handleGenderToggle(params.gender);
     }
 
     // Select event
@@ -577,6 +617,7 @@ class PerformanceCalculator extends BaseCalculator {
     this.selectEvent(params.event, eventInfo.displayName);
 
     // Set calculation mode (update UI without clearing input/hiding results)
+    // (aria-pressed mirrors via utils/aria-toggle-sync.js)
     if (params.mode && params.mode !== this.calculationMode) {
       this.calculationMode = params.mode;
       if (params.mode === 'performance') {

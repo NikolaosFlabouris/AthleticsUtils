@@ -16,6 +16,9 @@ export class BaseCalculator {
     this.currentEventKey = '';
     this.allEvents = [];
     this.availableEvents = [];
+    // Accessibility: track keyboard-highlighted option in the event dropdown
+    this.highlightedOptionIndex = -1;
+    this.optionIdPrefix = 'event-option-';
     this.setupDOMElements();
   }
 
@@ -93,12 +96,18 @@ export class BaseCalculator {
     try {
       this.showLoading(true);
       this.hideError();
+
+      // Event config is small (~20 KB) so always load it up front.
+      // Scoring tables are split by gender and loaded lazily — fetch the
+      // saved/default gender now so the initial UI is ready without a spinner.
+      const savedGender = sessionStorage.getItem('selectedGender') || 'men';
       await Promise.all([
-        scoringDataLoader.load(),
-        eventConfigLoader.load()
+        eventConfigLoader.load(),
+        scoringDataLoader.loadGender(savedGender)
       ]);
+
       this.allEvents = eventConfigLoader.getAllEvents();
-      this.initializeGenderToggle();
+      await this.initializeGenderToggle();
       this.showLoading(false);
     } catch (error) {
       console.error('Error loading scoring data:', error);
@@ -107,15 +116,15 @@ export class BaseCalculator {
     }
   }
 
-  initializeGenderToggle() {
+  async initializeGenderToggle() {
     // Load saved gender from session storage, default to 'men'
     const savedGender = sessionStorage.getItem('selectedGender') || 'men';
 
     // Set the initial gender and trigger UI update
-    this.handleGenderToggle(savedGender);
+    await this.handleGenderToggle(savedGender);
   }
 
-  handleGenderToggle(gender) {
+  async handleGenderToggle(gender) {
     // Don't do anything if clicking the already selected gender
     if (this.currentGender === gender) {
       return;
@@ -132,6 +141,7 @@ export class BaseCalculator {
     this.genderToggleMixed?.classList.remove('gender-toggle__option--active');
 
     // Add active class to the selected gender button
+    // (aria-pressed is mirrored automatically — see utils/aria-toggle-sync.js)
     if (gender === 'men') {
       this.genderToggleMen?.classList.add('gender-toggle__option--active');
     } else if (gender === 'women') {
@@ -140,13 +150,37 @@ export class BaseCalculator {
       this.genderToggleMixed?.classList.add('gender-toggle__option--active');
     }
 
-    // Update available events and reset event selection
-    this.filterAvailableEvents(this.currentGender);
-    this.eventTrigger.disabled = false;
-    this.eventTriggerText.textContent = 'Select event...';
+    // Reset event selection UI while we (potentially) fetch this gender's data.
+    this.eventTrigger.disabled = true;
+    this.eventTriggerText.textContent = 'Loading…';
     this.performanceInput.disabled = true;
     this.calculateBtn.disabled = true;
     this.hideResults();
+
+    // Lazy-load the scoring data for this gender if not already cached.
+    if (!scoringDataLoader.isGenderLoaded(gender)) {
+      this.showLoading(true);
+      try {
+        await scoringDataLoader.loadGender(gender);
+      } catch (error) {
+        console.error('Error loading scoring data for gender:', error);
+        this.showError('Failed to load scoring tables. Please try again.');
+        this.showLoading(false);
+        return;
+      }
+      this.showLoading(false);
+    }
+
+    // If the user toggled to another gender while this one was loading,
+    // don't clobber the newer selection.
+    if (this.currentGender !== gender) {
+      return;
+    }
+
+    // Update available events and unlock the event picker.
+    this.filterAvailableEvents(this.currentGender);
+    this.eventTrigger.disabled = false;
+    this.eventTriggerText.textContent = 'Select event...';
   }
 
   filterAvailableEvents(gender) {
@@ -178,18 +212,106 @@ export class BaseCalculator {
   }
 
   handleEventSearchKeydown(e) {
-    // Handle Enter key to select first filtered event
+    const options = this.eventList?.querySelectorAll('.event-dropdown__item') || [];
+
     if (e.key === 'Enter') {
       e.preventDefault();
-      const firstItem = this.eventList.querySelector('.event-dropdown__item');
-      if (firstItem) {
-        firstItem.click();
-      }
+      // Activate the highlighted option, or fall back to the first one
+      const idx = this.highlightedOptionIndex >= 0 ? this.highlightedOptionIndex : 0;
+      const target = options[idx];
+      if (target) target.click();
     } else if (e.key === 'Escape') {
       e.preventDefault();
       this.hideEventDropdown();
       this.eventTrigger.focus();
+    } else if (e.key === 'Tab') {
+      // Focus trap: don't let Tab leak to elements behind the overlay.
+      // Close the dropdown and return focus to the trigger, then let the
+      // browser continue its normal tab traversal from there.
+      e.preventDefault();
+      this.hideEventDropdown();
+      this.eventTrigger.focus();
+      // Reissue a synthetic tab-move after the trigger regains focus so the
+      // user still progresses/regresses one field as they expected.
+      const moveBackward = e.shiftKey;
+      requestAnimationFrame(() => this.moveFocusFrom(this.eventTrigger, moveBackward));
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (options.length === 0) return;
+      const next = this.highlightedOptionIndex < 0
+        ? 0
+        : Math.min(this.highlightedOptionIndex + 1, options.length - 1);
+      this.setHighlightedOption(next);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (options.length === 0) return;
+      const next = Math.max(0, this.highlightedOptionIndex - 1);
+      this.setHighlightedOption(next);
+    } else if (e.key === 'Home') {
+      if (options.length === 0) return;
+      e.preventDefault();
+      this.setHighlightedOption(0);
+    } else if (e.key === 'End') {
+      if (options.length === 0) return;
+      e.preventDefault();
+      this.setHighlightedOption(options.length - 1);
     }
+  }
+
+  setHighlightedOption(index) {
+    const options = this.eventList?.querySelectorAll('.event-dropdown__item') || [];
+    if (index < 0 || index >= options.length) return;
+
+    // Remove highlight from previously highlighted option
+    options.forEach(opt => opt.classList.remove('event-dropdown__item--highlighted'));
+
+    const option = options[index];
+    option.classList.add('event-dropdown__item--highlighted');
+    option.scrollIntoView({ block: 'nearest' });
+    this.highlightedOptionIndex = index;
+
+    // Update aria-activedescendant on the search input so screen readers
+    // announce the virtually-focused option.
+    if (this.eventSearch && option.id) {
+      this.eventSearch.setAttribute('aria-activedescendant', option.id);
+    }
+  }
+
+  clearHighlightedOption() {
+    this.highlightedOptionIndex = -1;
+    this.eventSearch?.removeAttribute('aria-activedescendant');
+  }
+
+  /**
+   * Move keyboard focus one step forward or backward from a reference element,
+   * matching the browser's default Tab / Shift+Tab behaviour. Used after
+   * closing the event dropdown on Tab so the user still advances by one
+   * logical step instead of getting stuck on the trigger.
+   */
+  moveFocusFrom(fromElement, backward = false) {
+    if (!fromElement) return;
+
+    // Build a snapshot of the document's tabbable elements in tab order.
+    const candidates = Array.from(
+      document.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]),' +
+        ' select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+    ).filter(el => {
+      if (el.hasAttribute('disabled')) return false;
+      if (el.getAttribute('aria-hidden') === 'true') return false;
+      // Skip elements inside hidden containers. offsetParent is null when
+      // display:none is applied anywhere up the ancestor chain.
+      if (el.offsetParent === null && el !== document.activeElement) return false;
+      return true;
+    });
+
+    const idx = candidates.indexOf(fromElement);
+    if (idx === -1) return;
+
+    const nextIdx = backward ? idx - 1 : idx + 1;
+    if (nextIdx < 0 || nextIdx >= candidates.length) return;
+    candidates[nextIdx].focus();
   }
 
   selectEvent(eventKey, displayName) {
@@ -225,6 +347,9 @@ export class BaseCalculator {
   }
 
   renderEventDropdown(searchTerm = '') {
+    // Reset keyboard highlight whenever we re-render.
+    this.clearHighlightedOption();
+
     // Filter events based on search term
     let filteredEvents = this.availableEvents;
 
@@ -236,9 +361,12 @@ export class BaseCalculator {
     }
 
     if (filteredEvents.length === 0) {
-      this.eventList.innerHTML = '<div class="event-dropdown__empty">No events found</div>';
+      this.eventList.innerHTML = '<div class="event-dropdown__empty" role="presentation">No events found</div>';
       return;
     }
+
+    // Counter for unique option ids (used by aria-activedescendant).
+    let optionCounter = 0;
 
     // Separate primary and non-primary events
     const primaryEvents = [];
@@ -284,9 +412,11 @@ export class BaseCalculator {
     for (const category of sortedCategories) {
       const events = primaryByCategory[category];
 
-      // Add category header
+      // Add category header — role="presentation" so screen readers don't
+      // count it as a listbox option.
       const categoryHeader = document.createElement('div');
       categoryHeader.className = 'event-dropdown__category';
+      categoryHeader.setAttribute('role', 'presentation');
       categoryHeader.textContent = this.formatCategoryName(category);
       this.eventList.appendChild(categoryHeader);
 
@@ -294,9 +424,12 @@ export class BaseCalculator {
       for (const event of events) {
         const item = document.createElement('div');
         item.className = 'event-dropdown__item';
+        item.setAttribute('role', 'option');
+        item.id = `${this.optionIdPrefix}${optionCounter++}`;
 
-        // Mark as selected if this is the current event
-        if (event.key === this.currentEvent) {
+        const isSelected = event.key === this.currentEvent;
+        item.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+        if (isSelected) {
           item.classList.add('event-dropdown__item--selected');
         }
 
@@ -338,9 +471,10 @@ export class BaseCalculator {
         return indexA - indexB;
       });
 
-      // Add "Other" category header
+      // Add "Other" category header (presentation so SR skips it)
       const otherHeader = document.createElement('div');
       otherHeader.className = 'event-dropdown__category';
+      otherHeader.setAttribute('role', 'presentation');
       otherHeader.textContent = 'Other';
       this.eventList.appendChild(otherHeader);
 
@@ -350,9 +484,12 @@ export class BaseCalculator {
         for (const event of events) {
           const item = document.createElement('div');
           item.className = 'event-dropdown__item';
+          item.setAttribute('role', 'option');
+          item.id = `${this.optionIdPrefix}${optionCounter++}`;
 
-          // Mark as selected if this is the current event
-          if (event.key === this.currentEvent) {
+          const isSelected = event.key === this.currentEvent;
+          item.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+          if (isSelected) {
             item.classList.add('event-dropdown__item--selected');
           }
 
@@ -376,14 +513,17 @@ export class BaseCalculator {
     this.eventSearch.value = '';
     this.renderEventDropdown('');
     this.eventDropdown?.classList.remove('hidden');
+    this.eventTrigger?.setAttribute('aria-expanded', 'true');
     // Auto-focus search field
     setTimeout(() => this.eventSearch.focus(), 0);
   }
 
   hideEventDropdown() {
     this.eventDropdown?.classList.add('hidden');
-    // Clear search field
+    this.eventTrigger?.setAttribute('aria-expanded', 'false');
+    // Clear search field and keyboard highlight state
     this.eventSearch.value = '';
+    this.clearHighlightedOption();
   }
 
   handlePerformanceInput(e) {

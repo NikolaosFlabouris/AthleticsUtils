@@ -174,6 +174,7 @@ class CombinedEventsCalculator {
     this.genderToggleWomen?.classList.remove('gender-toggle__option--active');
 
     // Add active class to the selected gender button
+    // (aria-pressed is mirrored automatically — see utils/aria-toggle-sync.js)
     if (gender === 'men') {
       this.genderToggleMen?.classList.add('gender-toggle__option--active');
     } else if (gender === 'women') {

@@ -2416,6 +2416,12 @@ class PaceCalculator extends PaceCalculatorBase {
       row.draggable = true;
       row.dataset.id = entry.id;
       row.dataset.index = index;
+      // Keyboard-reachable: Tab focuses the row, Enter/Space replays it.
+      row.tabIndex = 0;
+      row.setAttribute(
+        'aria-label',
+        `Replay ${entry.distance} — ${entry.totalTime}`
+      );
 
       // Show speed if speed mode entry, else show pace
       const paceOrSpeed = (entry.measurementMode === 'speed' && entry.speed)
@@ -2426,7 +2432,9 @@ class PaceCalculator extends PaceCalculatorBase {
         <td>${entry.distance}</td>
         <td class="history-row__performance">${entry.totalTime}</td>
         <td class="history-row__performance">${paceOrSpeed}</td>
-        <td>
+        <td class="history-row__actions">
+          <button class="history-move-btn" data-id="${entry.id}" data-direction="up" aria-label="Move up">&#x25B2;</button>
+          <button class="history-move-btn" data-id="${entry.id}" data-direction="down" aria-label="Move down">&#x25BC;</button>
           <button class="history-delete-btn" data-id="${entry.id}" aria-label="Delete"></button>
         </td>
       `;
@@ -2450,9 +2458,38 @@ class PaceCalculator extends PaceCalculatorBase {
         this.deleteHistoryEntry(entry.id);
       });
 
+      // Add move-up / move-down listeners (keyboard alternative to drag).
+      row.querySelectorAll('.history-move-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const direction = btn.dataset.direction;
+          const fromIndex = parseInt(row.dataset.index, 10);
+          const toIndex = direction === 'up' ? fromIndex - 1 : fromIndex + 1;
+          const historyNow = this.getHistory();
+          if (toIndex < 0 || toIndex >= historyNow.length) return;
+          this.reorderHistory(fromIndex, toIndex);
+          // Restore focus to the same button on the moved row.
+          requestAnimationFrame(() => {
+            const selector = `.history-move-btn[data-id="${entry.id}"][data-direction="${direction}"]`;
+            this.historyTableBody?.querySelector(selector)?.focus();
+          });
+        });
+      });
+
       // Add row click -> replay
       row.addEventListener('click', (e) => {
         if (e.target.closest('.history-delete-btn')) return;
+        if (e.target.closest('.history-move-btn')) return;
+        if (entry.params) {
+          this.applyCalculationParams(entry.params, { skipSave: true, scrollToResults: true });
+        }
+      });
+
+      // Keyboard replay: Enter or Space when the row itself is focused.
+      row.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        if (e.target !== row) return;
+        e.preventDefault();
         if (entry.params) {
           this.applyCalculationParams(entry.params, { skipSave: true, scrollToResults: true });
         }

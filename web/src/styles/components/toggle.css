@@ -40,10 +40,19 @@
   font-weight: var(--font-weight-semibold);
 }
 
+/* Mouse focus: soft tinted ring (after click). */
 .mode-toggle__option:focus,
 .gender-toggle__option:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.3);
+}
+
+/* Keyboard focus: full-strength outline for a clearly visible target. */
+.mode-toggle__option:focus-visible,
+.gender-toggle__option:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+  box-shadow: none;
 }
 
 /* Responsive: Allow text wrapping on small screens */

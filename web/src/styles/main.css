@@ -4,6 +4,7 @@
 @import './components/icon.css';
 @import './components/results-card.css';
 @import './components/history-table.css';
+@import './components/pwa-update-toast.css';
 @import './combined-events.css';
 @import './pages/pace.css';
 
@@ -31,6 +32,65 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+/* Accessibility: visually-hidden utility (visible only to screen readers) */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Accessibility: skip-to-content link — hidden until focused */
+.skip-link {
+  position: absolute;
+  top: -48px;
+  left: var(--spacing-md);
+  background: var(--color-primary);
+  color: white;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  z-index: var(--z-sticky);
+  transition: top var(--transition-fast);
+}
+
+.skip-link:focus {
+  top: var(--spacing-sm);
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+/* Accessibility: global keyboard focus ring.
+   `:focus-visible` only triggers on keyboard focus (not mouse clicks), so
+   mouse users don't get a persistent halo, but tab-navigation always has
+   a clearly visible indicator. Individual components can opt out by
+   setting `outline: none` in their own `:focus-visible` rule. */
+:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Don't leave a stray outline on `main` when focused via the skip link. */
+main:focus-visible {
+  outline: none;
+}
+
+/* Form inputs already change their border on `:focus`; the global outline
+   is redundant next to the border, so suppress it on keyboard focus and
+   rely on the existing (now stronger) border-colour + box-shadow combo. */
+.form-select:focus-visible,
+.form-input:focus-visible,
+.event-dropdown__search:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.35);
 }
 
 /* Container */
@@ -96,6 +156,7 @@ body {
   margin-bottom: var(--spacing-xl);
 }
 
+.calculator__header h1,
 .calculator__header h2 {
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-semibold);
@@ -295,6 +356,12 @@ body {
   font-weight: var(--font-weight-medium);
 }
 
+/* Keyboard-highlighted option (from ArrowUp/ArrowDown in search field) */
+.event-dropdown__item--highlighted {
+  background: var(--color-background-secondary);
+  border-left-color: var(--color-primary);
+}
+
 .event-dropdown__empty {
   padding: var(--spacing-lg);
   text-align: center;
@@ -383,7 +450,7 @@ body {
   border-top: 2px solid var(--color-border-light);
 }
 
-.results-header h3 {
+.results-header h2 {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
   margin-bottom: var(--spacing-lg);
@@ -439,9 +506,17 @@ body {
   margin-bottom: var(--spacing-xl);
 }
 
-.info-section h3 {
+.info-section h2 {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-md);
+  color: var(--color-text);
+}
+
+.info-section h3 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  margin-top: var(--spacing-lg);
   margin-bottom: var(--spacing-md);
   color: var(--color-text);
 }

@@ -3,19 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Combined Event Score Calculator - Calculate scores for Decathlon, Heptathlon, and Pentathlon using official World Athletics scoring tables.">
-  <meta name="keywords" content="decathlon calculator, heptathlon calculator, pentathlon calculator, combined events, World Athletics, IAAF points, athletics scoring">
+  <meta name="description" content="Free decathlon, heptathlon & pentathlon score calculator. Enter performances for each discipline and get a total score using the official World Athletics 2025 scoring tables.">
   <meta name="theme-color" content="#1a73e8">
-  <title>Athletics Utilities | Combined Event Score Calculator</title>
+  <title>Decathlon, Heptathlon & Pentathlon Score Calculator (2025)</title>
+  <link rel="canonical" href="https://athleticsutils.com/calculators/combined-events.html">
   <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+
+  <!-- Preload the small config file so it downloads in parallel with the JS bundle -->
+  <link rel="preload" as="fetch" href="/data/combined-event-config.min.json" crossorigin>
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Athletics Utilities">
+  <meta property="og:url" content="https://athleticsutils.com/calculators/combined-events.html">
+  <meta property="og:title" content="Decathlon, Heptathlon & Pentathlon Score Calculator (2025)">
+  <meta property="og:description" content="Free combined events calculator for decathlon, heptathlon, and pentathlon using the official World Athletics 2025 scoring tables.">
+  <meta property="og:image" content="https://athleticsutils.com/icons/og-combined.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Decathlon, Heptathlon & Pentathlon Score Calculator (2025)">
+  <meta name="twitter:description" content="Free combined events calculator for decathlon, heptathlon, and pentathlon.">
+  <meta name="twitter:image" content="https://athleticsutils.com/icons/og-combined.png">
+
   <link rel="stylesheet" href="../src/styles/main.css">
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Combined Event Score Calculator",
+    "url": "https://athleticsutils.com/calculators/combined-events.html",
+    "applicationCategory": "SportsApplication",
+    "operatingSystem": "Any (web browser)",
+    "browserRequirements": "Requires JavaScript",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "description": "Free calculator that totals performances across the individual disciplines of a combined event (decathlon, heptathlon, or pentathlon) using the official World Athletics 2025 scoring tables.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Athletics Utilities",
+      "url": "https://athleticsutils.com/"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://athleticsutils.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Combined Event Score Calculator", "item": "https://athleticsutils.com/calculators/combined-events.html" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Which combined events are supported?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Pentathlon, Heptathlon, and Decathlon are supported for both men and women, including Short Track (indoor) variants where they exist in the official tables."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How are combined event points calculated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Each discipline is scored with the official World Athletics formulas. Track events use Points = a \u00d7 (b - Time)^c; jumps use Points = a \u00d7 (Height - b)^c; throws use Points = a \u00d7 (Distance - b)^c. Points are rounded down and summed to give the total."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I enter hand-timed performances?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Tick the hand-timing checkbox for applicable sprint and hurdle events and the calculator will add the official offset before computing the score."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   <header class="header">
     <div class="container">
       <div class="header__brand">
-        <h1 class="header__title"><a href="/" class="header__title-link">Athletics Utilities</a></h1>
+        <p class="header__title"><a href="/" class="header__title-link">Athletics Utilities</a></p>
         <p class="header__subtitle">Combined Event Score Calculator</p>
       </div>
     </div>
@@ -32,11 +116,11 @@
     </div>
   </nav>
 
-  <main class="main">
+  <main class="main" id="main-content" tabindex="-1">
     <div class="container">
-      <section class="calculator">
+      <section class="calculator" aria-labelledby="calculator-heading">
         <div class="calculator__header">
-          <h2>Combined Event Score Calculator</h2>
+          <h1 id="calculator-heading">Combined Event Score Calculator</h1>
           <p class="calculator__description">
             Calculate total scores for combined events (e.g Decathlon, Heptathlon, Pentathlon) using official World Athletics scoring tables.
           </p>
@@ -44,13 +128,14 @@
 
         <div class="calculator__controls">
           <div class="form-group">
-            <label>Gender</label>
-            <div class="gender-toggle">
+            <label id="gender-toggle-label">Gender</label>
+            <div class="gender-toggle" role="group" aria-labelledby="gender-toggle-label">
               <button
                 type="button"
                 id="gender-toggle-men"
                 class="gender-toggle__option"
                 data-gender="men"
+                aria-pressed="false"
               >
                 Men
               </button>
@@ -59,6 +144,7 @@
                 id="gender-toggle-women"
                 class="gender-toggle__option"
                 data-gender="women"
+                aria-pressed="false"
               >
                 Women
               </button>
@@ -89,7 +175,7 @@
           </div>
 
           <div id="running-totals" class="running-totals hidden">
-            <h4>Running Total</h4>
+            <h2>Running Total</h2>
             <div id="running-totals-content" class="running-totals-content">
               <!-- Cumulative scores will be displayed here -->
             </div>
@@ -98,7 +184,7 @@
 
         <div id="results-container" class="calculator__results hidden">
           <div class="result-card">
-            <h3 class="result-card__title">Final Score</h3>
+            <h2 class="result-card__title">Final Score</h2>
             <div class="result-card__points" id="final-score" aria-live="polite">
               <span class="points-value">0</span>
               <span class="points-label">points</span>
@@ -122,7 +208,7 @@
       </section>
 
       <section class="info-section">
-        <h3>How to Use</h3>
+        <h2>How to Use</h2>
         <p>
           1. Select your gender (Men's or Women's)<br>
           2. Choose the combined event (Pentathlon, Heptathlon, or Decathlon)<br>
@@ -134,14 +220,14 @@
             </ul>
         </p>
 
-        <h3>About Combined Events</h3>
+        <h2>About Combined Events</h2>
         <p>
           Combined events are athletics competitions that consist of multiple track and field disciplines.
           Athletes earn points based on their performance in each event, with the winner being determined by
           the highest total score.
         </p>
 
-        <h4>Age Groups by Event</h4>
+        <h3>Age Groups by Event</h3>
         <p><strong>Men's Events:</strong></p>
         <ul>
           <li><strong>Pentathlon:</strong> U18, U20, Open</li>
@@ -157,7 +243,7 @@
           <li><strong>Decathlon:</strong> U20, Open</li>
         </ul>
 
-        <h4>Scoring System</h4>
+        <h3>Scoring System</h3>
         <p>
           Each discipline uses World Athletics' official scoring formulas to convert performances into points:
         </p>
@@ -170,11 +256,70 @@
           The formulas are calibrated to balance scoring across different event types, ensuring that no single
           discipline dominates the total score. All point values are rounded down to the nearest whole number.
         </p>
+
+        <h2>Disciplines in each combined event</h2>
+        <p><strong>Men's Decathlon</strong> — contested over two consecutive days:</p>
+        <ul>
+          <li><strong>Day 1:</strong> 100&nbsp;m, Long Jump, Shot Put, High Jump, 400&nbsp;m</li>
+          <li><strong>Day 2:</strong> 110&nbsp;m Hurdles, Discus, Pole Vault, Javelin, 1500&nbsp;m</li>
+        </ul>
+        <p><strong>Women's Heptathlon</strong> — contested over two consecutive days:</p>
+        <ul>
+          <li><strong>Day 1:</strong> 100&nbsp;m Hurdles, High Jump, Shot Put, 200&nbsp;m</li>
+          <li><strong>Day 2:</strong> Long Jump, Javelin, 800&nbsp;m</li>
+        </ul>
+        <p>
+          <strong>Men's Heptathlon (Short Track)</strong> and <strong>Women's Pentathlon (Short Track)</strong>
+          are the indoor variants, contested in one or two days depending on the schedule.
+          Short Track events use different implement weights and hurdle heights — the calculator
+          handles this automatically once you pick the event.
+        </p>
+
+        <h2>What counts as a good score?</h2>
+        <p>
+          A few reference points to calibrate expectations. The calculator uses the 2025 tables, so
+          historical totals from earlier editions may differ by a handful of points.
+        </p>
+        <ul>
+          <li><strong>Decathlon (men):</strong> 8000 points is typically national-level, 8500 is international, and 9000+ is reserved for the handful of athletes on the all-time list. The world record sits just above 9100.</li>
+          <li><strong>Heptathlon (women):</strong> 6000 points is a strong national standard, 6500 is international, and 7000+ is world-class. The world record sits just above 7200.</li>
+          <li><strong>Pentathlon (Short Track):</strong> 4000 points (women) and 6000 points (men's heptathlon indoor) mark the top of the indoor season.</li>
+        </ul>
+        <p>
+          Use the calculator to see how each individual mark contributes to the total. Because the scoring
+          curves are non-linear, improving a weak event by 100 points is often easier than squeezing the
+          same improvement out of your best event — a handy way for coaches to prioritise training load.
+        </p>
+
+        <h2>Running total and progressive entry</h2>
+        <p>
+          You don't need to enter every discipline at once. The running total updates as you fill each field,
+          which makes the calculator useful during a live competition — follow along event by event and see
+          the projected total build. The <strong>Clear All</strong> button resets the form when you're done.
+        </p>
+
+        <h2>Related Calculators</h2>
+        <p>
+          For a single-event lookup, use the <a href="/calculators/score.html">World Athletics Score Calculator</a>.
+          To plan training paces for the 1500&nbsp;m or other endurance legs, try the
+          <a href="/calculators/pace.html">Pace &amp; Speed Calculator</a>.
+        </p>
       </section>
     </div>
   </main>
 
   <footer class="footer">
+    <div class="container">
+      <p class="footer__links">
+        <a href="/">Home</a>
+        &nbsp;·&nbsp;
+        <a href="/calculators/pace.html">Pace &amp; Speed</a>
+        &nbsp;·&nbsp;
+        <a href="/calculators/score.html">World Athletics Score</a>
+        &nbsp;·&nbsp;
+        <a href="/calculators/combined-events.html">Combined Events</a>
+      </p>
+    </div>
   </footer>
 
   <script type="module" src="../src/js/pages/combined-events-calculator.js"></script>

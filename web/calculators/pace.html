@@ -3,19 +3,100 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Running Pace & Speed Calculator - Calculate your running pace per km or mile, or determine finish times based on your pace.">
-  <meta name="keywords" content="pace calculator, running pace, pace per km, pace per mile, running calculator, marathon pace, 5k pace, 10k pace, half marathon pace">
+  <meta name="description" content="Free running pace & speed calculator. Convert between pace (min/km, min/mile) and speed (km/h, mph, m/s), get split times, and calculate finish times for 5K, 10K, half marathon, and marathon.">
   <meta name="theme-color" content="#1a73e8">
-  <title>Athletics Utilities | Pace & Speed Calculator</title>
+  <title>Running Pace & Speed Calculator — min/km, min/mile, Splits</title>
+  <link rel="canonical" href="https://athleticsutils.com/calculators/pace.html">
   <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Athletics Utilities">
+  <meta property="og:url" content="https://athleticsutils.com/calculators/pace.html">
+  <meta property="og:title" content="Running Pace & Speed Calculator — min/km, min/mile, Splits">
+  <meta property="og:description" content="Free running pace & speed calculator with splits and unit conversions for 5K, 10K, half marathon, and marathon.">
+  <meta property="og:image" content="https://athleticsutils.com/icons/og-pace.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Running Pace & Speed Calculator — min/km, min/mile, Splits">
+  <meta name="twitter:description" content="Free running pace & speed calculator with splits and unit conversions.">
+  <meta name="twitter:image" content="https://athleticsutils.com/icons/og-pace.png">
+
   <link rel="stylesheet" href="../src/styles/main.css">
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Running Pace & Speed Calculator",
+    "url": "https://athleticsutils.com/calculators/pace.html",
+    "applicationCategory": "SportsApplication",
+    "operatingSystem": "Any (web browser)",
+    "browserRequirements": "Requires JavaScript",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "description": "Free calculator that converts between pace and speed, produces split times, and computes finish times for any distance including 5K, 10K, half marathon, and marathon.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Athletics Utilities",
+      "url": "https://athleticsutils.com/"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://athleticsutils.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Pace & Speed Calculator", "item": "https://athleticsutils.com/calculators/pace.html" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I calculate my running pace?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Select the distance, enter your total time in MM:SS or HH:MM:SS format, and choose whether you want the pace shown per kilometre or per mile. The calculator returns your pace along with equivalent speeds."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I calculate finish time from a target pace?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Switch the Calculate toggle to Total Time, enter your target pace or speed, and pick the distance. The calculator returns the expected finish time and splits."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does the calculator support miles and kilometres?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. All inputs and outputs support both imperial and metric units, including min/km, min/mile, km/h, mph, m/s, ft/s, and yd/s."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   <header class="header">
     <div class="container">
       <div class="header__brand">
-        <h1 class="header__title"><a href="/" class="header__title-link">Athletics Utilities</a></h1>
+        <p class="header__title"><a href="/" class="header__title-link">Athletics Utilities</a></p>
         <p class="header__subtitle">Pace & Speed Calculator</p>
       </div>
     </div>
@@ -32,11 +113,11 @@
     </div>
   </nav>
 
-  <main class="main">
+  <main class="main" id="main-content" tabindex="-1">
     <div class="container">
-      <section class="calculator">
+      <section class="calculator" aria-labelledby="calculator-heading">
         <div class="calculator__header">
-          <h2>Pace & Speed Calculator</h2>
+          <h1 id="calculator-heading">Pace & Speed Calculator</h1>
           <p class="calculator__description">
             Calculate the required pace or speed based on the target time, or calculate the total time based on the target pace or speed. Use Advanced mode for custom distances and pace intervals.
           </p>
@@ -45,13 +126,14 @@
         <div class="calculator__controls">
           <!-- PRIMARY TOGGLE: Pace vs Speed -->
           <div class="form-group">
-            <label>Measurement Type:</label>
-            <div class="mode-toggle">
+            <label id="measurement-toggle-label">Measurement Type:</label>
+            <div class="mode-toggle" role="group" aria-labelledby="measurement-toggle-label">
               <button
                 type="button"
                 id="mode-toggle-measurement-pace"
                 class="mode-toggle__option mode-toggle__option--active"
                 data-mode="pace"
+                aria-pressed="true"
               >
                 Pace
               </button>
@@ -60,6 +142,7 @@
                 id="mode-toggle-measurement-speed"
                 class="mode-toggle__option"
                 data-mode="speed"
+                aria-pressed="false"
               >
                 Speed
               </button>
@@ -68,13 +151,14 @@
 
           <!-- SECONDARY TOGGLE: Calculate vs Time (dynamic labels) -->
           <div class="form-group">
-            <label>Calculate:</label>
-            <div class="mode-toggle">
+            <label id="calculate-toggle-label">Calculate:</label>
+            <div class="mode-toggle" role="group" aria-labelledby="calculate-toggle-label">
               <button
                 type="button"
                 id="mode-toggle-calculate"
                 class="mode-toggle__option mode-toggle__option--active"
                 data-mode="calculate"
+                aria-pressed="true"
               >
                 <span id="calculate-label">Pace</span>
               </button>
@@ -83,6 +167,7 @@
                 id="mode-toggle-time"
                 class="mode-toggle__option"
                 data-mode="totalTime"
+                aria-pressed="false"
               >
                 <span id="time-label">Total Time</span>
               </button>
@@ -91,13 +176,14 @@
 
           <!-- TERTIARY TOGGLE: Standard vs Advanced -->
           <div class="form-group">
-            <label>Mode:</label>
-            <div class="mode-toggle">
+            <label id="advanced-toggle-label">Mode:</label>
+            <div class="mode-toggle" role="group" aria-labelledby="advanced-toggle-label">
               <button
                 type="button"
                 id="mode-toggle-standard"
                 class="mode-toggle__option mode-toggle__option--active"
                 data-mode="standard"
+                aria-pressed="true"
               >
                 Standard
               </button>
@@ -106,6 +192,7 @@
                 id="mode-toggle-advanced"
                 class="mode-toggle__option"
                 data-mode="advanced"
+                aria-pressed="false"
               >
                 Advanced
               </button>
@@ -503,7 +590,7 @@
 
         <div id="results-container" class="calculator__results hidden">
           <div class="results-header">
-            <h3>Results</h3>
+            <h2>Results</h2>
           </div>
           <div id="results-content" class="results-content">
             <!-- Results will be injected here -->
@@ -512,7 +599,7 @@
 
         <section id="history-section" class="history-section hidden">
           <div class="history-header">
-            <h3>Calculation History</h3>
+            <h2>Calculation History</h2>
           </div>
           <div class="history-table-container">
             <table class="history-table">
@@ -538,7 +625,7 @@
       </section>
 
       <section class="info-section">
-        <h3>How to Use</h3>
+        <h2>How to Use</h2>
         <p>
           <strong>Select Pace or Speed:</strong><br>
           Choose whether to calculate pace (time per distance) or speed (distance per time).
@@ -574,11 +661,80 @@
           &bull; Click the share button on a result to copy a shareable link to your clipboard<br>
           &bull; Click any row in the history table to re-run that calculation
         </p>
+
+        <h2>Pace vs Speed — which should you use?</h2>
+        <p>
+          <strong>Pace</strong> expresses how long it takes you to cover a fixed distance — for example,
+          5:00 per kilometre or 8:00 per mile. Pace is the default for most runners because it makes race
+          planning intuitive: if you know your 5&nbsp;km race pace, you know exactly what your splits should
+          look like on the watch.
+        </p>
+        <p>
+          <strong>Speed</strong> expresses distance covered per unit of time — for example, 12&nbsp;km/h
+          or 7.5&nbsp;mph. Speed is the default for cycling, rowing, and treadmill displays, and is the
+          more convenient unit for short sprints or interval sessions where times are small.
+        </p>
+        <p>
+          This calculator lets you switch between the two freely. Enter whatever you have and it converts
+          between <code>min/km</code>, <code>min/mile</code>, <code>km/h</code>, <code>mph</code>,
+          <code>m/s</code>, <code>ft/s</code>, and <code>yd/s</code> without rounding errors.
+        </p>
+
+        <h2>Common race paces</h2>
+        <p>
+          Some reference points for popular distances. Enter any of these finish times into the calculator
+          to see the equivalent pace and speed in every supported unit.
+        </p>
+        <ul>
+          <li><strong>5&nbsp;km in 25:00</strong> — 5:00 min/km, 8:03 min/mile, 12.0 km/h</li>
+          <li><strong>5&nbsp;km in 20:00</strong> — 4:00 min/km, 6:26 min/mile, 15.0 km/h</li>
+          <li><strong>10&nbsp;km in 50:00</strong> — 5:00 min/km, 8:03 min/mile, 12.0 km/h</li>
+          <li><strong>10&nbsp;km in 40:00</strong> — 4:00 min/km, 6:26 min/mile, 15.0 km/h</li>
+          <li><strong>Half marathon in 2:00:00</strong> — 5:41 min/km, 9:09 min/mile, 10.55 km/h</li>
+          <li><strong>Half marathon in 1:30:00</strong> — 4:16 min/km, 6:52 min/mile, 14.07 km/h</li>
+          <li><strong>Marathon in 4:00:00</strong> — 5:41 min/km, 9:09 min/mile, 10.55 km/h</li>
+          <li><strong>Marathon in 3:00:00</strong> — 4:16 min/km, 6:52 min/mile, 14.07 km/h</li>
+        </ul>
+
+        <h2>Advanced mode</h2>
+        <p>
+          Standard mode covers the common race distances (100&nbsp;m, 200&nbsp;m, 400&nbsp;m, 800&nbsp;m,
+          1&nbsp;km, 1 mile, 5&nbsp;km, 10&nbsp;km, half marathon, marathon, and more). Switch to
+          <strong>Advanced</strong> if you need a non-standard distance — a 3&nbsp;km tempo, an 8-mile long run,
+          a 600&nbsp;yd test, or a custom pace interval such as minutes per 400&nbsp;m for track reps.
+          Every unit combination is available in advanced mode.
+        </p>
+
+        <h2>Splits</h2>
+        <p>
+          When you calculate a finish time from a pace, the result includes split times at each kilometre
+          (or mile, depending on your unit preference) so you can take them onto the track or into the race.
+          Splits are generated from the normalised pace, which means they add up exactly to the target time
+          rather than drifting due to rounding.
+        </p>
+
+        <h2>Related Calculators</h2>
+        <p>
+          Once you know your pace, convert any track or field performance into points with the
+          <a href="/calculators/score.html">World Athletics Score Calculator</a>, or total up a multi-event competition
+          using the <a href="/calculators/combined-events.html">Combined Event Score Calculator</a>.
+        </p>
       </section>
     </div>
   </main>
 
   <footer class="footer">
+    <div class="container">
+      <p class="footer__links">
+        <a href="/">Home</a>
+        &nbsp;·&nbsp;
+        <a href="/calculators/pace.html">Pace &amp; Speed</a>
+        &nbsp;·&nbsp;
+        <a href="/calculators/score.html">World Athletics Score</a>
+        &nbsp;·&nbsp;
+        <a href="/calculators/combined-events.html">Combined Events</a>
+      </p>
+    </div>
   </footer>
 
   <script type="module" src="../src/js/pages/pace-calculator.js"></script>

@@ -646,19 +646,28 @@ class EnhancedScoringTableExtractor {
     console.log(`\n💾 Data exported to: ${outputPath}`);
     console.log(`💾 Minified version: ${minifiedPath}`);
 
-    // Copy minified version to website's public/data directory
+    // Publish per-gender split files to the website's public/data directory.
+    // The site loads scoring tables lazily per gender (men / women / mixed)
+    // so we write one file per top-level key rather than a single ~3 MB blob.
     const websiteDataDir = path.join(path.dirname(path.dirname(__dirname)), 'web', 'public', 'data');
-    const websiteDataPath = path.join(websiteDataDir, path.basename(minifiedPath));
 
     try {
-      // Ensure the directory exists
       if (!fs.existsSync(websiteDataDir)) {
         fs.mkdirSync(websiteDataDir, { recursive: true });
       }
 
-      // Copy minified file to website data directory
-      fs.copyFileSync(minifiedPath, websiteDataPath);
-      console.log(`📦 Published to website: ${websiteDataPath}`);
+      for (const [gender, subtree] of Object.entries(minifiedData)) {
+        const splitPath = path.join(websiteDataDir, `scoring-${gender}.min.json`);
+        fs.writeFileSync(splitPath, JSON.stringify(subtree));
+        console.log(`📦 Published to website: ${splitPath}`);
+      }
+
+      // Remove the legacy monolithic file if it still exists from an older publish.
+      const legacyPath = path.join(websiteDataDir, path.basename(minifiedPath));
+      if (fs.existsSync(legacyPath)) {
+        fs.unlinkSync(legacyPath);
+        console.log(`🧹 Removed legacy monolithic file: ${legacyPath}`);
+      }
     } catch (error) {
       console.warn(`⚠️  Warning: Could not publish to website directory: ${error.message}`);
     }

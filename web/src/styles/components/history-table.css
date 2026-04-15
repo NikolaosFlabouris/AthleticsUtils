@@ -10,7 +10,7 @@
   margin-bottom: var(--spacing-md);
 }
 
-.history-header h3 {
+.history-header h2 {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text);
@@ -45,7 +45,8 @@
 }
 
 .history-table th:last-child {
-  width: 40px;
+  /* Room for three icon buttons (move up, move down, delete). */
+  width: 96px;
 }
 
 /* Column width constraints for better layout */
@@ -71,6 +72,18 @@
   background: rgba(26, 115, 232, 0.08);
 }
 
+/* Keyboard-focused row (Tab to replay). Inset box-shadow acts as a ring
+   without breaking `border-collapse: collapse` on the surrounding table. */
+.history-row:focus {
+  outline: none;
+}
+
+.history-row:focus-visible {
+  outline: none;
+  background: rgba(26, 115, 232, 0.12);
+  box-shadow: inset 0 0 0 2px var(--color-primary);
+}
+
 .history-row.dragging {
   opacity: 0.5;
   cursor: move;
@@ -93,25 +106,58 @@
   font-weight: var(--font-weight-medium);
 }
 
-.history-delete-btn {
+/* Shared icon-button base for row actions (move, delete). */
+.history-delete-btn,
+.history-move-btn {
   background: transparent;
   border: none;
   color: var(--color-text-tertiary);
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-sm);
   cursor: pointer;
   padding: 0;
   width: 24px;
   height: 24px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
+  line-height: 1;
 }
 
-.history-delete-btn:hover {
+.history-delete-btn {
+  font-size: var(--font-size-xl);
+}
+
+.history-move-btn:hover {
+  background: rgba(26, 115, 232, 0.1);
+  color: var(--color-primary);
+}
+
+.history-move-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.history-delete-btn:hover,
+.history-delete-btn:focus-visible {
   background: rgba(244, 67, 54, 0.1);
   color: #f44336;
+}
+
+.history-delete-btn:focus-visible {
+  outline: 2px solid #f44336;
+  outline-offset: 2px;
+}
+
+/* Actions column: keep the three buttons on one line with snug spacing. */
+.history-row__actions {
+  white-space: nowrap;
+}
+
+.history-row__actions .history-move-btn + .history-move-btn,
+.history-row__actions .history-move-btn + .history-delete-btn {
+  margin-left: 2px;
 }
 
 /* Animations */
