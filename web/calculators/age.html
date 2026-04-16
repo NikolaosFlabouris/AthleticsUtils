@@ -16,7 +16,7 @@
   <meta property="og:site_name" content="Athletics Utilities">
   <meta property="og:url" content="https://athleticsutils.com/calculators/age.html">
   <meta property="og:title" content="Age Calculator — Years, Months, Days Between Dates">
-  <meta property="og:description" content="Free age calculator for exact years, months, and days between dates. Includes a reverse mode and end-of-year age for athletics age groups.">
+  <meta property="og:description" content="Free age calculator for exact years, months, and days between dates. Also calculates a date from an age, with end-of-year age for athletics age groups.">
   <meta property="og:image" content="https://athleticsutils.com/icons/og-default.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -24,7 +24,7 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Age Calculator — Years, Months, Days Between Dates">
-  <meta name="twitter:description" content="Free age calculator with reverse mode and end-of-year age for athletics age groups.">
+  <meta name="twitter:description" content="Free age calculator: calculate age from dates or calculate a date from an age, with end-of-year age for athletics age groups.">
   <meta name="twitter:image" content="https://athleticsutils.com/icons/og-default.png">
 
   <link rel="stylesheet" href="../src/styles/main.css">
@@ -40,7 +40,7 @@
     "operatingSystem": "Any (web browser)",
     "browserRequirements": "Requires JavaScript",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "description": "Free calculator that returns the exact age in years, months, and days between two dates, and a reverse mode for working from an age back to a date.",
+    "description": "Free calculator that returns the exact age in years, months, and days between two dates, and a Calculate Date mode for working from an age back to a date.",
     "publisher": {
       "@type": "Organization",
       "name": "Athletics Utilities",
@@ -84,7 +84,7 @@
         "name": "Can I calculate a date from an age?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes — switch to Reverse mode. Enter a date and an age, choose whether the date is the 'from' date (result is target) or the 'target' date (result is from), and the calculator returns the matching date."
+          "text": "Yes — switch to Calculate Date mode. Enter a date and an age, choose whether the date is the 'from' date (result is target) or the 'target' date (result is from), and the calculator returns the matching date."
         }
       }
     ]
@@ -126,9 +126,9 @@
         </div>
 
         <div class="calculator__controls">
-          <!-- PRIMARY TOGGLE: Forward vs Reverse -->
+          <!-- PRIMARY TOGGLE: Calculate Age vs Calculate Date -->
           <div class="form-group">
-            <label id="age-mode-toggle-label">Mode:</label>
+            <label id="age-mode-toggle-label">Calculate:</label>
             <div class="mode-toggle" role="group" aria-labelledby="age-mode-toggle-label">
               <button
                 type="button"
@@ -137,7 +137,7 @@
                 data-mode="forward"
                 aria-pressed="true"
               >
-                Forward
+                Calculate Age
               </button>
               <button
                 type="button"
@@ -146,10 +146,10 @@
                 data-mode="reverse"
                 aria-pressed="false"
               >
-                Reverse
+                Calculate Date
               </button>
             </div>
-            <small class="form-help" id="age-mode-help">Forward: from two dates, calculate an age. Reverse: from a date and an age, calculate the matching date.</small>
+            <small class="form-help" id="age-mode-help">Calculate Age: from two dates, calculate the age between them. Calculate Date: from a date and an age, calculate the matching date.</small>
           </div>
 
           <!-- FORWARD MODE: two date inputs -->
@@ -256,13 +256,13 @@
       <section class="info-section">
         <h2>How to Use</h2>
         <p>
-          <strong>Forward mode:</strong><br>
+          <strong>Calculate Age mode:</strong><br>
           1. Enter a <em>From date</em> (typically a date of birth)<br>
           2. Adjust the <em>Target date</em> if you need an age on a day other than today<br>
           3. The result updates automatically and shows the exact age in years, months, and days
         </p>
         <p>
-          <strong>Reverse mode:</strong><br>
+          <strong>Calculate Date mode:</strong><br>
           1. Enter a date<br>
           2. Choose whether that date is the <em>From Date</em> (result = date + age) or the <em>Target Date</em> (result = date − age)<br>
           3. Enter an age in years, months, and days and the matching date is calculated instantly
@@ -275,32 +275,18 @@
 
         <h2>Age at end of year (31 Dec)</h2>
         <p>
-          Underneath each forward-mode result is a second line showing the age the person will be
+          Underneath each Calculate Age result is a second line showing the age the person will be
           on <strong>31 December of the target year</strong>. Most national and international
           athletics federations assign athletes to age groups (U15, U17, U18, U20, etc.) based on
           their age on the 31 December of the competition year, so this value is often more
           relevant than the literal age on competition day.
         </p>
 
-        <h2>How the diff is calculated</h2>
+        <h2>Calculate Date mode</h2>
         <p>
-          The calculator uses the standard calendar convention: on your 30th birthday you are
-          exactly 30 years, 0 months, 0 days old. Days that don't fit into a month are borrowed
-          from the previous month's length (e.g. going back through March borrows 31 days),
-          months below zero borrow from years. This matches how legal age is determined in most
-          jurisdictions and how every mainstream "birthday" calculator operates.
-        </p>
-
-        <h2>Reverse mode</h2>
-        <p>
-          Reverse mode answers questions like <em>"what date is 25 years, 3 months, and 10 days
+          Calculate Date mode answers questions like <em>"what date is 25 years, 3 months, and 10 days
           after 5 April 2034?"</em> or <em>"if I'm 32 years and 4 months old today, when was I
-          born?"</em> — useful for filling in paperwork, planning birthday events, or working out
-          the cut-off dates for an age-group competition.
-        </p>
-        <p>
-          Month arithmetic clamps to the end of the target month, so for example 31 January + 1
-          month lands on 28/29 February rather than overflowing into March.
+          born?"</em> — useful for working out the cut-off dates for an age-group competition.
         </p>
 
         <h2>Related Calculators</h2>
