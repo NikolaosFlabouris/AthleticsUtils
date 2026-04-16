@@ -22,6 +22,25 @@ const PACE_PARAM_MAP = {
   speedUnit: 'su'
 };
 
+const AGE_PARAM_MAP = {
+  mode: 'md',            // 'forward' | 'reverse'
+  reverseSubMode: 'rmd', // 'from' | 'target' (reverse only)
+  fromDate: 'fd',        // forward: from-date as YYYY-MM-DD
+  targetDate: 'td',      // forward: target-date as YYYY-MM-DD
+  singleDate: 'd',       // reverse: the single date as YYYY-MM-DD
+  years: 'y',            // reverse: age years
+  months: 'mo',          // reverse: age months
+  days: 'dy'             // reverse: age days
+};
+
+const TIME_PARAM_MAP = {
+  mode: 'm',      // 'as' (add/subtract) | 'md' (multiply/divide)
+  times: 'ts',    // add/sub: serialised rows, e.g. "+5:00,-3:00,+1:30"
+  time: 't',      // mul/div: the single time value (seconds or MM:SS)
+  operator: 'op', // mul/div: 'mul' | 'div'
+  number: 'n'     // mul/div: the multiplier/divisor
+};
+
 /**
  * Build a shareable URL from calculator params.
  * @param {string} calculatorPath - e.g., '/calculators/score.html'
@@ -98,4 +117,4 @@ export async function copyToClipboard(text) {
   }
 }
 
-export { SCORE_PARAM_MAP, PACE_PARAM_MAP };
+export { SCORE_PARAM_MAP, PACE_PARAM_MAP, AGE_PARAM_MAP, TIME_PARAM_MAP };

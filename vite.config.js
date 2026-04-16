@@ -69,6 +69,18 @@ export default defineConfig({
             short_name: 'Combined',
             url: '/calculators/combined-events.html',
             description: 'Decathlon, heptathlon, and pentathlon totals.'
+          },
+          {
+            name: 'Age Calculator',
+            short_name: 'Age',
+            url: '/calculators/age.html',
+            description: 'Exact age in years, months, and days between dates.'
+          },
+          {
+            name: 'Time Calculator',
+            short_name: 'Time',
+            url: '/calculators/time.html',
+            description: 'Add, subtract, multiply, or divide times.'
           }
         ]
       },
@@ -123,7 +135,9 @@ export default defineConfig({
         main: resolve(__dirname, 'web/index.html'),
         score: resolve(__dirname, 'web/calculators/score.html'),
         pace: resolve(__dirname, 'web/calculators/pace.html'),
-        combinedEvents: resolve(__dirname, 'web/calculators/combined-events.html')
+        combinedEvents: resolve(__dirname, 'web/calculators/combined-events.html'),
+        age: resolve(__dirname, 'web/calculators/age.html'),
+        time: resolve(__dirname, 'web/calculators/time.html')
       }
     }
   }

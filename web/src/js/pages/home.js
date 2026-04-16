@@ -13,7 +13,9 @@ function addToolCardIcons() {
   const iconMap = {
     'Pace & Speed Calculator': 'timer',
     'World Athletics Score Calculator': 'trophy',
-    'Combined Event Score Calculator': 'layers'
+    'Combined Event Score Calculator': 'layers',
+    'Age Calculator': 'cake',
+    'Time Calculator': 'clock'
   };
 
   const titles = document.querySelectorAll('.tool-card__title');

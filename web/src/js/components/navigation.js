@@ -44,7 +44,9 @@ export class Navigation {
       '/index.html': 'home',
       '/calculators/pace.html': 'timer',
       '/calculators/score.html': 'trophy',
-      '/calculators/combined-events.html': 'layers'
+      '/calculators/combined-events.html': 'layers',
+      '/calculators/age.html': 'cake',
+      '/calculators/time.html': 'clock'
     };
 
     const links = document.querySelectorAll('.navigation__link');
