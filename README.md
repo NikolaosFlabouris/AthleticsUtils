@@ -1,28 +1,32 @@
 # Athletics Utilities
 
-A lightweight Progressive Web App (PWA) providing free athletics (track & field) calculators. Built with vanilla JavaScript for maximum performance.
+A lightweight Progressive Web App (PWA) providing Athletics (track & field) calculators. Built with vanilla JavaScript for maximum performance.
 
 **Live Site**: https://athleticsutils.com/
 
 ## Features
 
 ### Pace Calculator
+
 - Calculate pace from time and distance or time from pace and distance
 - Split times for various distances
 - Pace and speed equivalents (min/km, min/mile, km/h, mph, m/s)
 - Support for meters, kilometers, miles, and feet
 
 ### World Athletics Score Calculator
+
 - Look up point values for athletic performances using official World Athletics scoring tables (2025)
 - Find equivalent performances across all athletics events
 - Supports all track and field events: sprints, middle/long distance, hurdles, steeplechase, race walks, jumps, throws, combined events, and relays
 
 ### Combined Events Calculator
+
 - Calculate total scores for Decathlon, Heptathlon, and Pentathlon
 - Enter performances for each discipline
 - Uses official World Athletics scoring tables
 
 ### Progressive Web App
+
 - Works offline once loaded
 - Installable on mobile and desktop
 - Fast loading and responsive design
@@ -66,9 +70,11 @@ AthleticsUtils/
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 14.0.0 or higher
 
 ### Installation
+
 ```bash
 git clone https://github.com/NikolaosFlabouris/AthleticsUtils.git
 cd AthleticsUtils
@@ -76,6 +82,7 @@ npm install
 ```
 
 ### Development
+
 ```bash
 npm run dev      # Start dev server (http://localhost:5173)
 npm run build    # Build for production
@@ -90,6 +97,7 @@ Scoring tables are based on **World Athletics Scoring Tables of Athletics (2025)
 ### Updating Scoring Data
 
 When World Athletics releases new tables:
+
 ```bash
 cd tools/scoring-table-extractor
 npm install              # First time only

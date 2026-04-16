@@ -90,7 +90,7 @@ def make_og_image(title: str = "Athletics Utilities", subtitle_lines: list[str] 
     """1200x630 Open Graph / Twitter share card."""
     if subtitle_lines is None:
         subtitle_lines = [
-            "Free calculators for pace, World",
+            "Calculators for pace, World",
             "Athletics points, and combined events.",
         ]
     width, height = 1200, 630

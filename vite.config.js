@@ -13,7 +13,7 @@ export default defineConfig({
       manifest: {
         name: 'Athletics Utilities',
         short_name: 'AthleticsUtils',
-        description: 'Free calculators for track and field: pace & speed, World Athletics points, and combined events.',
+        description: 'Calculators for track and field: pace & speed, World Athletics points, and combined events.',
         theme_color: '#1a73e8',
         background_color: '#ffffff',
         display: 'standalone',
