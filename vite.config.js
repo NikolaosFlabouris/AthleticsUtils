@@ -137,7 +137,8 @@ export default defineConfig({
         pace: resolve(__dirname, 'web/calculators/pace.html'),
         combinedEvents: resolve(__dirname, 'web/calculators/combined-events.html'),
         age: resolve(__dirname, 'web/calculators/age.html'),
-        time: resolve(__dirname, 'web/calculators/time.html')
+        time: resolve(__dirname, 'web/calculators/time.html'),
+        privacy: resolve(__dirname, 'web/privacy.html')
       }
     }
   }
