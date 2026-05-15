@@ -137,9 +137,11 @@ main.main { flex: 1; }
    Header — divergent markup per theme, gated by .theme-only-* classes.
    Hide the inactive theme's block; leave the active block's display
    alone (so flex/grid layouts on the element itself still apply).
+   !important ensures this wins over any later layout rules that
+   set `display` on a matching .hero / .grid / etc.
    ============================================================ */
 [data-theme="lane"] .theme-only-track,
-[data-theme="track"] .theme-only-lane { display: none; }
+[data-theme="track"] .theme-only-lane { display: none !important; }
 
 /* Dark theme header */
 .top {
@@ -164,44 +166,41 @@ main.main { flex: 1; }
   display: block;
 }
 
-.brand-text { display: flex; flex-direction: column; gap: 2px; }
-.brand-title { font-size: 18px; font-weight: 600; letter-spacing: -0.005em; color: var(--ink); }
-.brand-title a { color: inherit; text-decoration: none; }
-.brand-sub { font-family: var(--mono); font-size: 12px; color: var(--muted); }
-
-/* Light theme — text block sits inline (serif title + uppercase tagline
-   on the same baseline). Overrides the Dark theme's column layout. */
-[data-theme="track"] .brand-text {
+.brand { min-width: 0; }
+/* Both themes show the brand text inline: icon → title → url, on a single
+   baseline. Same layout in Dark and Light; only typography (font, size,
+   case) differs per theme. */
+.brand-text {
+  display: flex;
   flex-direction: row;
   align-items: baseline;
-  gap: 14px;
+  gap: 12px;
+  min-width: 0;
   flex-wrap: wrap;
 }
+.brand-title {
+  font-size: clamp(14px, 3vw, 18px);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.brand-title a { color: inherit; text-decoration: none; }
+.brand-sub { font-family: var(--mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
 
 /* Light theme brand text */
-.brand-serif { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 28px; letter-spacing: -0.01em; color: var(--ink); }
+.brand-serif {
+  font-family: var(--serif); font-style: italic; font-weight: 500;
+  font-size: clamp(18px, 5.5vw, 28px);
+  letter-spacing: -0.01em; color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .brand-serif a { color: inherit; text-decoration: none; }
-.brand-tagline { font-size: 13px; color: var(--muted); letter-spacing: 0.14em; text-transform: uppercase; }
-
-/* Header meta block (Dark: status; Light: stat strip) */
-.meta {
-  font-family: var(--mono); font-size: 13px; color: var(--muted);
-  text-align: right; line-height: 1.7;
-  display: flex; flex-direction: column; gap: 2px; align-items: flex-end;
-}
-.meta b { color: var(--ink-2); font-weight: 500; }
-.meta .dot {
-  display: inline-block; width: 7px; height: 7px; border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 3px rgba(245, 213, 71, 0.16);
-  vertical-align: 0; margin-right: 6px;
-}
-[data-theme="track"] .meta {
-  font-family: var(--sans); font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase;
-  flex-direction: row; gap: 22px; align-items: center;
-}
-[data-theme="track"] .meta b { color: var(--ink); font-weight: 600; }
-[data-theme="track"] .meta .dot { background: var(--accent); box-shadow: 0 0 0 3px rgba(210, 74, 37, 0.16); }
+.brand-tagline { font-size: 13px; color: var(--muted); letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; }
 
 /* Theme toggle button */
 .theme-toggle {
@@ -292,11 +291,23 @@ nav.tabs a:hover:not(.active) { color: var(--ink); background: var(--panel); }
 /* ============================================================
    Page head — h1 + lede + mode-toggle row
    ============================================================ */
+/* Pagehead — shared flex layout for both themes. Stadium SVG sits to
+   the right of the title text block; gap shrinks first, SVG shrinks
+   second, SVG hides below 640px (rule lives further down). */
 .pagehead {
-  display: flex; align-items: flex-end; justify-content: space-between;
-  gap: 28px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
   padding: 26px 0 22px;
   border-bottom: 1px solid var(--line);
+}
+.pagehead > div:first-of-type {
+  flex: 0 0 auto;
+  width: clamp(320px, 40vw, 540px);
+  max-width: 100%;
 }
 .pagehead .crumb {
   font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
@@ -305,7 +316,8 @@ nav.tabs a:hover:not(.active) { color: var(--ink); background: var(--panel); }
 }
 .pagehead .crumb .stripe { display: inline-block; width: 36px; height: 2px; background: var(--accent); }
 .pagehead h1 {
-  font-size: 38px; line-height: 1; letter-spacing: -0.025em;
+  font-size: clamp(24px, 3.5vw, 38px);
+  line-height: 1; letter-spacing: -0.025em;
   font-weight: 700; margin: 0;
   color: var(--ink);
 }
@@ -314,11 +326,10 @@ nav.tabs a:hover:not(.active) { color: var(--ink); background: var(--panel); }
   margin: 10px 0 0; font-size: 14px;
 }
 
-/* Light theme variant of page head */
+/* Light theme pagehead — same flex layout, different typography. */
 [data-theme="track"] .pagehead {
   padding: 28px 0 22px;
   border-bottom-color: var(--line);
-  display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: end;
 }
 [data-theme="track"] .pagehead .crumb {
   font-family: var(--sans);
@@ -328,7 +339,8 @@ nav.tabs a:hover:not(.active) { color: var(--ink); background: var(--panel); }
 [data-theme="track"] .pagehead .crumb .stripe { display: none; }
 [data-theme="track"] .pagehead h1 {
   font-family: var(--sans); font-weight: 900;
-  font-size: 64px; letter-spacing: -0.04em; line-height: 0.92;
+  font-size: clamp(36px, 5.3vw, 64px);
+  letter-spacing: -0.04em; line-height: 0.92;
 }
 [data-theme="track"] .pagehead h1 em {
   font-family: var(--serif); font-style: italic; font-weight: 500; color: var(--accent);
@@ -2004,17 +2016,32 @@ select:disabled {
    Home page — hero, calculator grid, editorial layout
    ============================================================ */
 
-/* Dark theme hero */
+/* Hero — shared flex layout for both themes. The text column and SVG
+   share the same responsive collapse: as the viewport narrows, the gap
+   between them shrinks first, then the SVG shrinks, then the SVG hides
+   below 640px. All sizes scale continuously via clamp() — no step
+   changes at media-query boundaries. Theme-specific typography (font
+   family, weight, size range) is overridden below. */
 .hero {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 32px;
-  align-items: end;
-  padding: 40px 0 28px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 36px 0 32px;
+  border-bottom: 1px solid var(--line);
+}
+.hero > div:first-of-type {
+  flex: 0 0 auto;
+  width: clamp(320px, 40vw, 480px);
+  max-width: 100%;
 }
 .hero h1 {
-  font-size: 52px; line-height: 0.98;
-  letter-spacing: -0.035em; font-weight: 700;
+  font-size: clamp(30px, 4.5vw, 52px);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  font-weight: 700;
   margin: 0;
   text-wrap: balance;
   color: var(--ink);
@@ -2022,30 +2049,35 @@ select:disabled {
 .hero h1 .accent { color: var(--accent); }
 .hero h1 .light { color: var(--muted); font-weight: 400; }
 .hero p {
-  color: var(--ink-2); max-width: 38ch;
-  margin: 12px 0 0; font-size: 15px;
+  color: var(--ink-2);
+  max-width: 40ch;
+  margin: 12px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
 }
 .hero .kicker {
   font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
   color: var(--accent); margin-bottom: 18px; font-weight: 700;
 }
+
+/* Lane-art (the stadium SVG container) — same responsive sizing in both
+   themes. Hidden below 640px by a top-level media query further down. */
 .lane-art {
-  width: 200px; height: 200px;
+  flex: 0 1 auto;
+  width: 100%;
+  min-width: 260px;
+  max-width: clamp(280px, 50vw, 600px);
+  aspect-ratio: 360 / 240;   /* matches the trimmed SVG viewBox; ~1.5:1 */
+  margin: 0;
   position: relative;
 }
 .lane-art svg { display: block; width: 100%; height: 100%; }
 
-/* Track hero overrides */
-[data-theme="track"] .hero {
-  grid-template-columns: 1.2fr 1fr;
-  gap: 44px;
-  align-items: center;
-  padding: 36px 0 32px;
-  border-bottom: 1px solid var(--line);
-}
+/* Light theme hero h1 typography (heavier weight, larger range). */
 [data-theme="track"] .hero h1 {
   font-family: var(--sans); font-weight: 900;
-  font-size: 60px; line-height: 0.95;
+  font-size: clamp(36px, 5vw, 60px);
+  line-height: 0.95;
   letter-spacing: -0.04em;
 }
 [data-theme="track"] .hero h1 em {
@@ -2055,12 +2087,7 @@ select:disabled {
   font-size: 0.78em;
 }
 [data-theme="track"] .hero p {
-  font-size: 15px; max-width: 40ch;
-  margin: 18px 0 0; line-height: 1.5;
-}
-[data-theme="track"] .lane-art {
-  width: 100%; max-width: 360px; aspect-ratio: 1;
-  margin-left: auto;
+  margin: 18px 0 0;
 }
 
 /* Dark theme section header (between hero and grid) */
@@ -2254,29 +2281,14 @@ select:disabled {
 @media (max-width: 900px) {
   .wrap { padding: 16px 24px 30px; }
 
-  .top {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
-  }
-  .header-right { width: 100%; justify-content: space-between; }
-  .meta { text-align: left; align-items: flex-start; }
-  [data-theme="track"] .meta { gap: 16px; }
-
   nav.tabs { flex-wrap: wrap; gap: 2px; padding: 14px 0 0; }
   nav.tabs a { padding: 0 10px; height: 30px; font-size: 10px; }
   [data-theme="track"] nav.tabs { gap: 6px; }
   [data-theme="track"] nav.tabs a { margin-right: 14px; font-size: 12px; padding: 0 4px; height: 30px; }
 
-  .pagehead {
-    flex-direction: column; align-items: flex-start;
-    gap: 18px; padding: 22px 0 18px;
-  }
-  [data-theme="track"] .pagehead {
-    grid-template-columns: 1fr; gap: 18px;
-  }
-  .pagehead h1 { font-size: 30px; }
-  [data-theme="track"] .pagehead h1 { font-size: 48px; }
+  .pagehead { padding: 22px 0 18px; }
+  /* Pagehead h1 size handled by clamp() on the default rule.
+     Pagehead layout stays flex row (collapses progressively, not at 900px). */
 
   .calc, .calc.split-1-1 {
     grid-template-columns: 1fr; gap: 0;
@@ -2298,10 +2310,10 @@ select:disabled {
   /* Home — tablet */
   .hero { grid-template-columns: 1fr; gap: 22px; padding: 24px 0 20px; }
   .hero h1 { font-size: 40px; }
-  [data-theme="track"] .hero { grid-template-columns: 1fr; gap: 24px; padding: 24px 0 22px; }
-  [data-theme="track"] .hero h1 { font-size: 46px; }
+  [data-theme="track"] .hero { padding: 24px 0 22px; }
+  /* h1 font-size, text-column width, and SVG max-width are handled by
+     clamp() on the default rules; no step-change overrides needed here. */
   .lane-art { width: 140px; height: 140px; justify-self: end; }
-  [data-theme="track"] .lane-art { max-width: 220px; }
 
   .grid { grid-template-columns: 1fr 1fr; }
   .grid > .card { border-right: 1px solid var(--line); }
@@ -2318,6 +2330,47 @@ select:disabled {
 }
 
 /* ============================================================
+   Responsive — header URL collapse (≤700px)
+   Hide the URL line (sub for Dark, tagline for Light) so the brand
+   block is just icon + title. Keeps the icon and title on one line.
+   ============================================================ */
+@media (max-width: 700px) {
+  .brand-sub,
+  .brand-tagline { display: none; }
+}
+
+/* ============================================================
+   Responsive — circular theme toggle (≤350px)
+   At very narrow widths, the toggle collapses to an icon-only
+   circular button so the brand title and toggle stay on one line.
+   ============================================================ */
+@media (max-width: 350px) {
+  .theme-toggle {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
+    gap: 0;
+    justify-content: center;
+  }
+  .theme-toggle [data-theme-toggle-label] { display: none; }
+}
+
+/* ============================================================
+   Responsive — hero / pagehead SVG hide (≤640px)
+   Both themes: the SVG is hidden entirely below 640px and the text
+   column fills the hero/pagehead. Applied via plain .lane-art so
+   it covers Dark and Light theme equally.
+   ============================================================ */
+@media (max-width: 640px) {
+  .hero > div:first-of-type,
+  .pagehead > div:first-of-type {
+    width: 100%;
+  }
+  .lane-art { display: none; }
+}
+
+/* ============================================================
    Responsive — mobile (≤500px)
    ============================================================ */
 @media (max-width: 500px) {
@@ -2327,8 +2380,7 @@ select:disabled {
   nav.tabs a .ix { display: none; }
   [data-theme="track"] nav.tabs a { margin-right: 10px; font-size: 11px; padding: 0 3px; height: 28px; }
 
-  .pagehead h1 { font-size: 24px; }
-  [data-theme="track"] .pagehead h1 { font-size: 36px; }
+  /* Pagehead h1 size handled by clamp() on the default rule. */
   .pagehead p { font-size: 13px; }
 
   .pagehead .modes { width: 100%; }
@@ -2376,11 +2428,11 @@ select:disabled {
   /* Home — mobile */
   .hero { padding: 18px 0; }
   .hero h1 { font-size: 30px; }
-  [data-theme="track"] .hero h1 { font-size: 34px; }
+  /* Light theme h1 size handled by clamp() on the default rule. */
   .hero h1 br { display: none; }
   .hero p { font-size: 13px; max-width: 100%; }
   .lane-art { display: none; }
-  [data-theme="track"] .lane-art { display: block; max-width: 160px; }
+  /* Light theme SVG already hidden at ≤640px — no override needed here. */
 
   .grid { grid-template-columns: 1fr; }
   .grid > .card { border-right: 0 !important; min-height: auto; padding: 18px 16px; }
