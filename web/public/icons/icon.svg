@@ -5,10 +5,19 @@
       <rect x="4" y="4" width="64" height="64" rx="14"></rect>
     </clipPath>
   </defs>
+
+  
   <rect width="72" height="72" rx="22" fill="#0E1118"></rect>
+
+  
   <rect x="3.25" y="3.25" width="65.5" height="65.5" rx="18" fill="#171B25" stroke="#2A3040" stroke-width="2.5"></rect>
+
+  
   <g clip-path="url(#card-clip)">
+    
     <rect x="4" y="4" width="10" height="64" fill="#ECD24A"></rect>
+
+    
     <rect x="22.88" y="4" width="2.4" height="64" fill="#EDEDE8"></rect>
     <rect x="34.16" y="4" width="2.4" height="64" fill="#EDEDE8"></rect>
     <rect x="45.44" y="4" width="2.4" height="64" fill="#EDEDE8"></rect>

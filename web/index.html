@@ -4,12 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Athletics calculators: pace & speed, World Athletics / IAAF points, and combined events (decathlon, heptathlon, pentathlon). Uses the official 2025 scoring tables.">
-  <meta name="theme-color" content="#1a73e8">
+  <meta name="theme-color" content="#0a0c11">
   <title>Athletics Utils</title>
   <link rel="canonical" href="https://athleticsutils.com/">
   <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
   <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any">
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+
+  <!-- Theme pre-paint: read stored choice before CSS applies. Inline to avoid FOUC. -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('athleticsUtils.theme');
+        if (t !== 'lane' && t !== 'track') t = 'lane';
+        document.documentElement.setAttribute('data-theme', t);
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', t === 'lane' ? '#0a0c11' : '#f4efe6');
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'lane');
+      }
+    })();
+  </script>
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
@@ -28,7 +43,6 @@
   <meta name="twitter:image" content="https://athleticsutils.com/icons/og-default.png">
 
   <link rel="stylesheet" href="./src/styles/main.css">
-  <link rel="stylesheet" href="./src/styles/pages/home.css">
 
   <!-- Structured data -->
   <script type="application/ld+json">
@@ -56,161 +70,229 @@
     "@context": "https://schema.org",
     "@type": "ItemList",
     "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "url": "https://athleticsutils.com/calculators/pace.html",
-        "name": "Pace & Speed Calculator"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "url": "https://athleticsutils.com/calculators/score.html",
-        "name": "World Athletics Score Calculator"
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "url": "https://athleticsutils.com/calculators/combined-events.html",
-        "name": "Combined Event Score Calculator"
-      },
-      {
-        "@type": "ListItem",
-        "position": 4,
-        "url": "https://athleticsutils.com/calculators/age.html",
-        "name": "Age Calculator"
-      },
-      {
-        "@type": "ListItem",
-        "position": 5,
-        "url": "https://athleticsutils.com/calculators/time.html",
-        "name": "Time Calculator"
-      }
+      { "@type": "ListItem", "position": 1, "url": "https://athleticsutils.com/calculators/pace.html", "name": "Pace & Speed Calculator" },
+      { "@type": "ListItem", "position": 2, "url": "https://athleticsutils.com/calculators/score.html", "name": "World Athletics Score Calculator" },
+      { "@type": "ListItem", "position": 3, "url": "https://athleticsutils.com/calculators/combined-events.html", "name": "Combined Event Score Calculator" },
+      { "@type": "ListItem", "position": 4, "url": "https://athleticsutils.com/calculators/age.html", "name": "Age Calculator" },
+      { "@type": "ListItem", "position": 5, "url": "https://athleticsutils.com/calculators/time.html", "name": "Time Calculator" }
     ]
   }
   </script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to main content</a>
-  <header class="header">
-    <div class="container">
-      <div class="header__brand">
-        <h1 class="header__title"><a href="/" class="header__title-link">Athletics Utilities</a></h1>
-        <p class="header__subtitle">Utilities for the sport of Athletics</p>
+
+  <div class="wrap">
+
+    <!-- ===== HEADER ===== -->
+    <header class="top">
+      <!-- Dark theme brand -->
+      <div class="brand theme-only-lane">
+        <a href="/" aria-label="Home"><img class="brand-mark" src="/icons/icon.svg" alt="" width="42" height="42" /></a>
+        <div class="brand-text">
+          <div class="brand-title"><a href="/">Athletics Utilities</a></div>
+          <div class="brand-sub">athleticsutils.com</div>
+        </div>
       </div>
-    </div>
-  </header>
-
-  <nav class="navigation">
-    <div class="container">
-      <ul class="navigation__list">
-        <li><a href="/" class="navigation__link navigation__link--active">Home</a></li>
-        <li><a href="/calculators/pace.html" class="navigation__link">Pace & Speed</a></li>
-        <li><a href="/calculators/score.html" class="navigation__link">World Athletics Score</a></li>
-        <li><a href="/calculators/combined-events.html" class="navigation__link">Combined Events</a></li>
-        <li><a href="/calculators/age.html" class="navigation__link">Age</a></li>
-        <li><a href="/calculators/time.html" class="navigation__link">Time</a></li>
-      </ul>
-    </div>
-  </nav>
-
-  <main class="main" id="main-content" tabindex="-1">
-    <div class="container">
-
-      <section class="tools-grid" aria-label="Calculators">
-        <div class="tool-card">
-          <h2 class="tool-card__title">Pace & Speed Calculator</h2>
-          <p class="tool-card__description">
-            Calculate your required pace or speed based on your target time, or determine your finish time based on your target pace or speed.
-            Includes split times and pace and speed conversions.
-          </p>
-          <a href="/calculators/pace.html" class="btn btn-primary">Launch Calculator</a>
+      <!-- Light theme brand -->
+      <div class="brand theme-only-track">
+        <a href="/" aria-label="Home"><img class="brand-mark" src="/icons/icon-mono-light.svg" alt="" width="42" height="42" /></a>
+        <div class="brand-text">
+          <span class="brand-serif"><a href="/">Athletics Utilities</a></span>
+          <span class="brand-tagline">athleticsutils.com</span>
         </div>
+      </div>
 
-        <div class="tool-card">
-          <h2 class="tool-card__title">World Athletics Score Calculator</h2>
-          <p class="tool-card__description">
-            Calculate World Athletics points for any track and field performance using official scoring tables.
-            Find your score and discover equivalent performances across all athletics events.
-          </p>
-          <a href="/calculators/score.html" class="btn btn-primary">Launch Calculator</a>
+      <div class="header-right">
+        <div class="meta theme-only-lane">
+          <div><b>5</b> tools · <b>no signup</b></div>
         </div>
-
-        <div class="tool-card">
-          <h2 class="tool-card__title">Combined Event Score Calculator</h2>
-          <p class="tool-card__description">
-            Calculate scores for combined events including Decathlon, Heptathlon, and Pentathlon.
-            Enter performances for each discipline and get the total score based on official World Athletics scoring tables.
-          </p>
-          <a href="/calculators/combined-events.html" class="btn btn-primary">Launch Calculator</a>
+        <div class="meta theme-only-track">
+          <span><b>05</b> tools</span><span><b>no</b> signups</span>
         </div>
+        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch theme">
+          <span class="tt-icon" aria-hidden="true"></span>
+          <span data-theme-toggle-label>Light</span>
+        </button>
+      </div>
+    </header>
 
-        <div class="tool-card">
-          <h2 class="tool-card__title">Age Calculator</h2>
-          <p class="tool-card__description">
-            Calculate exact age in years, months, and days between any two dates, or work backwards from an age to find a date.
-            Includes an "age at end of year" readout for athletics age-group competitions.
-          </p>
-          <a href="/calculators/age.html" class="btn btn-primary">Launch Calculator</a>
+    <!-- ===== NAV ===== -->
+    <nav class="tabs" aria-label="Calculators">
+      <a href="/" class="active"><span class="ix">00</span> Home</a>
+      <a href="/calculators/pace.html"><span class="ix">01</span> Pace &amp; Speed</a>
+      <a href="/calculators/score.html"><span class="ix">02</span> WA Score</a>
+      <a href="/calculators/combined-events.html"><span class="ix">03</span> Combined</a>
+      <a href="/calculators/age.html"><span class="ix">04</span> Age</a>
+      <a href="/calculators/time.html"><span class="ix">05</span> Time</a>
+    </nav>
+
+    <main class="main" id="main-content" tabindex="-1">
+
+      <!-- ===== HERO (Dark theme) ===== -->
+      <section class="hero theme-only-lane">
+        <div>
+          <h1>Tools tuned<br/>for the sport of<br/><span class="accent">Athletics.</span></h1>
+          <p>Five focused calculators for athletes, coaches and fans. Free, fast, no signup &mdash; runs offline in your browser.</p>
         </div>
-
-        <div class="tool-card">
-          <h2 class="tool-card__title">Time Calculator</h2>
-          <p class="tool-card__description">
-            Add, subtract, multiply, or divide times. Chain as many times as you like with per-row operators,
-            or run a single time through a multiplier or divisor with a step-by-step running total.
-          </p>
-          <a href="/calculators/time.html" class="btn btn-primary">Launch Calculator</a>
+        <div class="lane-art" aria-hidden="true">
+          <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 10 200 A 100 100 0 0 1 110 100 L 210 100" fill="none" stroke="#2c3340" stroke-width="1.5"/>
+            <path d="M 10 200 A 80 80 0 0 1 90 120 L 210 120" fill="none" stroke="#2c3340" stroke-width="1.5"/>
+            <path d="M 10 200 A 60 60 0 0 1 70 140 L 210 140" fill="none" stroke="#2c3340" stroke-width="1.5"/>
+            <path d="M 10 200 A 40 40 0 0 1 50 160 L 210 160" fill="none" stroke="#2c3340" stroke-width="1.5"/>
+            <path d="M 10 200 A 20 20 0 0 1 30 180 L 210 180" fill="none" stroke="#f5d547" stroke-width="2"/>
+            <g font-family="ui-monospace, monospace" font-size="9" fill="#6e7585">
+              <text x="210" y="98" text-anchor="end">L1</text>
+              <text x="210" y="118" text-anchor="end">L2</text>
+              <text x="210" y="138" text-anchor="end">L3</text>
+              <text x="210" y="158" text-anchor="end">L4</text>
+              <text x="210" y="178" text-anchor="end" fill="#f5d547">L5</text>
+            </g>
+          </svg>
         </div>
       </section>
 
-      <section class="info-section">
-        <h2>About</h2>
-        <p>
-          Handy calculators for track and field athletes, coaches, and fans. Every tool is free, requires no signup,
-          works in your browser, and can be installed as a Progressive Web App for offline use.
-        </p>
-        <p>
-          Start with the <a href="/calculators/pace.html">Pace &amp; Speed Calculator</a> to plan training sessions and race splits,
-          use the <a href="/calculators/score.html">World Athletics Score Calculator</a> to convert any track or field performance into
-          World Athletics (formerly IAAF) points, or work out a multi-event total with the
-          <a href="/calculators/combined-events.html">Combined Event Score Calculator</a> for decathlon, heptathlon, and pentathlon.
-        </p>
-
-        <!-- <h3>Feedback & Source Code</h3>
-        <p>
-          Report issues or contribute on
-          <a href="https://github.com/NikolaosFlabouris/AthleticsUtils" target="_blank" rel="noopener" class="link-github">GitHub</a>.
-        </p> -->
-
-        <h2>Support</h2>
-        <p>
-          If you find Athletics Utilities useful please consider
-          <a href="https://www.paypal.com/donate/?hosted_button_id=7U6M8TUA354QL" target="_blank" rel="noopener" class="link-donate">donating</a>.
-        </p>
+      <!-- ===== HERO (Track) ===== -->
+      <section class="hero theme-only-track">
+        <div>
+          <h1>Tools tuned<br/>for the sport of<br/><em>Athletics.</em></h1>
+          <p>Five focused calculators for athletes, coaches and fans. Free, fast, no signup &mdash; runs offline in your browser.</p>
+        </div>
+        <div class="lane-art" aria-hidden="true">
+          <svg viewBox="0 0 360 360" xmlns="http://www.w3.org/2000/svg">
+            <g fill="none" stroke="#c9c2b0" stroke-width="1.5">
+              <rect x="20" y="80" width="320" height="200" rx="100" ry="100"/>
+              <rect x="34" y="94" width="292" height="172" rx="86" ry="86"/>
+              <rect x="48" y="108" width="264" height="144" rx="72" ry="72"/>
+              <rect x="62" y="122" width="236" height="116" rx="58" ry="58"/>
+              <rect x="76" y="136" width="208" height="88" rx="44" ry="44"/>
+            </g>
+            <rect x="90" y="150" width="180" height="60" rx="30" ry="30" fill="none" stroke="#d24a25" stroke-width="3"/>
+            <line x1="200" y1="80" x2="200" y2="150" stroke="#16110a" stroke-width="2.5"/>
+            <line x1="200" y1="80" x2="200" y2="150" stroke="#d24a25" stroke-width="2.5" stroke-dasharray="3 3"/>
+            <line x1="160" y1="210" x2="160" y2="280" stroke="#847b67" stroke-width="1.5" stroke-dasharray="2 3"/>
+            <g font-family="ui-monospace, monospace" font-size="10" fill="#847b67">
+              <text x="200" y="72" text-anchor="middle" fill="#16110a" font-weight="700">START &middot; FINISH</text>
+              <text x="160" y="298" text-anchor="middle">200 m</text>
+              <text x="340" y="184" text-anchor="end" fill="#d24a25" font-weight="700">L1 &middot; 400 m</text>
+            </g>
+          </svg>
+        </div>
       </section>
-    </div>
-  </main>
 
-  <footer class="footer">
-    <div class="container">
+      <!-- ===== Section header (Dark theme) ===== -->
+      <div class="sec-head theme-only-lane">
+        <div class="label">Calculators</div>
+        <div class="count">005 / 005 available</div>
+      </div>
+
+      <!-- ===== Section header (Track) ===== -->
+      <div class="secline theme-only-track">
+        <div class="h">The <em>toolkit</em>.</div>
+        <div class="r">Five calculators</div>
+      </div>
+
+      <!-- ===== Calculator grid (Dark theme) ===== -->
+      <div class="grid theme-only-lane">
+        <a class="card featured" href="/calculators/pace.html">
+          <div class="lane"><span class="stripe"></span>LANE 01</div>
+          <h3>Pace &amp; Speed</h3>
+          <p>Convert between target time, pace and speed. Splits, kilometre and mile tables included.</p>
+          <span class="go">Open calculator <span class="arrow">&rarr;</span></span>
+        </a>
+        <a class="card featured" href="/calculators/score.html">
+          <div class="lane"><span class="stripe"></span>LANE 02</div>
+          <h3>World Athletics Score</h3>
+          <p>Official scoring tables for every track and field event. Find equivalent performances across disciplines.</p>
+          <span class="go">Open calculator <span class="arrow">&rarr;</span></span>
+        </a>
+        <a class="card featured" href="/calculators/combined-events.html">
+          <div class="lane"><span class="stripe"></span>LANE 03</div>
+          <h3>Combined Events</h3>
+          <p>Decathlon, Heptathlon and Pentathlon scoring. Total your performances using World Athletics tables.</p>
+          <span class="go">Open calculator <span class="arrow">&rarr;</span></span>
+        </a>
+        <a class="card featured" href="/calculators/age.html">
+          <div class="lane"><span class="stripe"></span>LANE 04</div>
+          <h3>Age</h3>
+          <p>Exact age between two dates, plus athletics age-group readouts for end-of-year competitions.</p>
+          <span class="go">Open calculator <span class="arrow">&rarr;</span></span>
+        </a>
+        <a class="card featured" href="/calculators/time.html">
+          <div class="lane"><span class="stripe"></span>LANE 05</div>
+          <h3>Time</h3>
+          <p>Chain rows of sums and differences; step-by-step breakdown for multiplication and division.</p>
+          <span class="go">Open calculator <span class="arrow">&rarr;</span></span>
+        </a>
+        <a class="card" href="https://www.paypal.com/donate/?hosted_button_id=7U6M8TUA354QL" target="_blank" rel="noopener">
+          <h3>Support</h3>
+          <p>If you find Athletics Utilities useful, consider donating. Feedback always welcome.</p>
+          <span class="go">Donate <span class="arrow">&rarr;</span></span>
+        </a>
+      </div>
+
+      <!-- ===== Editorial grid (Track) ===== -->
+      <div class="editorial theme-only-track">
+        <a class="tool span3" href="/calculators/pace.html">
+          <div class="ix">N&deg;01</div>
+          <h3>Pace &amp; <em>Speed</em></h3>
+          <p>Convert between target time, pace and speed. Splits, kilometre and mile tables included.</p>
+          <span class="cta">Open <span class="arr">&rarr;</span></span>
+        </a>
+        <a class="tool span3" href="/calculators/score.html">
+          <div class="ix">N&deg;02</div>
+          <h3>World Athletics <em>Score</em></h3>
+          <p>Official scoring tables for every track and field event. Find equivalent performances across disciplines.</p>
+          <span class="cta">Open <span class="arr">&rarr;</span></span>
+        </a>
+        <a class="tool span3" href="/calculators/combined-events.html">
+          <div class="ix">N&deg;03</div>
+          <h3>Combined <em>Events</em></h3>
+          <p>Decathlon, Heptathlon and Pentathlon scoring. Total your performances using World Athletics tables.</p>
+          <span class="cta">Open <span class="arr">&rarr;</span></span>
+        </a>
+        <a class="tool span3" href="/calculators/age.html">
+          <div class="ix">N&deg;04</div>
+          <h3>Age</h3>
+          <p>Exact age between two dates, plus athletics age-group readouts for end-of-year competitions.</p>
+          <span class="cta">Open <span class="arr">&rarr;</span></span>
+        </a>
+        <a class="tool span3" href="/calculators/time.html">
+          <div class="ix">N&deg;05</div>
+          <h3>Time</h3>
+          <p>Chain rows of sums and differences; step-by-step breakdown for multiplication and division.</p>
+          <span class="cta">Open <span class="arr">&rarr;</span></span>
+        </a>
+        <a class="tool span3 dark" href="https://www.paypal.com/donate/?hosted_button_id=7U6M8TUA354QL" target="_blank" rel="noopener">
+          <div class="ix">N&deg;06</div>
+          <h3>Support</h3>
+          <p>If you find Athletics Utilities useful, consider donating. Feedback always welcome.</p>
+          <span class="cta">Donate <span class="arr">&rarr;</span></span>
+        </a>
+      </div>
+
+    </main>
+
+    <footer class="footer">
       <p class="footer__links">
         <a href="/">Home</a>
-        &nbsp;·&nbsp;
+        &nbsp;&middot;&nbsp;
         <a href="/calculators/pace.html">Pace &amp; Speed</a>
-        &nbsp;·&nbsp;
+        &nbsp;&middot;&nbsp;
         <a href="/calculators/score.html">World Athletics Score</a>
-        &nbsp;·&nbsp;
+        &nbsp;&middot;&nbsp;
         <a href="/calculators/combined-events.html">Combined Events</a>
-        &nbsp;·&nbsp;
+        &nbsp;&middot;&nbsp;
         <a href="/calculators/age.html">Age</a>
-        &nbsp;·&nbsp;
+        &nbsp;&middot;&nbsp;
         <a href="/calculators/time.html">Time</a>
-        &nbsp;·&nbsp;
+        &nbsp;&middot;&nbsp;
         <a href="/privacy.html">Privacy</a>
       </p>
-    </div>
-  </footer>
+    </footer>
+
+  </div>
 
   <script type="module" src="./src/js/pages/home.js"></script>
 </body>

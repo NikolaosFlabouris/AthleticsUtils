@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72" shape-rendering="geometricPrecision" role="img" aria-label="AthleticsUtils">
+  <title>AthleticsUtils</title>
+  <defs>
+    <clipPath id="card-clip-light">
+      <rect x="4" y="4" width="64" height="64" rx="14"></rect>
+    </clipPath>
+  </defs>
+  <rect width="72" height="72" rx="22" fill="currentColor"></rect>
+  <g clip-path="url(#card-clip-light)" fill="#fff">
+    <rect x="4" y="4" width="10" height="64"></rect>
+    <rect x="22.88" y="4" width="2.4" height="64"></rect>
+    <rect x="34.16" y="4" width="2.4" height="64"></rect>
+    <rect x="45.44" y="4" width="2.4" height="64"></rect>
+    <rect x="56.72" y="4" width="2.4" height="64"></rect>
+  </g>
+</svg>
