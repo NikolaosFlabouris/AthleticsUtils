@@ -413,17 +413,16 @@ nav.tabs a:hover:not(.active) { color: var(--ink); background: var(--panel); }
   position: relative;
 }
 
+/* Light theme calc box — same bordered, rounded, two-panel structure as
+   Dark (inherited from the base rules above). Only the colours change:
+   a slightly stronger outer border so the box reads on the paper bg,
+   and a deeper paper-3 right panel for the two-tone split (panel-l keeps
+   the base paper-2 from var(--panel)). */
 [data-theme="track"] .calc {
-  border: none; border-radius: 0;
-  grid-template-columns: 1fr 1.15fr;
-  gap: 44px;
-  padding: 26px 0 12px;
-}
-[data-theme="track"] .panel-l {
-  padding: 0; background: transparent; border-right: none;
+  border-color: var(--line-2);
 }
 [data-theme="track"] .panel-r {
-  padding: 0; background: transparent;
+  background: var(--paper-3);
 }
 
 /* Output "lane tag" — Dark theme only (running-lane decoration) */
@@ -642,6 +641,23 @@ select:disabled {
 }
 .form-group:first-of-type,
 .calculator__controls > .form-group:first-child { margin-top: 0; }
+
+/* Toggle row — groups several segmented-control form-groups onto one
+   row when there's space, wrapping to multiple rows when narrow.
+   Used by the Pace calculator (Measurement / Solve for / Mode).
+   margin-bottom keeps a consistent gap above the controls below it,
+   regardless of which .mode-controls block is currently visible. */
+.toggle-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+  margin-top: 0;
+  margin-bottom: 18px;
+}
+.toggle-row .form-group {
+  margin-top: 0;
+}
+
 .form-group label {
   font-family: var(--mono); font-size: 10px;
   letter-spacing: 0.12em; text-transform: uppercase;
@@ -1099,6 +1115,22 @@ select:disabled {
   gap: 10px;
   margin-top: 10px;
 }
+/* Category label spans the full grid width and starts a new visual group. */
+.equivalencies-grid__category {
+  grid-column: 1 / -1;
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--muted);
+  margin: 12px 0 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+.equivalencies-grid__category:first-child { margin-top: 0; }
+[data-theme="track"] .equivalencies-grid__category {
+  font-family: var(--sans); font-size: 11px; letter-spacing: 0.16em;
+  color: var(--ink-2);
+  border-bottom-color: var(--line-2);
+}
 .equivalency-item {
   background: var(--bg);
   padding: 10px 12px;
@@ -1361,16 +1393,72 @@ select:disabled {
   transition: background 0.15s;
 }
 .history-table tbody tr:hover { background: var(--bg); }
-.history-table .history-delete-btn {
-  font: inherit; font-family: var(--mono);
-  background: transparent; border: none;
-  color: var(--muted-2); cursor: pointer;
-  padding: 2px 6px; border-radius: 4px;
+/* Row action buttons (reorder up / down, delete) — themed icon buttons
+   that match the segmented-control / minibtn aesthetic instead of the
+   default OS button chrome. */
+.history-row__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  white-space: nowrap;
 }
-.history-table .history-delete-btn:hover { color: var(--hot); }
+.history-table .history-move-btn,
+.history-table .history-delete-btn {
+  font: inherit;
+  font-family: var(--mono);
+  font-size: 9px;
+  line-height: 1;
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.history-table .history-move-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--bg-2);
+}
+.history-table .history-move-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.history-table .history-delete-btn {
+  color: var(--muted-2);
+  margin-left: 4px;
+}
+.history-table .history-delete-btn:hover {
+  color: var(--hot);
+  border-color: var(--hot);
+}
+.history-table .history-delete-btn .icon { width: 12px; height: 12px; }
 
 [data-theme="track"] .history-table { font-family: var(--mono); }
 [data-theme="track"] .history-table tbody tr:hover { background: var(--paper-3); }
+[data-theme="track"] .history-table .history-move-btn,
+[data-theme="track"] .history-table .history-delete-btn {
+  font-family: var(--sans);
+  background: var(--paper-2);
+  border-color: var(--line-2);
+  border-radius: 999px;
+}
+[data-theme="track"] .history-table .history-move-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--paper-3);
+}
+[data-theme="track"] .history-table .history-delete-btn:hover {
+  color: var(--accent-deep);
+  border-color: var(--accent-deep);
+}
 
 /* ============================================================
    Event search dropdown (preserve existing component)
@@ -1486,12 +1574,51 @@ select:disabled {
   cursor: pointer; user-select: none;
   margin-top: 8px;
 }
-.checkbox-label input[type="checkbox"] {
-  width: 16px; height: 16px;
-  accent-color: var(--accent);
-  cursor: pointer;
-}
 .hand-timing-checkbox { margin-top: 10px; }
+
+/* Custom themed checkbox — replaces the default OS box (used by the
+   Hand Timed checkboxes on the Score and Combined Events calculators).
+   appearance:none lets us draw a themed box + scale-in tick. */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  margin: 0;
+  flex-shrink: 0;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  background: var(--bg);
+  cursor: pointer;
+  display: inline-grid;
+  place-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+input[type="checkbox"]::before {
+  content: '';
+  width: 4px; height: 8px;
+  border: solid var(--accent-ink);
+  border-width: 0 2px 2px 0;
+  margin-bottom: 2px;
+  transform: rotate(45deg) scale(0);
+  transition: transform 0.12s ease;
+}
+input[type="checkbox"]:hover:not(:checked) { border-color: var(--accent); }
+input[type="checkbox"]:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+input[type="checkbox"]:checked::before {
+  transform: rotate(45deg) scale(1);
+}
+input[type="checkbox"]:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+[data-theme="track"] input[type="checkbox"] {
+  background: var(--paper);
+  border-radius: 5px;
+}
 
 /* ============================================================
    Combined events — class names match combined-events-calculator.js
@@ -1522,30 +1649,62 @@ select:disabled {
   border-radius: 14px;
 }
 
+/* Day header — shared typography for both the static single-day <h4>
+   and the multi-day accordion <summary>. The short accent stripe mirrors
+   the .pagehead .crumb / lane motif used across the site. */
 .day-section__header {
   font-family: var(--mono); font-size: 10px;
   letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--accent);
   margin: 0 0 12px;
   font-weight: 600;
-  display: flex; align-items: center; gap: 8px;
-  padding: 0;
-  border-bottom: none;
+  display: flex; align-items: center; gap: 10px;
 }
 .day-section__header::before {
   content: ''; display: inline-block;
   width: 24px; height: 1px;
   background: var(--accent);
+  flex-shrink: 0;
 }
 
-.day-section details summary { cursor: pointer; user-select: none; list-style: none; }
-.day-section details summary::-webkit-details-marker { display: none; }
-.day-section details summary::before { content: '\25B6 '; display: inline-block; font-size: 9px; transition: transform 0.2s; margin-right: 6px; color: var(--muted); }
-.day-section details[open] summary::before { transform: rotate(90deg); }
+/* Accordion summary variant — a clickable header bar with a rotating
+   chevron, matching the collapsible result-card behaviour rather than
+   the default browser disclosure triangle. */
+summary.day-section__header {
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  margin: 0;
+  padding: 6px 6px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+summary.day-section__header::-webkit-details-marker { display: none; }
+summary.day-section__header::marker { content: ''; }
+summary.day-section__header:hover { color: var(--ink); background: var(--bg-2); }
+[data-theme="track"] summary.day-section__header { border-radius: 999px; }
+[data-theme="track"] summary.day-section__header:hover { color: var(--ink); background: var(--paper-3); }
+
+/* CSS chevron: points down when expanded, rotates to point right when
+   collapsed. Inherits the header colour via currentColor. */
+summary.day-section__header::after {
+  content: '';
+  width: 6px; height: 6px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  margin-left: auto;
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+  transform: rotate(45deg);
+}
+details:not([open]) > summary.day-section__header::after {
+  transform: rotate(-45deg);
+}
 
 .day-section__content {
   display: flex; flex-direction: column;
   gap: 10px;
+  margin-top: 12px;
 }
 
 .event-input-group {
@@ -1579,10 +1738,7 @@ select:disabled {
   display: inline-flex; align-items: center; gap: 6px;
   white-space: nowrap;
 }
-.hand-timing-wrapper .hand-timing-checkbox {
-  cursor: pointer; width: 16px; height: 16px;
-  margin: 0; accent-color: var(--accent);
-}
+/* Sizing/appearance comes from the global input[type="checkbox"] rule. */
 .hand-timing-label {
   cursor: pointer; user-select: none; margin: 0;
   font-family: var(--mono); font-size: 11px;
@@ -2293,10 +2449,9 @@ select:disabled {
   .calc, .calc.split-1-1 {
     grid-template-columns: 1fr; gap: 0;
   }
-  [data-theme="track"] .calc { gap: 22px; padding: 22px 0 12px; }
+  /* Both themes: single-column box with a horizontal divider at ≤900px. */
   .panel-l { border-right: 0; border-bottom: 1px solid var(--line); padding: 18px; }
   .panel-r { padding: 18px; }
-  [data-theme="track"] .panel-l, [data-theme="track"] .panel-r { padding: 0; border: none; }
 
   .result-big { font-size: 52px; }
   [data-theme="track"] .result-big { font-size: 64px; }

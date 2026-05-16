@@ -210,6 +210,76 @@ class PerformanceCalculator extends BaseCalculator {
     this.displayScoreResults(result, equivalents, Math.round(score));
   }
 
+  /**
+   * Build the equivalent-performances grid, grouped under small category
+   * labels. The long race walks (20 km / 50 km) and any event outside the
+   * six displayed categories (relays, combined events) are excluded — an
+   * "equivalent" relay/decathlon mark from a single performance is not a
+   * meaningful comparison.
+   *
+   * @param {Array<{event,category,performance,points}>} equivalents
+   *        Already distance-sorted within category by findEquivalentPerformances.
+   * @returns {HTMLElement} the populated `.equivalencies-grid` element
+   */
+  buildEquivalentsGrid(equivalents) {
+    const equivGrid = document.createElement('div');
+    equivGrid.className = 'equivalencies-grid';
+
+    // Ordered category → display label. An event whose category is not a
+    // key here is not shown in the equivalents list.
+    const CATEGORY_LABELS = {
+      sprints: 'Sprints & Hurdles',
+      middle_distance: 'Middle Distance',
+      long_distance: 'Long Distance',
+      jumps: 'Jumps',
+      throws: 'Throws',
+      race_walk: 'Walks'
+    };
+    // Events explicitly excluded from the equivalents list.
+    const EXCLUDED_EVENTS = new Set(['20km w', '50km w']);
+
+    // Group the (already distance-sorted) equivalents by category.
+    const byCategory = {};
+    for (const equiv of equivalents) {
+      if (equiv.event === this.currentEvent) continue;
+      if (EXCLUDED_EVENTS.has(equiv.event)) continue;
+      const cat = equiv.category;
+      if (!CATEGORY_LABELS[cat]) continue;
+      if (!byCategory[cat]) byCategory[cat] = [];
+      byCategory[cat].push(equiv);
+    }
+
+    for (const cat of Object.keys(CATEGORY_LABELS)) {
+      const items = byCategory[cat];
+      if (!items || items.length === 0) continue;
+
+      const label = document.createElement('div');
+      label.className = 'equivalencies-grid__category';
+      label.textContent = CATEGORY_LABELS[cat];
+      equivGrid.appendChild(label);
+
+      for (const equiv of items) {
+        const item = document.createElement('div');
+        item.className = 'equivalency-item';
+
+        const eventName = document.createElement('div');
+        eventName.className = 'equivalency-item__event';
+        eventName.textContent =
+          eventConfigLoader.getEventInfo(equiv.event)?.displayName || equiv.event;
+
+        const performance = document.createElement('div');
+        performance.className = 'equivalency-item__performance';
+        performance.textContent = formatPerformance(equiv.performance, equiv.event);
+
+        item.appendChild(eventName);
+        item.appendChild(performance);
+        equivGrid.appendChild(item);
+      }
+    }
+
+    return equivGrid;
+  }
+
   displayPerformanceResults(result, equivalents, originalInput) {
     this.resultsContent.innerHTML = '';
 
@@ -271,28 +341,7 @@ class PerformanceCalculator extends BaseCalculator {
     equivTitle.className = 'result-card__title';
     equivTitle.textContent = 'Equivalent Performances';
 
-    const equivGrid = document.createElement('div');
-    equivGrid.className = 'equivalencies-grid';
-
-    for (const equiv of equivalents) {
-      if (equiv.event === this.currentEvent) continue;
-
-      const item = document.createElement('div');
-      item.className = 'equivalency-item';
-
-      const eventName = document.createElement('div');
-      eventName.className = 'equivalency-item__event';
-      const equivDisplayName = eventConfigLoader.getEventInfo(equiv.event)?.displayName || equiv.event;
-      eventName.textContent = equivDisplayName;
-
-      const performance = document.createElement('div');
-      performance.className = 'equivalency-item__performance';
-      performance.textContent = formatPerformance(equiv.performance, equiv.event);
-
-      item.appendChild(eventName);
-      item.appendChild(performance);
-      equivGrid.appendChild(item);
-    }
+    const equivGrid = this.buildEquivalentsGrid(equivalents);
 
     equivCard.appendChild(equivTitle);
     equivCard.appendChild(equivGrid);
@@ -372,28 +421,7 @@ class PerformanceCalculator extends BaseCalculator {
     equivTitle.className = 'result-card__title';
     equivTitle.textContent = 'Equivalent Performances';
 
-    const equivGrid = document.createElement('div');
-    equivGrid.className = 'equivalencies-grid';
-
-    for (const equiv of equivalents) {
-      if (equiv.event === this.currentEvent) continue;
-
-      const item = document.createElement('div');
-      item.className = 'equivalency-item';
-
-      const eventName = document.createElement('div');
-      eventName.className = 'equivalency-item__event';
-      const equivDisplayName = eventConfigLoader.getEventInfo(equiv.event)?.displayName || equiv.event;
-      eventName.textContent = equivDisplayName;
-
-      const performance = document.createElement('div');
-      performance.className = 'equivalency-item__performance';
-      performance.textContent = formatPerformance(equiv.performance, equiv.event);
-
-      item.appendChild(eventName);
-      item.appendChild(performance);
-      equivGrid.appendChild(item);
-    }
+    const equivGrid = this.buildEquivalentsGrid(equivalents);
 
     equivCard.appendChild(equivTitle);
     equivCard.appendChild(equivGrid);

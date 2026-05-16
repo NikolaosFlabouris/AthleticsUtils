@@ -169,30 +169,33 @@
 
             <div class="calculator__controls">
 
-              <!-- PRIMARY TOGGLE: Pace vs Speed -->
-              <div class="form-group">
-                <label id="measurement-toggle-label">Measurement</label>
-                <div class="mode-toggle" role="group" aria-labelledby="measurement-toggle-label">
-                  <button type="button" id="mode-toggle-measurement-pace" class="mode-toggle__option mode-toggle__option--active" data-mode="pace" aria-pressed="true">Pace</button>
-                  <button type="button" id="mode-toggle-measurement-speed" class="mode-toggle__option" data-mode="speed" aria-pressed="false">Speed</button>
+              <!-- Mode toggles share one row when width allows, wrap when narrow -->
+              <div class="toggle-row">
+                <!-- PRIMARY TOGGLE: Pace vs Speed -->
+                <div class="form-group">
+                  <label id="measurement-toggle-label">Measurement</label>
+                  <div class="mode-toggle" role="group" aria-labelledby="measurement-toggle-label">
+                    <button type="button" id="mode-toggle-measurement-pace" class="mode-toggle__option mode-toggle__option--active" data-mode="pace" aria-pressed="true">Pace</button>
+                    <button type="button" id="mode-toggle-measurement-speed" class="mode-toggle__option" data-mode="speed" aria-pressed="false">Speed</button>
+                  </div>
                 </div>
-              </div>
 
-              <!-- SECONDARY TOGGLE: Calculate vs Time -->
-              <div class="form-group">
-                <label id="calculate-toggle-label">Solve for</label>
-                <div class="mode-toggle" role="group" aria-labelledby="calculate-toggle-label">
-                  <button type="button" id="mode-toggle-calculate" class="mode-toggle__option mode-toggle__option--active" data-mode="calculate" aria-pressed="true"><span id="calculate-label">Pace</span></button>
-                  <button type="button" id="mode-toggle-time" class="mode-toggle__option" data-mode="totalTime" aria-pressed="false"><span id="time-label">Total Time</span></button>
+                <!-- SECONDARY TOGGLE: Calculate vs Time -->
+                <div class="form-group">
+                  <label id="calculate-toggle-label">Solve for</label>
+                  <div class="mode-toggle" role="group" aria-labelledby="calculate-toggle-label">
+                    <button type="button" id="mode-toggle-calculate" class="mode-toggle__option mode-toggle__option--active" data-mode="calculate" aria-pressed="true"><span id="calculate-label">Pace</span></button>
+                    <button type="button" id="mode-toggle-time" class="mode-toggle__option" data-mode="totalTime" aria-pressed="false"><span id="time-label">Total Time</span></button>
+                  </div>
                 </div>
-              </div>
 
-              <!-- TERTIARY TOGGLE: Standard vs Advanced -->
-              <div class="form-group">
-                <label id="advanced-toggle-label">Mode</label>
-                <div class="mode-toggle" role="group" aria-labelledby="advanced-toggle-label">
-                  <button type="button" id="mode-toggle-standard" class="mode-toggle__option mode-toggle__option--active" data-mode="standard" aria-pressed="true">Standard</button>
-                  <button type="button" id="mode-toggle-advanced" class="mode-toggle__option" data-mode="advanced" aria-pressed="false">Advanced</button>
+                <!-- TERTIARY TOGGLE: Standard vs Advanced -->
+                <div class="form-group">
+                  <label id="advanced-toggle-label">Mode</label>
+                  <div class="mode-toggle" role="group" aria-labelledby="advanced-toggle-label">
+                    <button type="button" id="mode-toggle-standard" class="mode-toggle__option mode-toggle__option--active" data-mode="standard" aria-pressed="true">Standard</button>
+                    <button type="button" id="mode-toggle-advanced" class="mode-toggle__option" data-mode="advanced" aria-pressed="false">Advanced</button>
+                  </div>
                 </div>
               </div>
 
