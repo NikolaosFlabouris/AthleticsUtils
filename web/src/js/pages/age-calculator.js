@@ -75,6 +75,10 @@ class AgeCalculator {
 
     // Reverse controls
     this.reverseControls = document.getElementById('age-reverse-controls');
+    // The "Date is the" sub-toggle now lives in the shared .toggle-row
+    // (next to the Calculate toggle), so its visibility is synced
+    // separately from the reverse-controls container.
+    this.reverseSubToggle = document.getElementById('age-reverse-subtoggle');
     this.reverseFromBtn = document.getElementById('age-reverse-from-btn');
     this.reverseTargetBtn = document.getElementById('age-reverse-target-btn');
     this.reverseDateInput = document.getElementById('age-reverse-date');
@@ -137,6 +141,8 @@ class AgeCalculator {
     // Control visibility
     this.forwardControls.classList.toggle('hidden', this.currentMode !== 'forward');
     this.reverseControls.classList.toggle('hidden', this.currentMode !== 'reverse');
+    // Keep the relocated "Date is the" sub-toggle in sync with reverse mode.
+    this.reverseSubToggle.classList.toggle('hidden', this.currentMode !== 'reverse');
   }
 
   setupEventListeners() {

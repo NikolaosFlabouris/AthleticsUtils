@@ -124,14 +124,14 @@
         <svg viewBox="0 60 360 240" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
           <g fill="none" stroke="#2c3340" stroke-width="1.5">
             <rect x="10" y="72" width="340" height="216" rx="108" ry="108"/>
-            <rect x="24" y="86" width="312" height="188" rx="94" ry="94"/>
             <rect x="38" y="100" width="284" height="160" rx="80" ry="80"/>
             <rect x="52" y="114" width="256" height="132" rx="66" ry="66"/>
             <rect x="66" y="128" width="228" height="104" rx="52" ry="52"/>
+            <rect x="80" y="142" width="200" height="76" rx="38" ry="38"/>
           </g>
-          <rect x="80" y="142" width="200" height="76" rx="38" ry="38" fill="none" stroke="#f5d547" stroke-width="3"/>
+          <rect x="24" y="86" width="312" height="188" rx="94" ry="94" fill="none" stroke="#f5d547" stroke-width="3"/>
           <g font-family="ui-monospace, monospace" font-size="10" fill="#6e7585">
-            <text x="350" y="184" text-anchor="end" fill="#f5d547" font-weight="700">L1 &middot; 400 m</text>
+            <text x="180" y="180" text-anchor="middle" dominant-baseline="middle" fill="#f5d547" font-weight="700">L4</text>
           </g>
         </svg>
       </div>
@@ -139,14 +139,14 @@
         <svg viewBox="0 60 360 240" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
           <g fill="none" stroke="#c9c2b0" stroke-width="1.5">
             <rect x="10" y="72" width="340" height="216" rx="108" ry="108"/>
-            <rect x="24" y="86" width="312" height="188" rx="94" ry="94"/>
             <rect x="38" y="100" width="284" height="160" rx="80" ry="80"/>
             <rect x="52" y="114" width="256" height="132" rx="66" ry="66"/>
             <rect x="66" y="128" width="228" height="104" rx="52" ry="52"/>
+            <rect x="80" y="142" width="200" height="76" rx="38" ry="38"/>
           </g>
-          <rect x="80" y="142" width="200" height="76" rx="38" ry="38" fill="none" stroke="#d24a25" stroke-width="3"/>
+          <rect x="24" y="86" width="312" height="188" rx="94" ry="94" fill="none" stroke="#d24a25" stroke-width="3"/>
           <g font-family="ui-monospace, monospace" font-size="10" fill="#847b67">
-            <text x="350" y="184" text-anchor="end" fill="#d24a25" font-weight="700">L1 &middot; 400 m</text>
+            <text x="180" y="180" text-anchor="middle" dominant-baseline="middle" fill="#d24a25" font-weight="700">L4</text>
           </g>
         </svg>
       </div>
@@ -161,13 +161,25 @@
           <div class="panel-l">
             <div class="calculator__controls">
 
-              <div class="form-group">
-                <label id="age-mode-toggle-label">Calculate</label>
-                <div class="mode-toggle" role="group" aria-labelledby="age-mode-toggle-label">
-                  <button type="button" id="age-mode-toggle-forward" class="mode-toggle__option mode-toggle__option--active" data-mode="forward" aria-pressed="true">Calculate Age</button>
-                  <button type="button" id="age-mode-toggle-reverse" class="mode-toggle__option" data-mode="reverse" aria-pressed="false">Calculate Date</button>
+              <!-- Mode toggles share one row when width allows; the
+                   "Date is the" sub-toggle only appears in Calculate Date
+                   mode (visibility synced from age-calculator.js). -->
+              <div class="toggle-row">
+                <div class="form-group">
+                  <label id="age-mode-toggle-label">Calculate</label>
+                  <div class="mode-toggle" role="group" aria-labelledby="age-mode-toggle-label">
+                    <button type="button" id="age-mode-toggle-forward" class="mode-toggle__option mode-toggle__option--active" data-mode="forward" aria-pressed="true">Calculate Age</button>
+                    <button type="button" id="age-mode-toggle-reverse" class="mode-toggle__option" data-mode="reverse" aria-pressed="false">Calculate Date</button>
+                  </div>
                 </div>
-                <small class="form-help" id="age-mode-help">Calculate Age: from two dates, find the age between them. <br>Calculate Date: from a date and an age, find the matching date.</small>
+
+                <div class="form-group hidden" id="age-reverse-subtoggle">
+                  <label id="age-reverse-sub-toggle-label">Date is the</label>
+                  <div class="mode-toggle" role="group" aria-labelledby="age-reverse-sub-toggle-label">
+                    <button type="button" id="age-reverse-from-btn" class="mode-toggle__option mode-toggle__option--active" data-sub-mode="from" aria-pressed="true">From Date</button>
+                    <button type="button" id="age-reverse-target-btn" class="mode-toggle__option" data-sub-mode="target" aria-pressed="false">Target Date</button>
+                  </div>
+                </div>
               </div>
 
               <div id="age-forward-controls" class="mode-controls">
@@ -179,20 +191,10 @@
                 <div class="form-group">
                   <label for="age-target-date">Target date</label>
                   <input type="date" id="age-target-date" class="form-input">
-                  <small class="form-help">Defaults to today. The date to measure age on.</small>
                 </div>
               </div>
 
               <div id="age-reverse-controls" class="mode-controls hidden">
-                <div class="form-group">
-                  <label id="age-reverse-sub-toggle-label">Date is the</label>
-                  <div class="mode-toggle" role="group" aria-labelledby="age-reverse-sub-toggle-label">
-                    <button type="button" id="age-reverse-from-btn" class="mode-toggle__option mode-toggle__option--active" data-sub-mode="from" aria-pressed="true">From Date</button>
-                    <button type="button" id="age-reverse-target-btn" class="mode-toggle__option" data-sub-mode="target" aria-pressed="false">Target Date</button>
-                  </div>
-                  <small class="form-help" id="age-reverse-help">From Date: result = date + age. Target Date: result = date &minus; age.</small>
-                </div>
-
                 <div class="form-group">
                   <label for="age-reverse-date">Date</label>
                   <input type="date" id="age-reverse-date" class="form-input">
@@ -214,7 +216,6 @@
                       <span class="age-parts__unit">days</span>
                     </div>
                   </div>
-                  <small class="form-help">Leave fields empty to treat them as zero.</small>
                 </div>
               </div>
 
