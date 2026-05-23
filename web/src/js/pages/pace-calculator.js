@@ -412,8 +412,29 @@ class PaceCalculator extends PaceCalculatorBase {
    * @returns {boolean} True if valid
    */
   validateDistance(value) {
-    const num = parseFloat(value);
+    if (typeof value !== 'string') return false;
+    const trimmed = value.trim();
+    // Strict numeric regex — parseFloat alone accepts trailing garbage like
+    // "5<img …>", which then flows into the history row's innerHTML. Reject
+    // anything that isn't a clean positive decimal.
+    if (!/^\d+(\.\d+)?$/.test(trimmed) && !/^\.\d+$/.test(trimmed)) return false;
+    const num = parseFloat(trimmed);
     return !isNaN(num) && num > 0;
+  }
+
+  /**
+   * Escape a string for safe interpolation into HTML.
+   * Defence-in-depth for fields that flow through localStorage history into
+   * innerHTML — the validators upstream should already reject HTML, but a
+   * stored XSS via a tainted history entry is too cheap to leave open.
+   */
+  escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   /**
@@ -2345,8 +2366,13 @@ class PaceCalculator extends PaceCalculatorBase {
     try {
       let history = this.getHistory();
 
-      // Add unique ID
-      entry.id = `pace-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      // Add unique ID — prefer crypto.randomUUID so it's not predictable and
+      // doesn't rely on the deprecated String.prototype.substr.
+      entry.id = `pace-${
+        (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+          ? crypto.randomUUID()
+          : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 11)}`
+      }`;
 
       // Add to beginning of array
       history.unshift(entry);
@@ -2418,9 +2444,12 @@ class PaceCalculator extends PaceCalculatorBase {
       row.dataset.index = index;
       // Keyboard-reachable: Tab focuses the row, Enter/Space replays it.
       row.tabIndex = 0;
+      // setAttribute (vs innerHTML interpolation) is already attribute-safe,
+      // but keep the values themselves clean — they may have come from a
+      // tainted localStorage entry written by an older version.
       row.setAttribute(
         'aria-label',
-        `Replay ${entry.distance} — ${entry.totalTime}`
+        `Replay ${String(entry.distance)} — ${String(entry.totalTime)}`
       );
 
       // Show speed if speed mode entry, else show pace
@@ -2428,14 +2457,15 @@ class PaceCalculator extends PaceCalculatorBase {
         ? entry.speed
         : entry.pace;
 
+      const safeId = this.escapeHtml(entry.id);
       row.innerHTML = `
-        <td>${entry.distance}</td>
-        <td class="history-row__performance">${entry.totalTime}</td>
-        <td class="history-row__performance">${paceOrSpeed}</td>
+        <td>${this.escapeHtml(entry.distance)}</td>
+        <td class="history-row__performance">${this.escapeHtml(entry.totalTime)}</td>
+        <td class="history-row__performance">${this.escapeHtml(paceOrSpeed)}</td>
         <td class="history-row__actions">
-          <button class="history-move-btn" data-id="${entry.id}" data-direction="up" aria-label="Move up">&#x25B2;</button>
-          <button class="history-move-btn" data-id="${entry.id}" data-direction="down" aria-label="Move down">&#x25BC;</button>
-          <button class="history-delete-btn" data-id="${entry.id}" aria-label="Delete"></button>
+          <button class="history-move-btn" data-id="${safeId}" data-direction="up" aria-label="Move up">&#x25B2;</button>
+          <button class="history-move-btn" data-id="${safeId}" data-direction="down" aria-label="Move down">&#x25BC;</button>
+          <button class="history-delete-btn" data-id="${safeId}" aria-label="Delete"></button>
         </td>
       `;
 

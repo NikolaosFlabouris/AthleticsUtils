@@ -3,6 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--
+    Content-Security-Policy: defence-in-depth against XSS.
+    'unsafe-inline' is currently required for the theme pre-paint <script> in
+    this head and the JSON-LD blocks below; if those move out to external
+    files, 'unsafe-inline' can be removed from script-src.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self'; base-uri 'self'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="description" content="Running pace & speed calculator. Convert between pace (min/km, min/mile) and speed (km/h, mph, m/s), get split times, and calculate finish times for 5K, 10K, half marathon, and marathon.">
   <meta name="theme-color" content="#f4efe6">
   <title>Pace Calculator - Athletics Utils</title>

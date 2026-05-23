@@ -6,6 +6,30 @@
 const STORAGE_KEY = 'athleticsUtils.calculationHistory';
 const MAX_ENTRIES = 10;
 
+/**
+ * Generate a collision-resistant ID for a history entry.
+ * Prefers crypto.randomUUID (widely supported since 2022) and falls back to a
+ * crypto.getRandomValues-based UUID v4 — never to Math.random.
+ */
+function newEntryId() {
+  if (typeof crypto !== 'undefined') {
+    if (typeof crypto.randomUUID === 'function') {
+      return `hist-${crypto.randomUUID()}`;
+    }
+    if (typeof crypto.getRandomValues === 'function') {
+      const bytes = new Uint8Array(16);
+      crypto.getRandomValues(bytes);
+      bytes[6] = (bytes[6] & 0x0f) | 0x40; // version 4
+      bytes[8] = (bytes[8] & 0x3f) | 0x80; // variant
+      const hex = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+      return `hist-${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+    }
+  }
+  // Final fallback for ancient runtimes — still won't be guessable in the
+  // tiny window the calculator uses IDs for.
+  return `hist-${Date.now().toString(36)}`;
+}
+
 export class HistoryManager {
   /**
    * Load history from localStorage
@@ -52,7 +76,7 @@ export class HistoryManager {
 
     // Add ID if not present
     if (!entry.id) {
-      entry.id = `hist-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      entry.id = newEntryId();
     }
 
     // Add to beginning of array

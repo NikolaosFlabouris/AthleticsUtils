@@ -324,10 +324,13 @@ class PerformanceCalculator extends BaseCalculator {
     } else if (result.exactMatch) {
       content.textContent = `Performance: ${formatPerformance(result.closestPerformance, this.currentEvent)}`;
     } else {
-      content.innerHTML = `
-        Your input: ${originalInput}<br>
-        Closest match: ${formatPerformance(result.closestPerformance, this.currentEvent)}
-      `;
+      // Build the closest-match block with textContent so a hostile `?v=` URL
+      // param (which is what populates originalInput) can't reach innerHTML.
+      const yourInput = document.createElement('span');
+      yourInput.textContent = `Your input: ${originalInput}`;
+      const closest = document.createElement('span');
+      closest.textContent = `Closest match: ${formatPerformance(result.closestPerformance, this.currentEvent)}`;
+      content.replaceChildren(yourInput, document.createElement('br'), closest);
     }
 
     mainCard.appendChild(titleRow);
@@ -405,7 +408,13 @@ class PerformanceCalculator extends BaseCalculator {
       const fatPerformance = formatPerformance(result.originalPerformance, this.currentEvent);
       const offset = formatPerformance(String(Math.abs(result.appliedOffset)), this.currentEvent);
       performanceElement.textContent = `${htPerformance} (hand timed)`;
-      scoreElement.innerHTML = `${htPerformance} = ${fatPerformance} - ${offset} offset for hand timing<br>Score: ${formattedScore} points`;
+      // Build the two-line block with textContent so we never reach innerHTML
+      // for templated values (matches the displayPerformanceResults branch).
+      const breakdown = document.createElement('span');
+      breakdown.textContent = `${htPerformance} = ${fatPerformance} - ${offset} offset for hand timing`;
+      const scoreLine = document.createElement('span');
+      scoreLine.textContent = `Score: ${formattedScore} points`;
+      scoreElement.replaceChildren(breakdown, document.createElement('br'), scoreLine);
     } else {
       const performance = formatPerformance(result.performance, this.currentEvent);
       performanceElement.textContent = performance;
@@ -484,15 +493,18 @@ class PerformanceCalculator extends BaseCalculator {
       `Replay ${entry.gender} ${entry.eventDisplayName} — ${entry.performance}, ${Number(entry.score).toLocaleString()} points`
     );
 
+    // Escape every interpolation — entry.* may have been written to
+    // localStorage by an older version that didn't sanitise URL-param input.
+    const safeId = this.escapeHtml(entry.id);
     row.innerHTML = `
-      <td class="history-row__gender">${this.capitalizeFirst(entry.gender)}</td>
-      <td class="history-row__event">${entry.eventDisplayName}</td>
-      <td class="history-row__performance">${entry.performance}</td>
-      <td class="history-row__score">${entry.score}</td>
+      <td class="history-row__gender">${this.escapeHtml(this.capitalizeFirst(entry.gender))}</td>
+      <td class="history-row__event">${this.escapeHtml(entry.eventDisplayName)}</td>
+      <td class="history-row__performance">${this.escapeHtml(entry.performance)}</td>
+      <td class="history-row__score">${this.escapeHtml(entry.score)}</td>
       <td class="history-row__actions">
-        <button class="history-move-btn" aria-label="Move up" data-direction="up" data-history-id="${entry.id}">&#x25B2;</button>
-        <button class="history-move-btn" aria-label="Move down" data-direction="down" data-history-id="${entry.id}">&#x25BC;</button>
-        <button class="history-delete-btn" aria-label="Delete" data-history-id="${entry.id}"></button>
+        <button class="history-move-btn" aria-label="Move up" data-direction="up" data-history-id="${safeId}">&#x25B2;</button>
+        <button class="history-move-btn" aria-label="Move down" data-direction="down" data-history-id="${safeId}">&#x25BC;</button>
+        <button class="history-delete-btn" aria-label="Delete" data-history-id="${safeId}"></button>
       </td>
     `;
 
@@ -778,6 +790,21 @@ class PerformanceCalculator extends BaseCalculator {
     });
 
     HistoryManager.reorder(newOrder);
+  }
+
+  /**
+   * Escape a string for safe interpolation into HTML.
+   * Defence-in-depth — entry fields flow through localStorage history into
+   * innerHTML, and an entry written by an older (unpatched) version could
+   * contain HTML.
+   */
+  escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 }
 
