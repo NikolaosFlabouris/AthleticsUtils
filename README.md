@@ -141,7 +141,7 @@ AthleticsUtils/
 
 ### Prerequisites
 
-- Node.js **18+** (the GitHub Actions workflow pins Node 20)
+- Node.js **18+** (the GitHub Actions workflow pins Node 26)
 - npm
 
 ### Setup
@@ -162,21 +162,6 @@ npm run deploy   # Build + push ./dist to the gh-pages branch
 ```
 
 Vite's `root` is set to `web/`, so paths in `vite.config.js` need the `web/` prefix; pages reference assets with site-absolute paths like `/icons/...` which work in both dev and production.
-
----
-
-## Deployment
-
-The site is deployed automatically by [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) on every push to `main`:
-
-1. Checkout + `npm ci`
-2. `npm run build` (writes to `./dist`)
-3. Upload `./dist` as a Pages artifact
-4. Deploy to the `github-pages` environment
-
-The custom domain `athleticsutils.com` is configured in **Settings → Pages**, with the apex domain pointing at GitHub's Pages IPs via A records. PWA caching is configured in `vite.config.js`: the per-gender scoring JSON files use a `CacheFirst` strategy with a one-year max age, since the tables only change when World Athletics publishes new ones.
-
-For a one-off manual deploy (e.g. from a non-CI machine), `npm run deploy` builds locally and pushes to the `gh-pages` branch via [`gh-pages`](https://www.npmjs.com/package/gh-pages).
 
 ---
 
