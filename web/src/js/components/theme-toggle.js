@@ -42,15 +42,22 @@ function updateThemeColorMeta(theme) {
 
 function updateToggleButtonState(theme) {
   const buttons = document.querySelectorAll('[data-theme-toggle]');
+  const currentLabel = theme === THEME_LANE ? 'Dark' : 'Light';
+  const nextLabel = theme === THEME_LANE ? 'Light' : 'Dark';
   buttons.forEach(btn => {
     const labelEl = btn.querySelector('[data-theme-toggle-label]');
     // Button text shows the theme the user will switch TO, not the current one.
     if (labelEl) {
-      labelEl.textContent = theme === THEME_LANE ? 'Light' : 'Dark';
+      labelEl.textContent = nextLabel;
     }
-    const description = theme === THEME_LANE ? 'Switch to Light theme' : 'Switch to Dark theme';
+    // aria-label spells out BOTH the current theme and the action — the
+    // visible label ("Light" / "Dark") alone is ambiguous out of context.
+    const description = `Theme: ${currentLabel}. Switch to ${nextLabel} theme.`;
     btn.setAttribute('aria-label', description);
-    btn.setAttribute('title', description);
+    btn.setAttribute('title', `Switch to ${nextLabel} theme`);
+    // Pair this with aria-pressed so AT can announce the current state on
+    // re-focus without re-parsing the label. Pressed = light/track theme.
+    btn.setAttribute('aria-pressed', theme === THEME_TRACK ? 'true' : 'false');
   });
 }
 

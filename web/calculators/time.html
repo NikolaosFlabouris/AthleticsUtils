@@ -111,7 +111,7 @@
       <a href="/calculators/score.html"><span class="ix">02</span> WA Score</a>
       <a href="/calculators/combined-events.html"><span class="ix">03</span> Combined</a>
       <a href="/calculators/age.html"><span class="ix">04</span> Age</a>
-      <a href="/calculators/time.html" class="active"><span class="ix">05</span> Time</a>
+      <a href="/calculators/time.html" class="active" aria-current="page"><span class="ix">05</span> Time</a>
     </nav>
 
     <div class="pagehead">
@@ -155,7 +155,7 @@
     <main class="main" id="main-content" tabindex="-1">
 
       <section class="calculator" aria-labelledby="calculator-heading">
-        <div class="calculator__header"><h1 id="calculator-heading">Time Calculator</h1></div>
+        <div class="calculator__header"><h2 id="calculator-heading">Time Calculator</h2></div>
 
         <div class="calc">
           <div class="panel-l">
@@ -186,8 +186,8 @@
               <div class="calculator__controls">
                 <div class="form-group">
                   <label for="time-muldiv-time">Time</label>
-                  <input type="text" id="time-muldiv-time" class="form-input" placeholder="e.g., 1:15" autocomplete="off" inputmode="text">
-                  <small class="form-help">MM:SS, HH:MM:SS, or seconds (decimals allowed).</small>
+                  <input type="text" id="time-muldiv-time" class="form-input" placeholder="e.g., 1:15" autocomplete="off" inputmode="numeric" aria-describedby="time-muldiv-time-help">
+                  <small class="form-help" id="time-muldiv-time-help">MM:SS, HH:MM:SS, or seconds (decimals allowed).</small>
                 </div>
 
                 <div class="form-group">
@@ -200,7 +200,7 @@
 
                 <div class="form-group">
                   <label for="time-muldiv-number">Number</label>
-                  <input type="number" id="time-muldiv-number" class="form-input" placeholder="e.g., 4 or 1.5" step="any" min="0" inputmode="decimal">
+                  <input type="number" id="time-muldiv-number" class="form-input" placeholder="e.g., 4 or 1.5" step="any" min="0" inputmode="decimal" autocomplete="off" aria-describedby="time-muldiv-number-help">
                   <small class="form-help" id="time-muldiv-number-help">Decimals allowed for multiply; whole numbers give cleaner step lists.</small>
                 </div>
               </div>
@@ -213,7 +213,7 @@
 
             <div id="error-message" class="error-message hidden" role="alert" aria-live="polite"></div>
 
-            <div id="results-container" class="calculator__results hidden">
+            <div id="results-container" class="calculator__results hidden" aria-live="polite" aria-atomic="false">
               <div class="results-header"><h2>Result</h2></div>
               <div id="results-content" class="results-content"></div>
             </div>
@@ -224,8 +224,14 @@
           <div class="history-header"><h2>Calculation History</h2></div>
           <div class="history-table-container">
             <table class="history-table">
+              <caption class="visually-hidden">Recent time calculations</caption>
               <thead>
-                <tr><th>Mode</th><th>Expression</th><th>Result</th><th></th></tr>
+                <tr>
+                  <th scope="col">Mode</th>
+                  <th scope="col">Expression</th>
+                  <th scope="col">Result</th>
+                  <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
               </thead>
               <tbody id="history-table-body"></tbody>
             </table>

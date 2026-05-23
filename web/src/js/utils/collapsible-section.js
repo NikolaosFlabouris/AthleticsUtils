@@ -10,6 +10,8 @@
  * @param {string} storageKey - Unique key for session storage
  * @param {boolean} defaultCollapsed - Whether to start collapsed (default: true)
  */
+let collapsibleIdCounter = 0;
+
 export function makeCollapsible(titleElement, contentElement, storageKey, defaultCollapsed = true) {
   // Get stored state or use default
   const storedState = sessionStorage.getItem(storageKey);
@@ -28,13 +30,23 @@ export function makeCollapsible(titleElement, contentElement, storageKey, defaul
   // Wrap content in collapsible wrapper
   contentElement.classList.add('result-card__collapsible-content');
 
+  // Pair the title (acting as a button) with the panel it controls. Ensure
+  // the content has an id so aria-controls can reference it; assistive tech
+  // can then jump from the trigger straight to the revealed panel.
+  if (!contentElement.id) {
+    contentElement.id = `collapsible-content-${++collapsibleIdCounter}`;
+  }
+  titleElement.setAttribute('aria-controls', contentElement.id);
+
   // Set initial state
   if (isCollapsed) {
     contentElement.classList.add('result-card__collapsible-content--collapsed');
     icon.classList.add('result-card__collapse-icon--collapsed');
     titleElement.setAttribute('aria-expanded', 'false');
+    contentElement.setAttribute('aria-hidden', 'true');
   } else {
     titleElement.setAttribute('aria-expanded', 'true');
+    contentElement.setAttribute('aria-hidden', 'false');
   }
 
   // Add click handler
@@ -42,6 +54,7 @@ export function makeCollapsible(titleElement, contentElement, storageKey, defaul
     const nowCollapsed = contentElement.classList.toggle('result-card__collapsible-content--collapsed');
     icon.classList.toggle('result-card__collapse-icon--collapsed');
     titleElement.setAttribute('aria-expanded', nowCollapsed ? 'false' : 'true');
+    contentElement.setAttribute('aria-hidden', nowCollapsed ? 'true' : 'false');
 
     // Save state to session storage
     sessionStorage.setItem(storageKey, nowCollapsed.toString());

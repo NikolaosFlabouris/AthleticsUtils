@@ -27,6 +27,7 @@ import {
   formatShortDate
 } from '../calculators/age-calculations.js';
 import { buildShareUrl, parseUrlParams, clearUrlParams, copyToClipboard, AGE_PARAM_MAP } from '../utils/url-params.js';
+import { debounce } from '../utils/debounce.js';
 
 const HISTORY_KEY = 'athleticsUtils.ageHistory';
 const MAX_HISTORY = 10;
@@ -39,6 +40,11 @@ class AgeCalculator {
     this.currentReverseSubMode = 'from'; // 'from' (date + age → target) | 'target' (date − age → from)
     this.currentResult = null;           // Last valid calculation, for Add-to-History and Share
     this.currentParams = null;           // Share params for current result
+    // Auto-recalc is debounced so a screen reader's polite live region
+    // gets one announcement when the user pauses, not one per keystroke.
+    // Mode-switch and other click handlers still call recalculate()
+    // synchronously.
+    this.recalculateDebounced = debounce(() => this.recalculate(), 300);
   }
 
   initialize() {
@@ -152,7 +158,7 @@ class AgeCalculator {
     this.reverseFromBtn.addEventListener('click', () => this.switchReverseSubMode('from'));
     this.reverseTargetBtn.addEventListener('click', () => this.switchReverseSubMode('target'));
 
-    const auto = () => this.recalculate();
+    const auto = () => this.recalculateDebounced();
     this.fromDateInput.addEventListener('input', auto);
     this.fromDateInput.addEventListener('change', auto);
     this.targetDateInput.addEventListener('input', auto);
@@ -579,10 +585,38 @@ class AgeCalculator {
       });
 
       row.addEventListener('keydown', (e) => {
-        if (e.key !== 'Enter' && e.key !== ' ') return;
         if (e.target !== row) return;
-        e.preventDefault();
-        this.replayEntry(entry);
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.replayEntry(entry);
+          return;
+        }
+        // Alt+Up / Alt+Down — keyboard reorder.
+        if (e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+          const direction = e.key === 'ArrowUp' ? -1 : 1;
+          const from = parseInt(row.dataset.index, 10);
+          const to = from + direction;
+          const now = this.getHistory();
+          if (to < 0 || to >= now.length) return;
+          e.preventDefault();
+          this.reorderHistory(from, to);
+          requestAnimationFrame(() => {
+            this.historyTableBody.querySelector(`tr[data-id="${entry.id}"]`)?.focus();
+          });
+          return;
+        }
+        // Delete / Backspace — remove this entry, keep focus on the row
+        // that takes its slot (or the previous one if we removed the last).
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+          e.preventDefault();
+          const idx = parseInt(row.dataset.index, 10);
+          this.deleteEntry(entry.id);
+          requestAnimationFrame(() => {
+            const rows = this.historyTableBody.querySelectorAll('tr');
+            const nextRow = rows[idx] || rows[idx - 1];
+            nextRow?.focus();
+          });
+        }
       });
 
       this.historyTableBody.appendChild(row);

@@ -556,17 +556,53 @@ class PerformanceCalculator extends BaseCalculator {
       }
     });
 
-    // Keyboard: Enter / Space on a focused row replays it.
+    // Keyboard shortcuts on a focused history row:
+    //   Enter / Space            — replay
+    //   Alt + ArrowUp / Down     — reorder (mirrors the move buttons)
+    //   Delete / Backspace       — remove
     this.historyTableBody?.addEventListener('keydown', (e) => {
-      if (e.key !== 'Enter' && e.key !== ' ') return;
       const row = e.target.closest('.history-row');
-      if (!row || e.target !== row) return; // only act when the row itself is focused
-      e.preventDefault();
+      if (!row || e.target !== row) return; // only when the row itself is focused
       const id = row.dataset.historyId;
-      const history = HistoryManager.load();
-      const entry = history.find(h => h.id === id);
-      if (entry && entry.params) {
-        this.applyCalculationParams(entry.params, { skipSave: true, scrollToResults: true });
+
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const history = HistoryManager.load();
+        const entry = history.find(h => h.id === id);
+        if (entry && entry.params) {
+          this.applyCalculationParams(entry.params, { skipSave: true, scrollToResults: true });
+        }
+        return;
+      }
+
+      if (e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+        // Check bounds before moving so we don't preventDefault on no-op
+        // edges (the user can keep tabbing past the first/last row).
+        const direction = e.key === 'ArrowUp' ? 'up' : 'down';
+        const history = HistoryManager.load();
+        const idx = history.findIndex(h => h.id === id);
+        const newIdx = direction === 'up' ? idx - 1 : idx + 1;
+        if (idx < 0 || newIdx < 0 || newIdx >= history.length) return;
+        e.preventDefault();
+        HistoryManager.moveEntry(id, direction);
+        this.renderHistory();
+        requestAnimationFrame(() => {
+          this.historyTableBody?.querySelector(`tr[data-history-id="${id}"]`)?.focus();
+        });
+        return;
+      }
+
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault();
+        const rows = [...this.historyTableBody.querySelectorAll('.history-row')];
+        const idx = rows.indexOf(row);
+        HistoryManager.removeEntry(id);
+        this.renderHistory();
+        requestAnimationFrame(() => {
+          const after = this.historyTableBody?.querySelectorAll('.history-row');
+          const nextRow = after?.[idx] || after?.[idx - 1];
+          nextRow?.focus();
+        });
       }
     });
 

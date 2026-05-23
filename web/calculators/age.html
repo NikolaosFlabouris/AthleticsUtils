@@ -110,7 +110,7 @@
       <a href="/calculators/pace.html"><span class="ix">01</span> Pace &amp; Speed</a>
       <a href="/calculators/score.html"><span class="ix">02</span> WA Score</a>
       <a href="/calculators/combined-events.html"><span class="ix">03</span> Combined</a>
-      <a href="/calculators/age.html" class="active"><span class="ix">04</span> Age</a>
+      <a href="/calculators/age.html" class="active" aria-current="page"><span class="ix">04</span> Age</a>
       <a href="/calculators/time.html"><span class="ix">05</span> Time</a>
     </nav>
 
@@ -155,7 +155,7 @@
     <main class="main" id="main-content" tabindex="-1">
 
       <section class="calculator" aria-labelledby="calculator-heading">
-        <div class="calculator__header"><h1 id="calculator-heading">Age Calculator</h1></div>
+        <div class="calculator__header"><h2 id="calculator-heading">Age Calculator</h2></div>
 
         <div class="calc split-1-1">
           <div class="panel-l">
@@ -185,8 +185,8 @@
               <div id="age-forward-controls" class="mode-controls">
                 <div class="form-group">
                   <label for="age-from-date">From date</label>
-                  <input type="date" id="age-from-date" class="form-input">
-                  <small class="form-help">Usually a date of birth.</small>
+                  <input type="date" id="age-from-date" class="form-input" aria-describedby="age-from-date-help">
+                  <small class="form-help" id="age-from-date-help">Usually a date of birth.</small>
                 </div>
                 <div class="form-group">
                   <label for="age-target-date">Target date</label>
@@ -227,7 +227,7 @@
 
             <div id="error-message" class="error-message hidden" role="alert" aria-live="polite"></div>
 
-            <div id="results-container" class="calculator__results hidden">
+            <div id="results-container" class="calculator__results hidden" aria-live="polite" aria-atomic="false">
               <div class="results-header"><h2>Result</h2></div>
               <div id="results-content" class="results-content"></div>
             </div>
@@ -238,8 +238,14 @@
           <div class="history-header"><h2>Calculation History</h2></div>
           <div class="history-table-container">
             <table class="history-table">
+              <caption class="visually-hidden">Recent age calculations</caption>
               <thead>
-                <tr><th>Mode</th><th>Input</th><th>Result</th><th></th></tr>
+                <tr>
+                  <th scope="col">Mode</th>
+                  <th scope="col">Input</th>
+                  <th scope="col">Result</th>
+                  <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
               </thead>
               <tbody id="history-table-body"></tbody>
             </table>

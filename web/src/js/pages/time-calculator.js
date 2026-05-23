@@ -23,6 +23,7 @@ import {
   divideTime
 } from '../calculators/time-calculations.js';
 import { buildShareUrl, parseUrlParams, clearUrlParams, copyToClipboard, TIME_PARAM_MAP } from '../utils/url-params.js';
+import { debounce } from '../utils/debounce.js';
 
 const HISTORY_KEY = 'athleticsUtils.timeHistory';
 const MAX_HISTORY = 10;
@@ -36,6 +37,11 @@ class TimeCalculator {
     this.addSubRows = [];         // [{ operator:'+'|'-', value:string }]
     this.currentResult = null;    // Last valid calculation snapshot
     this.currentParams = null;    // Share params matching currentResult
+    // Auto-recalc is debounced so a screen reader's polite live region
+    // gets one announcement when the user pauses, not one per keystroke.
+    // Click handlers (mode switch, add row, op toggle) still call
+    // recalculate() synchronously.
+    this.recalculateDebounced = debounce(() => this.recalculate(), 300);
   }
 
   initialize() {
@@ -141,8 +147,8 @@ class TimeCalculator {
       });
     });
 
-    this.muldivTimeInput.addEventListener('input', () => this.recalculate());
-    this.muldivNumberInput.addEventListener('input', () => this.recalculate());
+    this.muldivTimeInput.addEventListener('input', () => this.recalculateDebounced());
+    this.muldivNumberInput.addEventListener('input', () => this.recalculateDebounced());
     this.muldivMulBtn.addEventListener('click', () => this.switchMulDivOp('mul'));
     this.muldivDivBtn.addEventListener('click', () => this.switchMulDivOp('div'));
   }
@@ -243,7 +249,7 @@ class TimeCalculator {
   handleRowInput(index, value) {
     // Store the raw string; we only re-parse on recalculate.
     this.addSubRows[index].value = value;
-    this.recalculate();
+    this.recalculateDebounced();
   }
 
   removeRow(index) {
@@ -737,10 +743,40 @@ class TimeCalculator {
       });
 
       row.addEventListener('keydown', (e) => {
-        if (e.key !== 'Enter' && e.key !== ' ') return;
         if (e.target !== row) return;
-        e.preventDefault();
-        this.replayEntry(entry);
+        // Enter / Space — replay this entry.
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.replayEntry(entry);
+          return;
+        }
+        // Alt+Up / Alt+Down — reorder without leaving the row. Mirrors the
+        // arrow-button click path, then re-focuses the moved row.
+        if (e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+          const direction = e.key === 'ArrowUp' ? -1 : 1;
+          const from = parseInt(row.dataset.index, 10);
+          const to = from + direction;
+          const now = this.getHistory();
+          if (to < 0 || to >= now.length) return;
+          e.preventDefault();
+          this.reorderHistory(from, to);
+          requestAnimationFrame(() => {
+            this.historyTableBody.querySelector(`tr[data-id="${entry.id}"]`)?.focus();
+          });
+          return;
+        }
+        // Delete / Backspace — remove this entry. Focus the next row,
+        // falling back to the previous one if we deleted the last entry.
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+          e.preventDefault();
+          const idx = parseInt(row.dataset.index, 10);
+          this.deleteEntry(entry.id);
+          requestAnimationFrame(() => {
+            const rows = this.historyTableBody.querySelectorAll('tr');
+            const nextRow = rows[idx] || rows[idx - 1];
+            nextRow?.focus();
+          });
+        }
       });
 
       this.historyTableBody.appendChild(row);

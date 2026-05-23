@@ -111,7 +111,7 @@
       <a href="/"><span class="ix">00</span> Home</a>
       <a href="/calculators/pace.html"><span class="ix">01</span> Pace &amp; Speed</a>
       <a href="/calculators/score.html"><span class="ix">02</span> WA Score</a>
-      <a href="/calculators/combined-events.html" class="active"><span class="ix">03</span> Combined</a>
+      <a href="/calculators/combined-events.html" class="active" aria-current="page"><span class="ix">03</span> Combined</a>
       <a href="/calculators/age.html"><span class="ix">04</span> Age</a>
       <a href="/calculators/time.html"><span class="ix">05</span> Time</a>
     </nav>
@@ -157,7 +157,7 @@
     <main class="main" id="main-content" tabindex="-1">
 
       <section class="calculator" aria-labelledby="calculator-heading">
-        <div class="calculator__header"><h1 id="calculator-heading">Combined Event Score Calculator</h1></div>
+        <div class="calculator__header"><h2 id="calculator-heading">Combined Event Score Calculator</h2></div>
 
         <div class="calc">
           <div class="panel-l">
@@ -214,12 +214,12 @@
               </div>
             </div>
 
-            <div id="loading-indicator" class="loading hidden">
-              <div class="loading__spinner"></div>
+            <div id="loading-indicator" class="loading hidden" role="status" aria-live="polite">
+              <div class="loading__spinner" aria-hidden="true"></div>
               <p>Loading...</p>
             </div>
 
-            <div id="error-message" class="error-message hidden"></div>
+            <div id="error-message" class="error-message hidden" role="alert" aria-live="polite"></div>
           </div>
         </div>
       </section>

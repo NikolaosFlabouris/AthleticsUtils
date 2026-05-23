@@ -112,7 +112,7 @@
     <nav class="tabs" aria-label="Calculators">
       <a href="/"><span class="ix">00</span> Home</a>
       <a href="/calculators/pace.html"><span class="ix">01</span> Pace &amp; Speed</a>
-      <a href="/calculators/score.html" class="active"><span class="ix">02</span> WA Score</a>
+      <a href="/calculators/score.html" class="active" aria-current="page"><span class="ix">02</span> WA Score</a>
       <a href="/calculators/combined-events.html"><span class="ix">03</span> Combined</a>
       <a href="/calculators/age.html"><span class="ix">04</span> Age</a>
       <a href="/calculators/time.html"><span class="ix">05</span> Time</a>
@@ -159,7 +159,7 @@
     <main class="main" id="main-content" tabindex="-1">
 
       <section class="calculator" aria-labelledby="calculator-heading">
-        <div class="calculator__header"><h1 id="calculator-heading">World Athletics Score Calculator</h1></div>
+        <div class="calculator__header"><h2 id="calculator-heading">World Athletics Score Calculator</h2></div>
 
         <div class="calc">
           <div class="panel-l">
@@ -199,7 +199,7 @@
 
               <div class="form-group">
                 <label for="performance-input" id="input-label">Performance</label>
-                <input type="text" id="performance-input" class="form-input" placeholder="Select an event first" disabled>
+                <input type="text" id="performance-input" class="form-input" placeholder="Select an event first" autocomplete="off" aria-describedby="input-help" disabled>
                 <small class="form-help" id="input-help">Select an event to see performance format</small>
                 <div id="hand-timing-container" class="hand-timing-checkbox" style="display: none;">
                   <label class="checkbox-label">
@@ -217,17 +217,17 @@
           <div class="panel-r">
             <div class="lane-tag"><span class="stripe"></span>OUTPUT &middot; LANE 02</div>
 
-            <div id="results-container" class="calculator__results hidden">
+            <div id="results-container" class="calculator__results hidden" aria-live="polite" aria-atomic="false">
               <div class="results-header"><h2>Results</h2></div>
               <div id="results-content" class="results-content"></div>
             </div>
 
-            <div id="loading-indicator" class="loading hidden">
-              <div class="loading__spinner"></div>
+            <div id="loading-indicator" class="loading hidden" role="status" aria-live="polite">
+              <div class="loading__spinner" aria-hidden="true"></div>
               <p>Loading scoring tables...</p>
             </div>
 
-            <div id="error-message" class="error-message hidden"></div>
+            <div id="error-message" class="error-message hidden" role="alert" aria-live="polite"></div>
           </div>
         </div>
 
@@ -235,8 +235,15 @@
           <div class="history-header"><h2>Calculation History</h2></div>
           <div class="history-table-container">
             <table class="history-table">
+              <caption class="visually-hidden">Recent World Athletics score calculations</caption>
               <thead>
-                <tr><th>Gender</th><th>Event</th><th>Performance</th><th>Score</th><th></th></tr>
+                <tr>
+                  <th scope="col">Gender</th>
+                  <th scope="col">Event</th>
+                  <th scope="col">Performance</th>
+                  <th scope="col">Score</th>
+                  <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
               </thead>
               <tbody id="history-table-body"></tbody>
             </table>

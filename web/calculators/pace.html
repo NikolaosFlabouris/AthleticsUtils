@@ -113,7 +113,7 @@
     <!-- ===== NAV ===== -->
     <nav class="tabs" aria-label="Calculators">
       <a href="/"><span class="ix">00</span> Home</a>
-      <a href="/calculators/pace.html" class="active"><span class="ix">01</span> Pace &amp; Speed</a>
+      <a href="/calculators/pace.html" class="active" aria-current="page"><span class="ix">01</span> Pace &amp; Speed</a>
       <a href="/calculators/score.html"><span class="ix">02</span> WA Score</a>
       <a href="/calculators/combined-events.html"><span class="ix">03</span> Combined</a>
       <a href="/calculators/age.html"><span class="ix">04</span> Age</a>
@@ -162,7 +162,7 @@
     <main class="main" id="main-content" tabindex="-1">
 
       <section class="calculator" aria-labelledby="calculator-heading">
-        <div class="calculator__header"><h1 id="calculator-heading">Pace &amp; Speed Calculator</h1></div>
+        <div class="calculator__header"><h2 id="calculator-heading">Pace &amp; Speed Calculator</h2></div>
 
         <div class="calc">
           <div class="panel-l">
@@ -203,13 +203,13 @@
               <div id="pace-standard-controls" class="mode-controls">
                 <div class="form-group">
                   <label for="distance-select-pace-standard">Distance</label>
-                  <select id="distance-select-pace-standard" class="form-select"><option value="">Select distance...</option></select>
+                  <select id="distance-select-pace-standard" class="form-select" aria-describedby="distance-equivalent-pace-standard"><option value="">Select distance...</option></select>
                   <small class="form-help" id="distance-equivalent-pace-standard"></small>
                 </div>
                 <div class="form-group">
                   <label for="time-input-pace-standard">Total Time</label>
-                  <input type="text" id="time-input-pace-standard" class="form-input" placeholder="e.g., 30:00">
-                  <small class="form-help">Enter time in HH:MM:SS or MM:SS format</small>
+                  <input type="text" id="time-input-pace-standard" class="form-input" placeholder="e.g., 30:00" inputmode="numeric" autocomplete="off" aria-describedby="time-input-pace-standard-help">
+                  <small class="form-help" id="time-input-pace-standard-help">Enter time in HH:MM:SS or MM:SS format</small>
                 </div>
                 <div class="form-group">
                   <label for="pace-unit-select-standard">Pace Unit</label>
@@ -229,10 +229,10 @@
               <!-- Pace Advanced Mode Controls -->
               <div id="pace-advanced-controls" class="mode-controls hidden">
                 <div class="form-group">
-                  <label>Distance</label>
+                  <label for="distance-input-pace-advanced">Distance</label>
                   <div class="distance-input-group">
-                    <input type="number" id="distance-input-pace-advanced" class="form-input" placeholder="e.g., 5 or 10.5" step="any" min="0" lang="en">
-                    <select id="distance-unit-select-pace-advanced" class="form-select">
+                    <input type="number" id="distance-input-pace-advanced" class="form-input" placeholder="e.g., 5 or 10.5" step="any" min="0" lang="en" inputmode="decimal" autocomplete="off" aria-describedby="distance-equivalent-pace-advanced">
+                    <select id="distance-unit-select-pace-advanced" class="form-select" aria-label="Distance unit">
                       <option value="km">km</option><option value="m">m</option><option value="miles">miles</option><option value="yards">yards</option><option value="feet">feet</option>
                     </select>
                   </div>
@@ -240,18 +240,18 @@
                 </div>
                 <div class="form-group">
                   <label for="time-input-pace-advanced">Total Time</label>
-                  <input type="text" id="time-input-pace-advanced" class="form-input" placeholder="e.g., 30:00">
-                  <small class="form-help">Enter time in HH:MM:SS or MM:SS format</small>
+                  <input type="text" id="time-input-pace-advanced" class="form-input" placeholder="e.g., 30:00" inputmode="numeric" autocomplete="off" aria-describedby="time-input-pace-advanced-help">
+                  <small class="form-help" id="time-input-pace-advanced-help">Enter time in HH:MM:SS or MM:SS format</small>
                 </div>
                 <div class="form-group">
-                  <label>Pace Interval</label>
+                  <label for="pace-interval-input-pace-advanced">Pace Interval</label>
                   <div class="distance-input-group">
-                    <input type="number" id="pace-interval-input-pace-advanced" class="form-input" placeholder="e.g., 1 or 2" step="any" min="0" value="1" lang="en">
-                    <select id="pace-interval-unit-select-pace-advanced" class="form-select">
+                    <input type="number" id="pace-interval-input-pace-advanced" class="form-input" placeholder="e.g., 1 or 2" step="any" min="0" value="1" lang="en" inputmode="decimal" autocomplete="off" aria-describedby="pace-interval-input-pace-advanced-help">
+                    <select id="pace-interval-unit-select-pace-advanced" class="form-select" aria-label="Pace interval unit">
                       <option value="km">km</option><option value="m">m</option><option value="miles">miles</option><option value="yards">yards</option><option value="feet">feet</option>
                     </select>
                   </div>
-                  <small class="form-help">Distance over which pace is measured</small>
+                  <small class="form-help" id="pace-interval-input-pace-advanced-help">Distance over which pace is measured</small>
                 </div>
                 <div class="form-group form-group--button">
                   <button type="button" id="calculate-btn-pace-advanced" class="btn btn-primary compute">Calculate <span class="kbd">&crarr;</span></button>
@@ -262,13 +262,13 @@
               <div id="time-standard-controls" class="mode-controls hidden">
                 <div class="form-group">
                   <label for="distance-select-time-standard">Distance</label>
-                  <select id="distance-select-time-standard" class="form-select"><option value="">Select distance...</option></select>
+                  <select id="distance-select-time-standard" class="form-select" aria-describedby="distance-equivalent-time-standard"><option value="">Select distance...</option></select>
                   <small class="form-help" id="distance-equivalent-time-standard"></small>
                 </div>
                 <div class="form-group">
                   <label for="pace-input-time-standard">Pace</label>
-                  <input type="text" id="pace-input-time-standard" class="form-input" placeholder="e.g., 5:00, 4:30, or 30">
-                  <small class="form-help">Enter pace in MM:SS format or seconds</small>
+                  <input type="text" id="pace-input-time-standard" class="form-input" placeholder="e.g., 5:00, 4:30, or 30" inputmode="numeric" autocomplete="off" aria-describedby="pace-input-time-standard-help">
+                  <small class="form-help" id="pace-input-time-standard-help">Enter pace in MM:SS format or seconds</small>
                 </div>
                 <div class="form-group">
                   <label for="pace-unit-select-time-standard">Pace Unit</label>
@@ -284,10 +284,10 @@
               <!-- Total Time Advanced Mode Controls -->
               <div id="time-advanced-controls" class="mode-controls hidden">
                 <div class="form-group">
-                  <label>Distance</label>
+                  <label for="distance-input-time-advanced">Distance</label>
                   <div class="distance-input-group">
-                    <input type="number" id="distance-input-time-advanced" class="form-input" placeholder="e.g., 5 or 10.5" step="any" min="0" lang="en">
-                    <select id="distance-unit-select-time-advanced" class="form-select">
+                    <input type="number" id="distance-input-time-advanced" class="form-input" placeholder="e.g., 5 or 10.5" step="any" min="0" lang="en" inputmode="decimal" autocomplete="off" aria-describedby="distance-equivalent-time-advanced">
+                    <select id="distance-unit-select-time-advanced" class="form-select" aria-label="Distance unit">
                       <option value="km">km</option><option value="m">m</option><option value="miles">miles</option><option value="yards">yards</option><option value="feet">feet</option>
                     </select>
                   </div>
@@ -295,18 +295,18 @@
                 </div>
                 <div class="form-group">
                   <label for="pace-input-time-advanced">Pace</label>
-                  <input type="text" id="pace-input-time-advanced" class="form-input" placeholder="e.g., 5:00, 4:30, or 30">
-                  <small class="form-help">Enter pace in MM:SS format or seconds</small>
+                  <input type="text" id="pace-input-time-advanced" class="form-input" placeholder="e.g., 5:00, 4:30, or 30" inputmode="numeric" autocomplete="off" aria-describedby="pace-input-time-advanced-help">
+                  <small class="form-help" id="pace-input-time-advanced-help">Enter pace in MM:SS format or seconds</small>
                 </div>
                 <div class="form-group">
-                  <label>Pace Interval</label>
+                  <label for="pace-interval-input-time-advanced">Pace Interval</label>
                   <div class="distance-input-group">
-                    <input type="number" id="pace-interval-input-time-advanced" class="form-input" placeholder="e.g., 1 or 2" step="any" min="0" value="1" lang="en">
-                    <select id="pace-interval-unit-select-time-advanced" class="form-select">
+                    <input type="number" id="pace-interval-input-time-advanced" class="form-input" placeholder="e.g., 1 or 2" step="any" min="0" value="1" lang="en" inputmode="decimal" autocomplete="off" aria-describedby="pace-interval-input-time-advanced-help">
+                    <select id="pace-interval-unit-select-time-advanced" class="form-select" aria-label="Pace interval unit">
                       <option value="km">km</option><option value="m">m</option><option value="miles">miles</option><option value="yards">yards</option><option value="feet">feet</option>
                     </select>
                   </div>
-                  <small class="form-help">Distance over which pace is measured</small>
+                  <small class="form-help" id="pace-interval-input-time-advanced-help">Distance over which pace is measured</small>
                 </div>
                 <div class="form-group form-group--button">
                   <button type="button" id="calculate-btn-time-advanced" class="btn btn-primary compute">Calculate <span class="kbd">&crarr;</span></button>
@@ -317,13 +317,13 @@
               <div id="speed-standard-controls" class="mode-controls hidden">
                 <div class="form-group">
                   <label for="distance-select-speed-standard">Distance</label>
-                  <select id="distance-select-speed-standard" class="form-select"><option value="">Select distance...</option></select>
+                  <select id="distance-select-speed-standard" class="form-select" aria-describedby="distance-equivalent-speed-standard"><option value="">Select distance...</option></select>
                   <small class="form-help" id="distance-equivalent-speed-standard"></small>
                 </div>
                 <div class="form-group">
                   <label for="time-input-speed-standard">Total Time</label>
-                  <input type="text" id="time-input-speed-standard" class="form-input" placeholder="e.g., 30:00">
-                  <small class="form-help">Enter time in HH:MM:SS or MM:SS format</small>
+                  <input type="text" id="time-input-speed-standard" class="form-input" placeholder="e.g., 30:00" inputmode="numeric" autocomplete="off" aria-describedby="time-input-speed-standard-help">
+                  <small class="form-help" id="time-input-speed-standard-help">Enter time in HH:MM:SS or MM:SS format</small>
                 </div>
                 <div class="form-group">
                   <label for="speed-unit-select-standard">Speed Unit</label>
@@ -339,10 +339,10 @@
               <!-- Speed Advanced Mode Controls -->
               <div id="speed-advanced-controls" class="mode-controls hidden">
                 <div class="form-group">
-                  <label>Distance</label>
+                  <label for="distance-input-speed-advanced">Distance</label>
                   <div class="distance-input-group">
-                    <input type="number" id="distance-input-speed-advanced" class="form-input" placeholder="e.g., 5 or 10.5" step="any" min="0" lang="en">
-                    <select id="distance-unit-select-speed-advanced" class="form-select">
+                    <input type="number" id="distance-input-speed-advanced" class="form-input" placeholder="e.g., 5 or 10.5" step="any" min="0" lang="en" inputmode="decimal" autocomplete="off" aria-describedby="distance-equivalent-speed-advanced">
+                    <select id="distance-unit-select-speed-advanced" class="form-select" aria-label="Distance unit">
                       <option value="km">km</option><option value="m">m</option><option value="miles">miles</option><option value="yards">yards</option><option value="feet">feet</option>
                     </select>
                   </div>
@@ -350,8 +350,8 @@
                 </div>
                 <div class="form-group">
                   <label for="time-input-speed-advanced">Total Time</label>
-                  <input type="text" id="time-input-speed-advanced" class="form-input" placeholder="e.g., 30:00">
-                  <small class="form-help">Enter time in HH:MM:SS or MM:SS format</small>
+                  <input type="text" id="time-input-speed-advanced" class="form-input" placeholder="e.g., 30:00" inputmode="numeric" autocomplete="off" aria-describedby="time-input-speed-advanced-help">
+                  <small class="form-help" id="time-input-speed-advanced-help">Enter time in HH:MM:SS or MM:SS format</small>
                 </div>
                 <div class="form-group">
                   <label for="speed-unit-select-advanced">Speed Unit</label>
@@ -368,13 +368,13 @@
               <div id="speed-time-standard-controls" class="mode-controls hidden">
                 <div class="form-group">
                   <label for="distance-select-speed-time-standard">Distance</label>
-                  <select id="distance-select-speed-time-standard" class="form-select"><option value="">Select distance...</option></select>
+                  <select id="distance-select-speed-time-standard" class="form-select" aria-describedby="distance-equivalent-speed-time-standard"><option value="">Select distance...</option></select>
                   <small class="form-help" id="distance-equivalent-speed-time-standard"></small>
                 </div>
                 <div class="form-group">
                   <label for="speed-input-time-standard">Speed</label>
-                  <input type="number" id="speed-input-time-standard" class="form-input" placeholder="e.g., 12.5" step="any" min="0" lang="en">
-                  <small class="form-help">Enter speed as a decimal number</small>
+                  <input type="number" id="speed-input-time-standard" class="form-input" placeholder="e.g., 12.5" step="any" min="0" lang="en" inputmode="decimal" autocomplete="off" aria-describedby="speed-input-time-standard-help">
+                  <small class="form-help" id="speed-input-time-standard-help">Enter speed as a decimal number</small>
                 </div>
                 <div class="form-group">
                   <label for="speed-unit-select-time-standard">Speed Unit</label>
@@ -390,10 +390,10 @@
               <!-- Speed Time Advanced -->
               <div id="speed-time-advanced-controls" class="mode-controls hidden">
                 <div class="form-group">
-                  <label>Distance</label>
+                  <label for="distance-input-speed-time-advanced">Distance</label>
                   <div class="distance-input-group">
-                    <input type="number" id="distance-input-speed-time-advanced" class="form-input" placeholder="e.g., 5 or 10.5" step="any" min="0" lang="en">
-                    <select id="distance-unit-select-speed-time-advanced" class="form-select">
+                    <input type="number" id="distance-input-speed-time-advanced" class="form-input" placeholder="e.g., 5 or 10.5" step="any" min="0" lang="en" inputmode="decimal" autocomplete="off" aria-describedby="distance-equivalent-speed-time-advanced">
+                    <select id="distance-unit-select-speed-time-advanced" class="form-select" aria-label="Distance unit">
                       <option value="km">km</option><option value="m">m</option><option value="miles">miles</option><option value="yards">yards</option><option value="feet">feet</option>
                     </select>
                   </div>
@@ -401,8 +401,8 @@
                 </div>
                 <div class="form-group">
                   <label for="speed-input-time-advanced">Speed</label>
-                  <input type="number" id="speed-input-time-advanced" class="form-input" placeholder="e.g., 12.5" step="any" min="0" lang="en">
-                  <small class="form-help">Enter speed as a decimal number</small>
+                  <input type="number" id="speed-input-time-advanced" class="form-input" placeholder="e.g., 12.5" step="any" min="0" lang="en" inputmode="decimal" autocomplete="off" aria-describedby="speed-input-time-advanced-help">
+                  <small class="form-help" id="speed-input-time-advanced-help">Enter speed as a decimal number</small>
                 </div>
                 <div class="form-group">
                   <label for="speed-unit-select-time-advanced">Speed Unit</label>
@@ -422,13 +422,13 @@
           <div class="panel-r">
             <div class="lane-tag"><span class="stripe"></span>OUTPUT &middot; LANE 01</div>
 
-            <div id="results-container" class="calculator__results hidden">
+            <div id="results-container" class="calculator__results hidden" aria-live="polite" aria-atomic="false">
               <div class="results-header"><h2>Results</h2></div>
               <div id="results-content" class="results-content"></div>
             </div>
 
-            <div id="loading-indicator" class="loading hidden">
-              <div class="loading__spinner"></div>
+            <div id="loading-indicator" class="loading hidden" role="status" aria-live="polite">
+              <div class="loading__spinner" aria-hidden="true"></div>
               <p>Loading...</p>
             </div>
           </div><!-- /.panel-r -->
@@ -439,8 +439,14 @@
           <div class="history-header"><h2>Calculation History</h2></div>
           <div class="history-table-container">
             <table class="history-table">
+              <caption class="visually-hidden">Recent pace and speed calculations</caption>
               <thead>
-                <tr><th>Distance</th><th>Total Time</th><th>Pace / Speed</th><th></th></tr>
+                <tr>
+                  <th scope="col">Distance</th>
+                  <th scope="col">Total Time</th>
+                  <th scope="col">Pace / Speed</th>
+                  <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
               </thead>
               <tbody id="history-table-body"></tbody>
             </table>
