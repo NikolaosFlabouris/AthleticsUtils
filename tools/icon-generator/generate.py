@@ -12,9 +12,12 @@ Outputs, relative to web/public/:
   icons/og-pace.png           1200x630, share image for the pace calculator
   icons/og-score.png          1200x630, share image for the score calculator
   icons/og-combined.png       1200x630, share image for the combined-events calculator
+  icons/og-age.png            1200x630, share image for the age calculator
+  icons/og-time.png           1200x630, share image for the time calculator
   icons/github-social-preview.png
                               1280x640, GitHub repo social preview card
-                              (Settings → General → Social preview)
+                              (Settings → General → Social preview). Mirrors
+                              og-default.png's copy at GitHub's canvas size.
 
 These match the current site's visual language: the dark "lane" theme — near-black
 panels, a hi-vis yellow accent, and the track-card brand mark from
@@ -317,14 +320,30 @@ def main() -> None:
         ),
         "og-combined.png",
     )
+    save(
+        make_og_image(
+            "Age Calculator",
+            "Years, months and days between dates — including end-of-year "
+            "age for athletics age groups.",
+        ),
+        "og-age.png",
+    )
+    save(
+        make_og_image(
+            "Time Calculator",
+            "Add, subtract, multiply and divide times — with running totals "
+            "and step-by-step breakdowns.",
+        ),
+        "og-time.png",
+    )
 
-    # GitHub repo social preview — same brand language as the OG cards,
-    # rendered at GitHub's 1280x640 canvas. Content stays well inside the
-    # 40pt safe border GitHub recommends for cropping.
+    # GitHub repo social preview — same brand language as the OG cards, with
+    # the home-page (og-default) copy rendered at GitHub's 1280x640 canvas.
+    # Content stays well inside the 40pt safe border GitHub recommends.
     save(
         make_og_image(
             "Athletics Utilities",
-            "Pace, scoring and combined-events calculators — "
+            "Five focused calculators for pace, scoring, age and time — "
             "free, fast and offline.",
             canvas=(1280, 640),
         ),
