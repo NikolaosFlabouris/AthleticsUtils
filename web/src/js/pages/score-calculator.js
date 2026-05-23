@@ -144,7 +144,7 @@ class PerformanceCalculator extends BaseCalculator {
         const errorMsg = this.calculationMode === 'performance'
           ? 'Please enter a performance value.'
           : 'Please enter a score.';
-        this.showError(errorMsg);
+        this.showError(errorMsg, this.performanceInput);
       }
       return;
     }
@@ -164,7 +164,7 @@ class PerformanceCalculator extends BaseCalculator {
     } catch (error) {
       console.error('Calculation error:', error);
       this.performanceInput.classList.add('input-error');
-      this.showError('An error occurred during calculation. Please try again.');
+      this.showError('An error occurred during calculation. Please try again.', this.performanceInput);
     }
   }
 
@@ -173,7 +173,7 @@ class PerformanceCalculator extends BaseCalculator {
 
     if (!normalizedPerformance) {
       this.performanceInput.classList.add('input-error');
-      this.showError('Invalid performance format. Please enter a valid number (e.g., 10.5 or 1:30.5)');
+      this.showError('Invalid performance format. Please enter a valid number (e.g., 10.5 or 1:30.5)', this.performanceInput);
       return;
     }
 
@@ -181,7 +181,7 @@ class PerformanceCalculator extends BaseCalculator {
 
     if (!result) {
       this.performanceInput.classList.add('input-error');
-      this.showError('Could not find points for this performance. Please check your input.');
+      this.showError('Could not find points for this performance. Please check your input.', this.performanceInput);
       return;
     }
 
@@ -194,7 +194,7 @@ class PerformanceCalculator extends BaseCalculator {
 
     if (isNaN(score) || score <= 0) {
       this.performanceInput.classList.add('input-error');
-      this.showError('Invalid score. Please enter a positive number.');
+      this.showError('Invalid score. Please enter a positive number.', this.performanceInput);
       return;
     }
 
@@ -202,7 +202,7 @@ class PerformanceCalculator extends BaseCalculator {
 
     if (!result) {
       this.performanceInput.classList.add('input-error');
-      this.showError('Could not find performance for this score. Please check your input.');
+      this.showError('Could not find performance for this score. Please check your input.', this.performanceInput);
       return;
     }
 
@@ -308,7 +308,9 @@ class PerformanceCalculator extends BaseCalculator {
 
     const points = document.createElement('div');
     points.className = 'result-card__points';
-    points.textContent = `${result.points} points`;
+    // toLocaleString gives "1,206 points" instead of "1206 points" — easier
+    // to read at a glance for four-digit scores.
+    points.textContent = `${result.points.toLocaleString()} points`;
 
     const content = document.createElement('div');
     content.className = 'result-card__content';
@@ -394,7 +396,8 @@ class PerformanceCalculator extends BaseCalculator {
 
     const scoreElement = document.createElement('div');
     scoreElement.className = 'result-card__content';
-    scoreElement.textContent = `Score: ${submittedScore} points`;
+    const formattedScore = Number(submittedScore).toLocaleString();
+    scoreElement.textContent = `Score: ${formattedScore} points`;
 
     if (result.appliedOffset) {
       // Hand timing adjustment was applied (offset is negative for HT)
@@ -402,7 +405,7 @@ class PerformanceCalculator extends BaseCalculator {
       const fatPerformance = formatPerformance(result.originalPerformance, this.currentEvent);
       const offset = formatPerformance(String(Math.abs(result.appliedOffset)), this.currentEvent);
       performanceElement.textContent = `${htPerformance} (hand timed)`;
-      scoreElement.innerHTML = `${htPerformance} = ${fatPerformance} - ${offset} offset for hand timing<br>Score: ${submittedScore} points`;
+      scoreElement.innerHTML = `${htPerformance} = ${fatPerformance} - ${offset} offset for hand timing<br>Score: ${formattedScore} points`;
     } else {
       const performance = formatPerformance(result.performance, this.currentEvent);
       performanceElement.textContent = performance;
@@ -478,7 +481,7 @@ class PerformanceCalculator extends BaseCalculator {
     row.tabIndex = 0;
     row.setAttribute(
       'aria-label',
-      `Replay ${entry.gender} ${entry.eventDisplayName} — ${entry.performance}, ${entry.score} points`
+      `Replay ${entry.gender} ${entry.eventDisplayName} — ${entry.performance}, ${Number(entry.score).toLocaleString()} points`
     );
 
     row.innerHTML = `
@@ -754,6 +757,8 @@ class PerformanceCalculator extends BaseCalculator {
 
     const toast = document.createElement('div');
     toast.className = 'share-toast';
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
     toast.textContent = success ? 'Link copied!' : 'Failed to copy';
     anchorElement.closest('.result-card__title-row')?.appendChild(toast);
     setTimeout(() => toast.remove(), 2000);

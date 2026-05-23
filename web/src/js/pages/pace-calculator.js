@@ -2660,6 +2660,10 @@ class PaceCalculator extends PaceCalculatorBase {
 
     const toast = document.createElement('div');
     toast.className = 'share-toast';
+    // role="status" so SR users hear "Link copied!" the same way the
+    // toast pops up visually for sighted users.
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
     toast.textContent = success ? 'Link copied!' : 'Failed to copy';
     anchorElement.closest('.result-card__title-row')?.appendChild(toast);
     setTimeout(() => toast.remove(), 2000);

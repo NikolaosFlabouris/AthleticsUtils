@@ -23,7 +23,9 @@
   --line-2: #2c3340;
   --ink: #eef0f4;
   --ink-2: #b9bfca;
-  --muted: #6e7585;
+  /* --muted bumped from #6e7585 → #82899a so it clears WCAG AA 4.5:1
+     against --bg (was ~4.4:1, now ~5.8:1). */
+  --muted: #82899a;
   --muted-2: #4e5563;
   --accent: #f5d547;
   --accent-ink: #18140a;
@@ -44,7 +46,9 @@
   --paper-3: #e3dccb;
   --ink: #16110a;
   --ink-2: #3a3326;
-  --muted: #847b67;
+  /* --muted darkened from #847b67 → #6e6657 so it clears WCAG AA against
+     --paper (was ~3.6:1, now ~5.0:1). */
+  --muted: #6e6657;
   --muted-2: #a59c87;
   --line: #d8d2c1;
   --line-2: #c9c2b0;
@@ -685,6 +689,17 @@ select:disabled {
   background: var(--error-bg);
 }
 
+/* Explicit placeholder colour. Default UA placeholder rendering knocks
+   opacity down to ~50%, which can take the contrast below WCAG AA on
+   either theme — pin it to --muted with full opacity so it stays
+   readable. (Placeholders are still hint text, not a label substitute.) */
+.form-input::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
 .form-help {
   display: block;
   font-family: var(--mono); font-size: 12px;
@@ -699,7 +714,12 @@ select:disabled {
   gap: 6px;
   margin-top: 18px;
 }
-.form-group:first-of-type,
+/* Use :first-child rather than :first-of-type so the rule applies whether
+   the first .form-group is a <div> or a <fieldset> (the Age composite).
+   Every actual call site has the form-group as the first child of its
+   container, so this is a safe equivalent — and it stays correct when
+   the element type varies. */
+.form-group:first-child,
 .calculator__controls > .form-group:first-child { margin-top: 0; }
 
 /* Toggle row — groups several segmented-control form-groups onto one
@@ -718,13 +738,18 @@ select:disabled {
   margin-top: 0;
 }
 
-.form-group label {
+/* Label typography. Applies to both <label> (single inputs) and <legend>
+   (fieldset groups like the Age composite) so the group caption matches
+   the rest of the form-group labels visually and semantically. */
+.form-group label,
+.form-group > legend {
   font-family: var(--mono); font-size: 12px;
   letter-spacing: 0.12em; text-transform: uppercase;
   color: var(--muted);
   font-weight: 500;
 }
-[data-theme="track"] .form-group label {
+[data-theme="track"] .form-group label,
+[data-theme="track"] .form-group > legend {
   font-size: 12px; letter-spacing: 0.18em;
 }
 
@@ -733,6 +758,32 @@ select:disabled {
   display: grid; grid-template-columns: 1fr auto; gap: 8px;
 }
 .distance-input-group .form-select { min-width: 90px; }
+
+/* Age composite (years / months / days) — uses a real <fieldset>/<legend>
+   so screen readers announce "Age" as the group name when the user
+   reaches any of the three sub-inputs. Browser defaults add a border, a
+   notched-legend cutout, and an intrinsic min-width that would all
+   disrupt the form-group flex layout, so reset them here. The base
+   .form-group rules above still drive the `display: flex`,
+   `flex-direction: column`, and `gap: 6px` between the legend and the
+   age-parts row, and the shared .form-group selector styles the legend
+   typography to match the rest of the form. */
+fieldset.age-parts-group {
+  border: 0;
+  padding: 0;
+  /* Removes the intrinsic min-content min-width that fieldsets carry,
+     which would otherwise prevent the parent flex/grid from shrinking. */
+  min-width: 0;
+}
+fieldset.age-parts-group > legend {
+  /* Legends have UA padding (esp. when paired with a border) and Safari
+     historically floats them; reset so the legend behaves like a plain
+     block-level label within the flex column. */
+  padding: 0;
+  float: none;
+  /* margin-bottom not needed — the parent's `gap: 6px` (from .form-group)
+     handles the gap to the .age-parts grid below. */
+}
 
 /* age-parts row */
 .age-parts { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
@@ -2705,4 +2756,126 @@ details:not([open]) > summary.day-section__header::after {
   /* Decorative hover/focus translations on the home-page cards. */
   .card:hover .go .arrow,
   .editorial .tool:hover .cta .arr { transform: none !important; }
+}
+
+/* ============================================================
+   Forced colors (Windows High Contrast / "Use system colors").
+   When the user opts in, browsers replace the page palette with
+   their OS-defined system colours. Our accent-based focus rings
+   get overwritten too, so the global ":focus-visible" outline
+   ends up using whatever the system thinks "accent" should be —
+   sometimes invisible against the system's button-face colour.
+
+   We re-anchor focus rings to the System Highlight colour and
+   opt the affected elements OUT of further palette overrides
+   via forced-color-adjust: none. Backgrounds-only patterns
+   (e.g. the segmented "pressed" pill) gain an explicit border
+   so the active state is still visible when fills are flattened.
+   ============================================================ */
+@media (forced-colors: active) {
+  :focus-visible,
+  .btn-primary:focus-visible,
+  .compute:focus-visible,
+  .calcbtn:focus-visible,
+  .mode-toggle__option:focus-visible,
+  .gender-toggle__option:focus-visible,
+  .seg button:focus-visible,
+  nav.tabs a:focus-visible,
+  .theme-toggle:focus-visible {
+    outline: 2px solid Highlight !important;
+    outline-offset: 2px;
+  }
+
+  /* Pressed segmented options are normally distinguished only by fill —
+     add a Highlight border so the active state survives the override. */
+  .mode-toggle__option[aria-pressed="true"],
+  .gender-toggle__option[aria-pressed="true"],
+  nav.tabs a.active {
+    border: 1px solid Highlight;
+  }
+
+  /* The custom checkbox draws its tick with ::before; make the box and
+     tick both follow system colours so the checked state is visible. */
+  input[type="checkbox"] {
+    border-color: ButtonText;
+  }
+  input[type="checkbox"]:checked {
+    background: Highlight;
+    border-color: Highlight;
+  }
+  input[type="checkbox"]::before { border-color: HighlightText; }
+
+  /* SVG icons inherit currentColor where set; keep that working. */
+  .icon { forced-color-adjust: auto; }
+}
+
+/* ============================================================
+   Print — a coach printing a results page off their phone shouldn't
+   get a dark-navy ink-spill. Force black-on-white for the content
+   that matters (results, history) and hide site chrome the reader
+   can't act on (theme toggle, nav tabs, lane art, hero copy on info
+   pages). Keep all functional output text legible.
+   ============================================================ */
+@media print {
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* Site chrome and decorations the printout doesn't need. */
+  .top, nav.tabs, .footer,
+  .lane-art, .hero .lane-art,
+  .skip-link,
+  .theme-toggle,
+  .share-btn, .share-toast,
+  .history-move-btn, .history-delete-btn,
+  .time-row__remove-btn,
+  #loading-indicator,
+  .pagehead .lane-art {
+    display: none !important;
+  }
+
+  /* Calculator inputs panel still helps explain WHAT was calculated —
+     keep it but drop the colour-coded chrome. */
+  .panel-l, .panel-r,
+  .calculator__results,
+  .history-section,
+  .info-section,
+  .result-card {
+    background: #fff !important;
+    color: #000 !important;
+    border-color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  /* Strip the dark fills off the heading-on-accent styles. */
+  h1, h2, h3, .pagehead h1, .pagehead .crumb {
+    color: #000 !important;
+    background: transparent !important;
+  }
+
+  /* Link URLs are clickable on screen — on paper, expose the href. */
+  a[href]:not([href^="#"])::after {
+    content: " (" attr(href) ")";
+    font-size: 90%;
+    color: #555;
+  }
+
+  /* Avoid page-breaking inside results. */
+  .result-card,
+  .history-row,
+  .calculator__results { break-inside: avoid; }
+}
+
+/* ============================================================
+   Reduced transparency — users on iOS/macOS who set "Reduce
+   Transparency" (or its desktop equivalents) find translucent
+   panels and toasts hard to read because background colour bleeds
+   through. Replace the rgba() / partially-translucent fills used
+   for hover halos and toasts with their opaque equivalents.
+   ============================================================ */
+@media (prefers-reduced-transparency: reduce) {
+  .share-toast { background: var(--panel) !important; opacity: 1 !important; }
+  .form-input.input-error { background: var(--panel) !important; }
+  .age-readout .cell .n { background: transparent !important; }
 }

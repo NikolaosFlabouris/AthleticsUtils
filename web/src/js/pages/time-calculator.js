@@ -24,6 +24,7 @@ import {
 } from '../calculators/time-calculations.js';
 import { buildShareUrl, parseUrlParams, clearUrlParams, copyToClipboard, TIME_PARAM_MAP } from '../utils/url-params.js';
 import { debounce } from '../utils/debounce.js';
+import { linkDescribedBy, unlinkDescribedBy } from '../utils/aria-describedby.js';
 
 const HISTORY_KEY = 'athleticsUtils.timeHistory';
 const MAX_HISTORY = 10;
@@ -324,16 +325,19 @@ class TimeCalculator {
 
     // Flag inputs with parse errors so the user can see what's wrong,
     // but don't block the running total display for the valid rows.
+    // Collect the invalid inputs so showError can link them to the
+    // central message via aria-describedby; aria-invalid is then set
+    // by showError itself, keeping the source of truth in one place.
+    const invalidInputs = [];
     this.timeRowsContainer.querySelectorAll('.time-row').forEach((rowEl, i) => {
       const input = rowEl.querySelector('.time-row__input');
       if (!input) return;
       const row = parsedRows[i];
       if (!row.valid && !row.empty) {
         input.classList.add('input-error');
-        input.setAttribute('aria-invalid', 'true');
+        invalidInputs.push(input);
       } else {
         input.classList.remove('input-error');
-        input.setAttribute('aria-invalid', 'false');
       }
     });
 
@@ -341,7 +345,10 @@ class TimeCalculator {
       // Need at least two valid rows to show a meaningful result card.
       this.hideResults();
       if (anyInvalid) {
-        this.showError('Some rows could not be parsed — check for typos.');
+        this.showError(
+          'Some rows could not be parsed — check for typos.',
+          invalidInputs
+        );
       }
       return;
     }
@@ -386,8 +393,8 @@ class TimeCalculator {
     }
     if (this.muldivOp === 'div' && num === 0) {
       this.muldivNumberInput.classList.add('input-error');
-      this.muldivNumberInput.setAttribute('aria-invalid', 'true');
-      this.showError('Cannot divide by zero.');
+      // showError handles aria-invalid + aria-describedby linking.
+      this.showError('Cannot divide by zero.', this.muldivNumberInput);
       this.hideResults();
       return;
     }
@@ -597,6 +604,10 @@ class TimeCalculator {
     if (existing) existing.remove();
     const toast = document.createElement('div');
     toast.className = 'share-toast';
+    // role="status" + aria-live="polite" so SR users get the same "Link
+    // copied!" / "Added to history" feedback that sighted users see.
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
     toast.textContent = message;
     titleRow.appendChild(toast);
     setTimeout(() => toast.remove(), 2000);
@@ -886,14 +897,44 @@ class TimeCalculator {
 
   // ---------- helpers ----------
 
-  showError(message) {
+  /**
+   * Display an error in the central error panel and, if any inputs are
+   * passed in, link them to the panel via aria-describedby + flip
+   * aria-invalid. The tracked set is unlinked again in hideError so the
+   * inputs return to their pre-error a11y state (their form-help link
+   * stays intact thanks to linkDescribedBy / unlinkDescribedBy).
+   */
+  showError(message, inputs = []) {
     if (!this.errorEl) return;
     this.errorEl.textContent = message;
     this.errorEl.classList.remove('hidden');
+
+    // Clear any previously-flagged inputs first so a different error
+    // doesn't leave the old set stranded with describedby pointing at
+    // the new message.
+    this._clearErroredInputs();
+    const list = (Array.isArray(inputs) ? inputs : [inputs]).filter(Boolean);
+    if (!this.errorEl.id) return;
+    list.forEach(input => {
+      linkDescribedBy(input, this.errorEl.id);
+      input.setAttribute('aria-invalid', 'true');
+    });
+    this._erroredInputs = list;
   }
 
   hideError() {
     this.errorEl?.classList.add('hidden');
+    this._clearErroredInputs();
+  }
+
+  _clearErroredInputs() {
+    if (!this._erroredInputs?.length) return;
+    const errorId = this.errorEl?.id;
+    this._erroredInputs.forEach(input => {
+      if (errorId) unlinkDescribedBy(input, errorId);
+      input.setAttribute('aria-invalid', 'false');
+    });
+    this._erroredInputs = [];
   }
 
   hideResults() {

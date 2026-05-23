@@ -28,6 +28,7 @@ import {
 } from '../calculators/age-calculations.js';
 import { buildShareUrl, parseUrlParams, clearUrlParams, copyToClipboard, AGE_PARAM_MAP } from '../utils/url-params.js';
 import { debounce } from '../utils/debounce.js';
+import { linkDescribedBy, unlinkDescribedBy } from '../utils/aria-describedby.js';
 
 const HISTORY_KEY = 'athleticsUtils.ageHistory';
 const MAX_HISTORY = 10;
@@ -220,7 +221,12 @@ class AgeCalculator {
     }
 
     if (compareDates(from, target) > 0) {
-      this.showError('From date must be on or before target date.');
+      // Either input could be the one the user meant to edit; link both
+      // so the SR announces the constraint when focus returns to either.
+      this.showError(
+        'From date must be on or before target date.',
+        [this.fromDateInput, this.targetDateInput]
+      );
       this.hideResults();
       return;
     }
@@ -262,13 +268,16 @@ class AgeCalculator {
     const days = parseInt(this.reverseDaysInput.value || '0', 10);
 
     // Reject negative entries (the HTML `min="0"` also blocks this on the
-    // native spinner, but free-typed input can still bypass it).
-    if (
-      !Number.isFinite(years) || years < 0 ||
-      !Number.isFinite(months) || months < 0 ||
-      !Number.isFinite(days) || days < 0
-    ) {
-      this.showError('Age components must be zero or positive.');
+    // native spinner, but free-typed input can still bypass it). Collect
+    // each failing field individually so showError only links the bad
+    // ones (the SR doesn't announce "invalid" on a field the user
+    // entered correctly).
+    const ageInvalid = [];
+    if (!Number.isFinite(years) || years < 0) ageInvalid.push(this.reverseYearsInput);
+    if (!Number.isFinite(months) || months < 0) ageInvalid.push(this.reverseMonthsInput);
+    if (!Number.isFinite(days) || days < 0) ageInvalid.push(this.reverseDaysInput);
+    if (ageInvalid.length > 0) {
+      this.showError('Age components must be zero or positive.', ageInvalid);
       this.hideResults();
       return;
     }
@@ -428,6 +437,8 @@ class AgeCalculator {
 
     const toast = document.createElement('div');
     toast.className = 'share-toast';
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
     toast.textContent = message;
     titleRow.appendChild(toast);
     setTimeout(() => toast.remove(), 2000);
@@ -728,14 +739,40 @@ class AgeCalculator {
 
   // ---------- small helpers ----------
 
-  showError(message) {
+  /**
+   * Show an error in the central error panel and link any offending
+   * inputs to it via aria-describedby (so a screen-reader user tabbing
+   * back to the bad field hears the error description) and aria-invalid.
+   * Tracked inputs are unlinked again in hideError.
+   */
+  showError(message, inputs = []) {
     if (!this.errorEl) return;
     this.errorEl.textContent = message;
     this.errorEl.classList.remove('hidden');
+
+    this._clearErroredInputs();
+    const list = (Array.isArray(inputs) ? inputs : [inputs]).filter(Boolean);
+    if (!this.errorEl.id) return;
+    list.forEach(input => {
+      linkDescribedBy(input, this.errorEl.id);
+      input.setAttribute('aria-invalid', 'true');
+    });
+    this._erroredInputs = list;
   }
 
   hideError() {
     this.errorEl?.classList.add('hidden');
+    this._clearErroredInputs();
+  }
+
+  _clearErroredInputs() {
+    if (!this._erroredInputs?.length) return;
+    const errorId = this.errorEl?.id;
+    this._erroredInputs.forEach(input => {
+      if (errorId) unlinkDescribedBy(input, errorId);
+      input.setAttribute('aria-invalid', 'false');
+    });
+    this._erroredInputs = [];
   }
 
   hideResults() {

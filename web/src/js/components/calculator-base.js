@@ -7,6 +7,7 @@ import { scoringDataLoader } from '../data/scoring-data-loader.js';
 import { eventConfigLoader } from '../data/event-config-loader.js';
 import { getPerformancePlaceholder } from '../utils/performance-parser.js';
 import { createIcon } from './icon.js';
+import { linkDescribedBy, unlinkDescribedBy } from '../utils/aria-describedby.js';
 
 export class BaseCalculator {
   constructor(selectors) {
@@ -553,15 +554,44 @@ export class BaseCalculator {
     }
   }
 
-  showError(message) {
-    if (this.errorMessage) {
-      this.errorMessage.textContent = message;
-      this.errorMessage.classList.remove('hidden');
-    }
+  /**
+   * Display an error in the central error panel. If `inputs` are passed,
+   * link them to the panel via aria-describedby + aria-invalid so a
+   * screen-reader user tabbing back to the bad field hears the error
+   * description rather than just "invalid". The tracked set is unlinked
+   * again in hideError.
+   *
+   * @param {string} message
+   * @param {HTMLElement|HTMLElement[]} [inputs]
+   */
+  showError(message, inputs = []) {
+    if (!this.errorMessage) return;
+    this.errorMessage.textContent = message;
+    this.errorMessage.classList.remove('hidden');
+
+    this._clearErroredInputs();
+    const list = (Array.isArray(inputs) ? inputs : [inputs]).filter(Boolean);
+    if (!this.errorMessage.id) return;
+    list.forEach(input => {
+      linkDescribedBy(input, this.errorMessage.id);
+      input.setAttribute('aria-invalid', 'true');
+    });
+    this._erroredInputs = list;
   }
 
   hideError() {
     this.errorMessage?.classList.add('hidden');
+    this._clearErroredInputs();
+  }
+
+  _clearErroredInputs() {
+    if (!this._erroredInputs?.length) return;
+    const errorId = this.errorMessage?.id;
+    this._erroredInputs.forEach(input => {
+      if (errorId) unlinkDescribedBy(input, errorId);
+      input.setAttribute('aria-invalid', 'false');
+    });
+    this._erroredInputs = [];
   }
 
   hideResults() {

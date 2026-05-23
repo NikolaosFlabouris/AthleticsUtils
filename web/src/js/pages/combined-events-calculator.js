@@ -478,7 +478,7 @@ class CombinedEventsCalculator {
 
       // Update UI
       input.classList.remove('input-error');
-      scoreDisplay.textContent = `${score} points`;
+      scoreDisplay.textContent = `${score.toLocaleString()} points`;
       scoreDisplay.classList.add('has-value');
 
       // Recalculate totals
@@ -580,7 +580,8 @@ class CombinedEventsCalculator {
     const pointsValue = this.finalScore.querySelector('.points-value');
 
     if (pointsValue) {
-      pointsValue.textContent = this.totalScore;
+      // Localised so a five-digit decathlon total reads "9,036" not "9036".
+      pointsValue.textContent = this.totalScore.toLocaleString();
     }
 
     // Update event scores summary
@@ -617,7 +618,7 @@ class CombinedEventsCalculator {
         html += `
           <div class="event-score-item">
             <span class="event-score-name">${displayName}</span>
-            <span class="event-score-points">${perf.score} pts</span>
+            <span class="event-score-points">${perf.score.toLocaleString()} pts</span>
           </div>
         `;
       }
