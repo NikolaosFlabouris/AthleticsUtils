@@ -199,14 +199,6 @@ See [`tools/scoring-table-extractor/README.md`](tools/scoring-table-extractor/RE
 
 ---
 
-## Contributing
-
-Issues and PRs are welcome — bug reports, new event types, improvements to parsing, and additional themes are all fair game. See [AGENTS.md](AGENTS.md) for project conventions and the architectural decisions worth knowing about before opening a PR (notably: no frameworks, vanilla JS by design, and the `web/` root quirk in Vite config).
-
-For development guidelines used by AI coding agents on this repo, the same `AGENTS.md` is the source of truth.
-
----
-
 ## Acknowledgments
 
 - **World Athletics** for publishing the official scoring tables and combined-events formulas
