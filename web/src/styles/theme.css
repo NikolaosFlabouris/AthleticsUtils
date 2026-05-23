@@ -1001,7 +1001,7 @@ fieldset.age-parts-group > legend {
 
 .results-content { display: flex; flex-direction: column; gap: 12px; }
 
-/* result-head + result-big + result-sub (used in newly built result blocks) */
+/* result-head (used in newly built result blocks) */
 .result-head {
   display: flex; align-items: center; justify-content: space-between;
   gap: 12px; flex-wrap: wrap;
@@ -1017,39 +1017,6 @@ fieldset.age-parts-group > legend {
   box-shadow: 0 0 0 3px rgba(245, 213, 71, 0.16);
   margin-right: 6px; vertical-align: 0;
 }
-
-.result-big {
-  font-family: var(--mono); font-size: 64px; line-height: 0.9;
-  letter-spacing: -0.04em;
-  font-variant-numeric: tabular-nums;
-  font-weight: 500;
-  margin: 14px 0 4px;
-  color: var(--ink);
-  display: flex; align-items: baseline; gap: 0;
-  flex-wrap: wrap;
-}
-.result-big .sep { color: var(--muted-2); margin: 0 2px; }
-.result-big .unit {
-  font-size: 14px; font-weight: 400; color: var(--muted);
-  text-transform: uppercase; letter-spacing: 0.08em;
-  margin-left: 14px; align-self: center;
-  font-family: var(--mono);
-}
-.result-big.accent { color: var(--accent); }
-.result-sub {
-  font-family: var(--mono); font-size: 12px;
-  color: var(--ink-2);
-  letter-spacing: 0.02em;
-}
-
-[data-theme="track"] .result-big {
-  font-family: var(--sans); font-weight: 900;
-  font-size: 84px; letter-spacing: -0.05em;
-}
-[data-theme="track"] .result-big .sep {
-  color: var(--accent); font-family: var(--serif); font-style: italic; font-weight: 400;
-}
-[data-theme="track"] .result-sub { font-family: var(--sans); font-size: 14px; }
 
 /* KPI grid */
 .kpis {
@@ -2575,9 +2542,6 @@ details:not([open]) > summary.day-section__header::after {
   .panel-l { border-right: 0; border-bottom: 1px solid var(--line); padding: 18px; }
   .panel-r { padding: 18px; }
 
-  .result-big { font-size: 52px; }
-  [data-theme="track"] .result-big { font-size: 64px; }
-
   .presets button, .chip { font-size: 12px; padding: 6px 10px; }
 
   .lane-tag { position: static; margin-bottom: 12px; }
@@ -2666,9 +2630,6 @@ details:not([open]) > summary.day-section__header::after {
 
   .inputbox .v { font-size: 22px; }
   [data-theme="track"] .inputbox .v { font-size: 28px; }
-
-  .result-big { font-size: 38px; }
-  [data-theme="track"] .result-big { font-size: 50px; }
 
   .result-head { flex-wrap: wrap; gap: 6px; }
 
