@@ -2232,8 +2232,8 @@ class PaceCalculator extends PaceCalculatorBase {
     const toggleContainer = document.createElement('div');
     toggleContainer.className = 'split-format-toggle-container';
     toggleContainer.innerHTML = `
-      <label class="split-format-toggle-label">Split Format:</label>
-      <div class="mode-toggle split-format-toggle">
+      <label id="split-format-toggle-label" class="split-format-toggle-label">Split Distance</label>
+      <div class="mode-toggle split-format-toggle" role="group" aria-labelledby="split-format-toggle-label">
         <button type="button" class="mode-toggle__option" data-format="default">Default</button>
         <button type="button" class="mode-toggle__option" data-format="1km">1km</button>
         <button type="button" class="mode-toggle__option" data-format="5km">5km</button>

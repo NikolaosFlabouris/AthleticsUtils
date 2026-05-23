@@ -843,9 +843,14 @@ fieldset.age-parts-group > legend {
   opacity: 0.5; cursor: not-allowed;
 }
 .compute .kbd {
-  font-family: var(--mono); font-size: 12px; opacity: 0.6;
-  border: 1px solid currentColor; padding: 1px 5px; border-radius: 3px;
+  display: inline-flex; align-items: center; justify-content: center;
+  vertical-align: -3px;
+  width: 22px; height: 22px;
+  border: 1px solid currentColor; border-radius: 4px;
+  opacity: 0.7;
+  margin-left: 4px;
 }
+.compute .kbd svg { width: 12px; height: 12px; display: block; }
 
 [data-theme="track"] .btn-primary,
 [data-theme="track"] .compute,
@@ -965,6 +970,31 @@ fieldset.age-parts-group > legend {
 [data-theme="track"] .mode-toggle__option[aria-pressed="true"],
 [data-theme="track"] .gender-toggle__option[aria-pressed="true"] {
   background: var(--ink); color: var(--paper); border-color: var(--ink);
+}
+
+/* Split-format toggle: label sits alongside the buttons. */
+.split-format-toggle-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-bottom: 12px;
+}
+.split-format-toggle-label {
+  font-family: var(--mono); font-size: 12px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+}
+[data-theme="track"] .split-format-toggle-label {
+  font-size: 12px; letter-spacing: 0.18em;
+}
+/* Fixed-width buttons sized to fit the widest label ("400m Track") on one line.
+   Overrides the mobile `flex: 1` rule so wrapped rows don't stretch a lone
+   button to fill the row. */
+.split-format-toggle .mode-toggle__option {
+  flex: 0 0 auto;
+  min-width: 100px;
 }
 
 /* ============================================================
@@ -1182,7 +1212,7 @@ fieldset.age-parts-group > legend {
 
 .result-card__content {
   color: var(--ink-2);
-  font-size: 14px;
+  font-size: 16px;
 }
 .result-card__content p { margin: 6px 0; }
 
@@ -1842,20 +1872,22 @@ details:not([open]) > summary.day-section__header::after {
   color: var(--ink); font-weight: 500;
 }
 
+/* Input row: input + (optional) hand-timed checkbox + score sit on a single
+   line at every width. Nothing wraps — the input flex-shrinks to give the
+   other items room. */
 .input-with-controls {
-  display: flex; flex-direction: column;
-  gap: 6px;
-}
-@media (min-width: 480px) {
-  .input-with-controls { flex-direction: row; align-items: center; }
+  display: flex; flex-direction: row; align-items: center;
+  flex-wrap: nowrap;
+  gap: 10px;
 }
 
 .event-performance-input {
-  flex: 1; min-width: 0;
+  flex: 1 1 auto; min-width: 0;
 }
 
 .hand-timing-wrapper {
   display: inline-flex; align-items: center; gap: 6px;
+  flex: 0 0 auto;
   white-space: nowrap;
 }
 /* Sizing/appearance comes from the global input[type="checkbox"] rule. */
@@ -1868,11 +1900,12 @@ details:not([open]) > summary.day-section__header::after {
 [data-theme="track"] .hand-timing-label { font-family: var(--sans); font-size: 12px; }
 
 .event-score {
+  flex: 0 0 auto;
+  white-space: nowrap;
   font-family: var(--mono); font-size: 12px;
+  font-variant-numeric: tabular-nums;
   color: var(--muted);
-  min-height: 16px;
   font-style: italic;
-  margin-top: 2px;
 }
 .event-score.has-value {
   color: var(--accent); font-weight: 600; font-style: normal;
@@ -1904,7 +1937,8 @@ details:not([open]) > summary.day-section__header::after {
   font-family: var(--sans);
 }
 
-/* Running totals */
+/* Running totals — combined-events results, sitting under the Final Score
+   card. One column per competition day; cumulative total carries across. */
 .running-totals {
   margin-top: 18px;
   padding-top: 14px;
@@ -1914,12 +1948,24 @@ details:not([open]) > summary.day-section__header::after {
   font-family: var(--mono); font-size: 12px;
   letter-spacing: 0.12em; text-transform: uppercase;
   color: var(--muted);
-  margin: 0 0 10px;
+  margin: 0 0 12px;
   font-weight: 500;
 }
-.running-totals-list {
+.running-totals-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+.running-totals-day__header {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+.running-totals-day__list {
+  display: flex; flex-direction: column;
   gap: 6px;
 }
 .running-total-item {
@@ -1935,6 +1981,12 @@ details:not([open]) > summary.day-section__header::after {
 }
 .running-total-label { color: var(--muted); }
 .running-total-value { color: var(--accent); font-weight: 600; }
+/* Pending rows = the event hasn't been entered yet. Value styled to match
+   the muted/italic empty-state of .event-score so the visual hierarchy
+   (entered = accent + bold, pending = muted + italic) stays consistent. */
+.running-total-item--pending .running-total-value {
+  color: var(--muted); font-weight: 400; font-style: italic;
+}
 
 /* Final score result card */
 .result-card__points {
@@ -1956,28 +2008,9 @@ details:not([open]) > summary.day-section__header::after {
 }
 [data-theme="track"] .result-card__points {
   font-family: var(--sans); font-weight: 900;
-  font-size: 84px;
+  font-size: 72px;
 }
 
-.event-scores-summary { margin-top: 14px; }
-.event-scores-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 6px;
-}
-.event-score-item {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 8px 10px;
-  background: var(--bg-2);
-  border-radius: 6px;
-  font-family: var(--mono); font-size: 12px;
-  font-variant-numeric: tabular-nums;
-}
-[data-theme="track"] .event-score-item {
-  background: var(--paper-3); border-radius: 8px;
-}
-.event-score-name { color: var(--ink-2); }
-.event-score-points { color: var(--accent); font-weight: 600; }
 
 /* ============================================================
    Time calculator — chain rows + step list
@@ -2569,7 +2602,11 @@ details:not([open]) > summary.day-section__header::after {
      Pagehead layout stays flex row (collapses progressively, not at 900px). */
 
   .calc, .calc.split-1-1 {
-    grid-template-columns: 1fr; gap: 0;
+    /* `minmax(0, 1fr)` (not bare `1fr`, which is `minmax(auto, 1fr)`) so the
+       grid track can shrink below the items' min-content size. Otherwise a
+       single wide descendant (e.g. an input with default size) pushes the
+       track — and the panels — wider than the viewport at ~500-700px. */
+    grid-template-columns: minmax(0, 1fr); gap: 0;
   }
   /* Both themes: single-column box with a horizontal divider at ≤900px. */
   .panel-l { border-right: 0; border-bottom: 1px solid var(--line); padding: 18px; }

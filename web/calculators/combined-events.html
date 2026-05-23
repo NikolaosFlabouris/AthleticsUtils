@@ -116,7 +116,7 @@
       <div>
         <div class="crumb"><span class="stripe"></span>LANE 03 &middot; CALCULATOR</div>
         <h1>Combined <em>Events</em></h1>
-        <p>Score a Decathlon, Heptathlon or Pentathlon performance discipline-by-discipline. Total ticks live as you enter; per-event points are computed against the World Athletics combined-event tables.</p>
+        <p>Score a Decathlon, Heptathlon or Pentathlon performance discipline-by-discipline. Total updates live as you enter; per-event points are computed against the World Athletics combined-event tables.</p>
       </div>
       <div class="lane-art theme-only-lane" aria-hidden="true">
         <svg viewBox="0 60 360 240" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
@@ -186,11 +186,6 @@
               <div class="clear-all-container">
                 <button id="clear-all-btn" class="btn clear-all-btn hidden" aria-label="Clear all entered performances">Clear All</button>
               </div>
-
-              <div id="running-totals" class="running-totals hidden">
-                <h2>Running Total</h2>
-                <div id="running-totals-content" class="running-totals-content"></div>
-              </div>
             </div>
           </div>
 
@@ -204,9 +199,11 @@
                   <span class="points-value">0</span>
                   <span class="points-label">points</span>
                 </div>
-                <div class="result-card__content">
-                  <div id="event-scores-summary" class="event-scores-summary"></div>
-                </div>
+              </div>
+
+              <div id="running-totals" class="running-totals">
+                <h2>Running Total</h2>
+                <div id="running-totals-content" class="running-totals-content"></div>
               </div>
             </div>
 
@@ -264,24 +261,15 @@
         <h2>Disciplines in each combined event</h2>
         <p><strong>Men's Decathlon</strong> &mdash; contested over two consecutive days:</p>
         <ul>
-          <li><strong>Day 1:</strong> 100&nbsp;m, Long Jump, Shot Put, High Jump, 400&nbsp;m</li>
-          <li><strong>Day 2:</strong> 110&nbsp;m Hurdles, Discus, Pole Vault, Javelin, 1500&nbsp;m</li>
+          <li><strong>Day 1:</strong> 100m, Long Jump, Shot Put, High Jump, 400m</li>
+          <li><strong>Day 2:</strong> 110m Hurdles, Discus, Pole Vault, Javelin, 1500m</li>
         </ul>
         <p><strong>Women's Heptathlon</strong> &mdash; contested over two consecutive days:</p>
         <ul>
-          <li><strong>Day 1:</strong> 100&nbsp;m Hurdles, High Jump, Shot Put, 200&nbsp;m</li>
-          <li><strong>Day 2:</strong> Long Jump, Javelin, 800&nbsp;m</li>
+          <li><strong>Day 1:</strong> 100m Hurdles, High Jump, Shot Put, 200m</li>
+          <li><strong>Day 2:</strong> Long Jump, Javelin, 800m</li>
         </ul>
-        <p><strong>Men's Heptathlon (Short Track)</strong> and <strong>Women's Pentathlon (Short Track)</strong> are the indoor variants, contested in one or two days. Short Track events use different implement weights and hurdle heights &mdash; the calculator handles this automatically once you pick the event.</p>
-
-        <h2>What counts as a good score?</h2>
-        <p>A few reference points to calibrate expectations. The calculator uses the 2025 tables, so historical totals from earlier editions may differ by a handful of points.</p>
-        <ul>
-          <li><strong>Decathlon (men):</strong> 8000 points is national-level, 8500 is international, and 9000+ is world-class. The world record sits just above 9100.</li>
-          <li><strong>Heptathlon (women):</strong> 6000 points is a strong national standard, 6500 is international, and 7000+ is world-class. The world record sits just above 7200.</li>
-          <li><strong>Pentathlon (Short Track):</strong> 4000 points (women) and 6000 points (men's heptathlon indoor) mark the top of the indoor season.</li>
-        </ul>
-        <p>Use the calculator to see how each individual mark contributes to the total. Because the scoring curves are non-linear, improving a weak event by 100 points is often easier than squeezing the same improvement out of your best event &mdash; a handy way for coaches to prioritise training load.</p>
+        <p><strong>Men's Heptathlon (Short Track)</strong> and <strong>Women's Pentathlon (Short Track)</strong> are the indoor variants, contested in one or two days.</p>
 
         <h2>Running total and progressive entry</h2>
         <p>You don't need to enter every discipline at once. The running total updates as you fill each field, which makes the calculator useful during a live competition. The <strong>Clear All</strong> button resets the form when you're done.</p>

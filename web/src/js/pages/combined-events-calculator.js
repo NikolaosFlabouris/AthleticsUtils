@@ -41,7 +41,6 @@ class CombinedEventsCalculator {
     this.runningTotalsContent = null;
     this.resultsContainer = null;
     this.finalScore = null;
-    this.eventScoresSummary = null;
     this.loadingIndicator = null;
     this.errorMessage = null;
   }
@@ -102,7 +101,6 @@ class CombinedEventsCalculator {
     this.runningTotalsContent = document.getElementById('running-totals-content');
     this.resultsContainer = document.getElementById('results-container');
     this.finalScore = document.getElementById('final-score');
-    this.eventScoresSummary = document.getElementById('event-scores-summary');
     this.loadingIndicator = document.getElementById('loading-indicator');
     this.errorMessage = document.getElementById('error-message');
   }
@@ -206,10 +204,9 @@ class CombinedEventsCalculator {
 
     this.currentCombinedEvent = selectedEvent;
 
-    // Reset performances
+    // Reset performances. `calculateTotals()` below re-derives totalScore and
+    // completedCount from this empty map, so no need to zero them here too.
     this.performances = {};
-    this.totalScore = 0;
-    this.completedCount = 0;
 
     // Load event configuration
     this.eventConfig = await combinedEventsConfigLoader.getCombinedEvent(
@@ -225,8 +222,11 @@ class CombinedEventsCalculator {
     this.clearAllBtn.classList.remove('hidden');
     this.resultsContainer.classList.remove('hidden');
 
-    // Update progress
-    this.updateProgress();
+    // Recompute everything from the now-empty performances map. This zeroes
+    // the Final Score (previously left stale at the prior event's total),
+    // resets the progress counter, and primes the Running Total columns with
+    // pending rows for the new event's disciplines.
+    this.calculateTotals();
   }
 
   /**
@@ -363,15 +363,19 @@ class CombinedEventsCalculator {
       inputContainer.appendChild(checkboxWrapper);
     }
 
-    group.appendChild(inputContainer);
-
-    // Score display
+    // Score display — lives inside the input row so it sits alongside the
+    // input rather than beneath it. `nowrap` on the row keeps the score
+    // pinned to the right; the input flex-shrinks to give it space.
+    // Always reads "{n} points"; no entry shows "0 points" in the muted
+    // empty-state style (the .has-value class flips it to the accent colour).
     const scoreDisplay = document.createElement('div');
     scoreDisplay.className = 'event-score';
     scoreDisplay.id = `score-${eventKey}`;
     scoreDisplay.setAttribute('aria-live', 'polite');
-    scoreDisplay.textContent = '';
-    group.appendChild(scoreDisplay);
+    scoreDisplay.textContent = '0 points';
+    inputContainer.appendChild(scoreDisplay);
+
+    group.appendChild(inputContainer);
 
     return group;
   }
@@ -419,10 +423,11 @@ class CombinedEventsCalculator {
 
     const inputValue = input.value.trim();
 
-    // If input is empty, clear the score
+    // Empty input: reset to the muted "0 points" baseline rather than blanking
+    // the row, so the score column reads consistently across all events.
     if (!inputValue) {
       delete this.performances[eventKey];
-      scoreDisplay.textContent = '';
+      scoreDisplay.textContent = '0 points';
       scoreDisplay.classList.remove('has-value');
       input.classList.remove('input-error');
       this.calculateTotals();
@@ -527,48 +532,60 @@ class CombinedEventsCalculator {
   }
 
   /**
-   * Update running totals display
+   * Update running totals display.
+   *
+   * Renders one column per competition day, each headed "Day N", with a
+   * cumulative `After {event}: {total} points` row for every event in that
+   * day — entered or not. Unentered events contribute 0, so the cumulative
+   * carries unchanged past them, and the row is tagged `--pending` so it
+   * renders in the muted/italic empty-state style. The cumulative carries
+   * across days (so Day 2's first row starts from where Day 1 left off).
+   * Single-day events drop the day header.
    */
   async updateRunningTotals() {
     if (!this.eventConfig) return;
 
-    const allEvents = this.eventConfig.events.flat();
-
-    // Only show running totals if at least one event is completed
-    if (this.completedCount === 0) {
-      this.runningTotals.classList.add('hidden');
-      return;
-    }
-
+    // Always visible once a combined event has been picked.
     this.runningTotals.classList.remove('hidden');
 
-    let html = '<div class="running-totals-list">';
+    const days = this.eventConfig.events;
+    const isMultiDay = days.length > 1;
     let runningTotal = 0;
+    const dayColumns = [];
 
-    // Calculate cumulative score for each completed event in order
-    for (const eventKey of allEvents) {
-      const perf = this.performances[eventKey];
-      if (perf && perf.score !== undefined) {
-        runningTotal += perf.score;
+    for (let i = 0; i < days.length; i++) {
+      const items = [];
 
-        // Get the display name for the event
+      for (const eventKey of days[i]) {
+        const perf = this.performances[eventKey];
+        const entered = !!(perf && perf.score !== undefined);
+        if (entered) runningTotal += perf.score;
+
         const eventParams = await combinedEventsConfigLoader.getEventParameters(
           this.currentGender,
           eventKey
         );
         const displayName = eventParams ? eventParams.displayName : eventKey;
+        const cls = entered ? 'running-total-item' : 'running-total-item running-total-item--pending';
 
-        html += `
-          <div class="running-total-item">
+        items.push(`
+          <div class="${cls}">
             <span class="running-total-label">After ${displayName}:</span>
-            <span class="running-total-value">${runningTotal} points</span>
+            <span class="running-total-value">${runningTotal.toLocaleString()} points</span>
           </div>
-        `;
+        `);
       }
+
+      dayColumns.push(`
+        <div class="running-totals-day">
+          ${isMultiDay ? `<div class="running-totals-day__header">Day ${i + 1}</div>` : ''}
+          <div class="running-totals-day__list">${items.join('')}</div>
+        </div>
+      `);
     }
 
-    html += '</div>';
-    this.runningTotalsContent.innerHTML = html;
+    this.runningTotalsContent.innerHTML =
+      `<div class="running-totals-grid">${dayColumns.join('')}</div>`;
   }
 
   /**
@@ -583,49 +600,6 @@ class CombinedEventsCalculator {
       // Localised so a five-digit decathlon total reads "9,036" not "9036".
       pointsValue.textContent = this.totalScore.toLocaleString();
     }
-
-    // Update event scores summary
-    await this.updateEventScoresSummary();
-  }
-
-  /**
-   * Update individual event scores summary
-   */
-  async updateEventScoresSummary() {
-    if (!this.eventConfig || !this.eventScoresSummary) return;
-
-    const allEvents = this.eventConfig.events.flat();
-
-    // Only show summary if at least one event is completed
-    if (this.completedCount === 0) {
-      this.eventScoresSummary.innerHTML = '<p>Enter performances to see individual scores</p>';
-      return;
-    }
-
-    let html = '<div class="event-scores-list">';
-
-    // Display score for each completed event
-    for (const eventKey of allEvents) {
-      const perf = this.performances[eventKey];
-      if (perf && perf.score !== undefined) {
-        // Get the display name for the event
-        const eventParams = await combinedEventsConfigLoader.getEventParameters(
-          this.currentGender,
-          eventKey
-        );
-        const displayName = eventParams ? eventParams.displayName : eventKey;
-
-        html += `
-          <div class="event-score-item">
-            <span class="event-score-name">${displayName}</span>
-            <span class="event-score-points">${perf.score.toLocaleString()} pts</span>
-          </div>
-        `;
-      }
-    }
-
-    html += '</div>';
-    this.eventScoresSummary.innerHTML = html;
   }
 
   /**
@@ -645,10 +619,10 @@ class CombinedEventsCalculator {
       checkbox.checked = false;
     });
 
-    // Clear all score displays
+    // Clear all score displays — match the empty-input baseline above.
     const scores = this.daysContainer.querySelectorAll('.event-score');
     scores.forEach(score => {
-      score.textContent = '';
+      score.textContent = '0 points';
       score.classList.remove('has-value');
     });
 

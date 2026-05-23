@@ -235,6 +235,12 @@ class PerformanceCalculator extends BaseCalculator {
       throws: 'Throws',
       race_walk: 'Walks'
     };
+    // Mixed events are all relays (4x400m and 4x400m sh), so include the
+    // relays category for mixed — otherwise the equivalents grid would be
+    // empty for the only events the mixed catalog contains.
+    if (this.currentGender === 'mixed') {
+      CATEGORY_LABELS.relays = 'Relays';
+    }
     // Events explicitly excluded from the equivalents list.
     const EXCLUDED_EVENTS = new Set(['20km w', '50km w']);
 
