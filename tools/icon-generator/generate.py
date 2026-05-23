@@ -12,6 +12,9 @@ Outputs, relative to web/public/:
   icons/og-pace.png           1200x630, share image for the pace calculator
   icons/og-score.png          1200x630, share image for the score calculator
   icons/og-combined.png       1200x630, share image for the combined-events calculator
+  icons/github-social-preview.png
+                              1280x640, GitHub repo social preview card
+                              (Settings → General → Social preview)
 
 These match the current site's visual language: the dark "lane" theme — near-black
 panels, a hi-vis yellow accent, and the track-card brand mark from
@@ -186,17 +189,26 @@ def _wrap(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont,
     return lines
 
 
-def make_og_image(title: str, subtitle: str) -> Image.Image:
-    """1200x630 Open Graph / Twitter share card in the dark 'lane' theme."""
-    width, height = 1200 * SS, 630 * SS
+def make_og_image(
+    title: str,
+    subtitle: str,
+    canvas: tuple[int, int] = (1200, 630),
+) -> Image.Image:
+    """Branded share card in the dark 'lane' theme.
+
+    Defaults to 1200x630 (Open Graph / Twitter); pass canvas=(1280, 640) for
+    GitHub's repo social-preview slot. All positions are anchored to the
+    canvas edges or centre, so the layout scales between the two."""
+    cw, ch = canvas
+    width, height = cw * SS, ch * SS
     img = Image.new("RGB", (width, height), OG_BG)
     draw = ImageDraw.Draw(img)
 
     # Decorative track lanes, centred just off the right edge
-    _draw_lane_art(draw, cx=1190 * SS, cy=316 * SS)
+    _draw_lane_art(draw, cx=(cw - 10) * SS, cy=(ch // 2 + 1) * SS)
 
     margin = 84 * SS
-    max_w = 600 * SS  # keep text clear of the lane artwork
+    max_w = (cw // 2) * SS  # keep text clear of the lane artwork
 
     # ── Brand row: track-card badge + wordmark ──
     badge_size = 60 * SS
@@ -304,6 +316,19 @@ def main() -> None:
             "World Athletics scoring.",
         ),
         "og-combined.png",
+    )
+
+    # GitHub repo social preview — same brand language as the OG cards,
+    # rendered at GitHub's 1280x640 canvas. Content stays well inside the
+    # 40pt safe border GitHub recommends for cropping.
+    save(
+        make_og_image(
+            "Athletics Utilities",
+            "Pace, scoring and combined-events calculators — "
+            "free, fast and offline.",
+            canvas=(1280, 640),
+        ),
+        "github-social-preview.png",
     )
     print("Done.")
 
