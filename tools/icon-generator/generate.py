@@ -16,7 +16,9 @@ Outputs, relative to web/public/:
   icons/og-time.png           1200x630, share image for the time calculator
   icons/github-social-preview.png
                               1280x640, GitHub repo social preview card
-                              (Settings → General → Social preview)
+                              (Settings → General → Social preview).
+                              Mirrors og-default.png's copy at GitHub's
+                              canvas size.
 
 PWA icons remain in the dark "lane" treatment — they're a single mark
 that lives on a phone home screen and the splash colour is already set
@@ -419,8 +421,8 @@ def main() -> None:
     save(
         make_og_image(
             "Age Calculator",
-            "Exact age in years, months and days between any two dates "
-            "— or work back from an age to find the matching date.",
+            "Years, months and days between dates — including end-of-year "
+            "age for athletics age groups.",
         ),
         "og-age.png",
     )
@@ -433,13 +435,13 @@ def main() -> None:
         "og-time.png",
     )
 
-    # GitHub repo social preview — same brand language as the OG cards,
-    # rendered at GitHub's 1280x640 canvas. Content stays well inside the
-    # 40pt safe border GitHub recommends for cropping.
+    # GitHub repo social preview — same brand language as the OG cards, with
+    # the home-page (og-default) copy rendered at GitHub's 1280x640 canvas.
+    # Content stays well inside the 40pt safe border GitHub recommends.
     save(
         make_og_image(
             "Athletics Utilities",
-            "Pace, scoring and combined-events calculators — "
+            "Five focused calculators for pace, scoring, age and time — "
             "free, fast and offline.",
             canvas=(1280, 640),
         ),
