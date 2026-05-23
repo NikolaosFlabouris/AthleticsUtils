@@ -4,26 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Time calculator. Add, subtract, multiply, or divide multiple times with a running total and per-row operators. Supports MM:SS, HH:MM:SS, and decimal seconds.">
-  <meta name="theme-color" content="#0a0c11">
+  <meta name="theme-color" content="#f4efe6">
   <title>Time Calculator - Athletics Utils</title>
   <link rel="canonical" href="https://athleticsutils.com/calculators/time.html">
   <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
   <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any">
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
 
-  <script>
-    (function () {
-      try {
-        var t = localStorage.getItem('athleticsUtils.theme');
-        if (t !== 'lane' && t !== 'track') t = 'lane';
-        document.documentElement.setAttribute('data-theme', t);
-        var meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.setAttribute('content', t === 'lane' ? '#0a0c11' : '#f4efe6');
-      } catch (e) {
-        document.documentElement.setAttribute('data-theme', 'lane');
-      }
-    })();
-  </script>
+  <!-- THEME_BOOTSTRAP -->
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Athletics Utilities">
@@ -100,7 +88,7 @@
       <div class="header-right">
         <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch theme">
           <span class="tt-icon" aria-hidden="true"></span>
-          <span data-theme-toggle-label>Light</span>
+          <span data-theme-toggle-label>Dark</span>
         </button>
       </div>
     </header>
@@ -111,7 +99,7 @@
       <a href="/calculators/score.html"><span class="ix">02</span> WA Score</a>
       <a href="/calculators/combined-events.html"><span class="ix">03</span> Combined</a>
       <a href="/calculators/age.html"><span class="ix">04</span> Age</a>
-      <a href="/calculators/time.html" class="active"><span class="ix">05</span> Time</a>
+      <a href="/calculators/time.html" class="active" aria-current="page"><span class="ix">05</span> Time</a>
     </nav>
 
     <div class="pagehead">
@@ -155,7 +143,7 @@
     <main class="main" id="main-content" tabindex="-1">
 
       <section class="calculator" aria-labelledby="calculator-heading">
-        <div class="calculator__header"><h1 id="calculator-heading">Time Calculator</h1></div>
+        <div class="calculator__header"><h2 id="calculator-heading">Time Calculator</h2></div>
 
         <div class="calc">
           <div class="panel-l">
@@ -186,8 +174,8 @@
               <div class="calculator__controls">
                 <div class="form-group">
                   <label for="time-muldiv-time">Time</label>
-                  <input type="text" id="time-muldiv-time" class="form-input" placeholder="e.g., 1:15" autocomplete="off" inputmode="text">
-                  <small class="form-help">MM:SS, HH:MM:SS, or seconds (decimals allowed).</small>
+                  <input type="text" id="time-muldiv-time" class="form-input" placeholder="e.g., 1:15" autocomplete="off" inputmode="numeric" spellcheck="false" enterkeyhint="done" aria-describedby="time-muldiv-time-help">
+                  <small class="form-help" id="time-muldiv-time-help">MM:SS, HH:MM:SS, or seconds (decimals allowed).</small>
                 </div>
 
                 <div class="form-group">
@@ -200,7 +188,7 @@
 
                 <div class="form-group">
                   <label for="time-muldiv-number">Number</label>
-                  <input type="number" id="time-muldiv-number" class="form-input" placeholder="e.g., 4 or 1.5" step="any" min="0" inputmode="decimal">
+                  <input type="number" id="time-muldiv-number" class="form-input" placeholder="e.g., 4 or 1.5" step="any" min="0" inputmode="decimal" autocomplete="off" aria-describedby="time-muldiv-number-help">
                   <small class="form-help" id="time-muldiv-number-help">Decimals allowed for multiply; whole numbers give cleaner step lists.</small>
                 </div>
               </div>
@@ -213,7 +201,7 @@
 
             <div id="error-message" class="error-message hidden" role="alert" aria-live="polite"></div>
 
-            <div id="results-container" class="calculator__results hidden">
+            <div id="results-container" class="calculator__results hidden" aria-live="polite" aria-atomic="false">
               <div class="results-header"><h2>Result</h2></div>
               <div id="results-content" class="results-content"></div>
             </div>
@@ -224,8 +212,14 @@
           <div class="history-header"><h2>Calculation History</h2></div>
           <div class="history-table-container">
             <table class="history-table">
+              <caption class="visually-hidden">Recent time calculations</caption>
               <thead>
-                <tr><th>Mode</th><th>Expression</th><th>Result</th><th></th></tr>
+                <tr>
+                  <th scope="col">Mode</th>
+                  <th scope="col">Expression</th>
+                  <th scope="col">Result</th>
+                  <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
               </thead>
               <tbody id="history-table-body"></tbody>
             </table>
@@ -286,12 +280,12 @@
 
     <footer class="footer">
       <p class="footer__links">
-        <a href="/">Home</a> &nbsp;&middot;&nbsp;
-        <a href="/calculators/pace.html">Pace &amp; Speed</a> &nbsp;&middot;&nbsp;
-        <a href="/calculators/score.html">World Athletics Score</a> &nbsp;&middot;&nbsp;
-        <a href="/calculators/combined-events.html">Combined Events</a> &nbsp;&middot;&nbsp;
-        <a href="/calculators/age.html">Age</a> &nbsp;&middot;&nbsp;
-        <a href="/calculators/time.html">Time</a> &nbsp;&middot;&nbsp;
+        <a href="/">Home</a> <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
+        <a href="/calculators/pace.html">Pace &amp; Speed</a> <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
+        <a href="/calculators/score.html">World Athletics Score</a> <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
+        <a href="/calculators/combined-events.html">Combined Events</a> <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
+        <a href="/calculators/age.html">Age</a> <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
+        <a href="/calculators/time.html">Time</a> <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
         <a href="/privacy.html">Privacy</a>
       </p>
     </footer>

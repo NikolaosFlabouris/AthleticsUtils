@@ -4,26 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="World Athletics / IAAF points calculator using the official 2025 scoring tables. Convert any track & field performance to points and find equivalent performances across every event.">
-  <meta name="theme-color" content="#0a0c11">
+  <meta name="theme-color" content="#f4efe6">
   <title>Score Calculator - Athletics Utils</title>
   <link rel="canonical" href="https://athleticsutils.com/calculators/score.html">
   <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
   <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any">
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
 
-  <script>
-    (function () {
-      try {
-        var t = localStorage.getItem('athleticsUtils.theme');
-        if (t !== 'lane' && t !== 'track') t = 'lane';
-        document.documentElement.setAttribute('data-theme', t);
-        var meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.setAttribute('content', t === 'lane' ? '#0a0c11' : '#f4efe6');
-      } catch (e) {
-        document.documentElement.setAttribute('data-theme', 'lane');
-      }
-    })();
-  </script>
+  <!-- THEME_BOOTSTRAP -->
 
   <link rel="preload" as="fetch" href="/data/events_config.json" crossorigin>
 
@@ -104,7 +92,7 @@
       <div class="header-right">
         <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch theme">
           <span class="tt-icon" aria-hidden="true"></span>
-          <span data-theme-toggle-label>Light</span>
+          <span data-theme-toggle-label>Dark</span>
         </button>
       </div>
     </header>
@@ -112,7 +100,7 @@
     <nav class="tabs" aria-label="Calculators">
       <a href="/"><span class="ix">00</span> Home</a>
       <a href="/calculators/pace.html"><span class="ix">01</span> Pace &amp; Speed</a>
-      <a href="/calculators/score.html" class="active"><span class="ix">02</span> WA Score</a>
+      <a href="/calculators/score.html" class="active" aria-current="page"><span class="ix">02</span> WA Score</a>
       <a href="/calculators/combined-events.html"><span class="ix">03</span> Combined</a>
       <a href="/calculators/age.html"><span class="ix">04</span> Age</a>
       <a href="/calculators/time.html"><span class="ix">05</span> Time</a>
@@ -159,7 +147,7 @@
     <main class="main" id="main-content" tabindex="-1">
 
       <section class="calculator" aria-labelledby="calculator-heading">
-        <div class="calculator__header"><h1 id="calculator-heading">World Athletics Score Calculator</h1></div>
+        <div class="calculator__header"><h2 id="calculator-heading">World Athletics Score Calculator</h2></div>
 
         <div class="calc">
           <div class="panel-l">
@@ -190,16 +178,16 @@
               </div>
 
               <div class="form-group">
-                <label id="mode-toggle-label">Direction</label>
+                <label id="mode-toggle-label">Conversion</label>
                 <div class="mode-toggle" role="group" aria-labelledby="mode-toggle-label">
-                  <button type="button" id="mode-toggle-performance" class="mode-toggle__option mode-toggle__option--active" data-mode="performance" aria-pressed="true">Perf &rarr; Score</button>
-                  <button type="button" id="mode-toggle-score" class="mode-toggle__option" data-mode="score" aria-pressed="false">Score &rarr; Perf</button>
+                  <button type="button" id="mode-toggle-performance" class="mode-toggle__option mode-toggle__option--active" data-mode="performance" aria-pressed="true">Performance &rarr; Score</button>
+                  <button type="button" id="mode-toggle-score" class="mode-toggle__option" data-mode="score" aria-pressed="false">Score &rarr; Performance</button>
                 </div>
               </div>
 
               <div class="form-group">
                 <label for="performance-input" id="input-label">Performance</label>
-                <input type="text" id="performance-input" class="form-input" placeholder="Select an event first" disabled>
+                <input type="text" id="performance-input" class="form-input" placeholder="Select an event first" autocomplete="off" spellcheck="false" enterkeyhint="go" aria-describedby="input-help" disabled>
                 <small class="form-help" id="input-help">Select an event to see performance format</small>
                 <div id="hand-timing-container" class="hand-timing-checkbox" style="display: none;">
                   <label class="checkbox-label">
@@ -217,17 +205,17 @@
           <div class="panel-r">
             <div class="lane-tag"><span class="stripe"></span>OUTPUT &middot; LANE 02</div>
 
-            <div id="results-container" class="calculator__results hidden">
+            <div id="results-container" class="calculator__results hidden" aria-live="polite" aria-atomic="false">
               <div class="results-header"><h2>Results</h2></div>
               <div id="results-content" class="results-content"></div>
             </div>
 
-            <div id="loading-indicator" class="loading hidden">
-              <div class="loading__spinner"></div>
+            <div id="loading-indicator" class="loading hidden" role="status" aria-live="polite">
+              <div class="loading__spinner" aria-hidden="true"></div>
               <p>Loading scoring tables...</p>
             </div>
 
-            <div id="error-message" class="error-message hidden"></div>
+            <div id="error-message" class="error-message hidden" role="alert" aria-live="polite"></div>
           </div>
         </div>
 
@@ -235,8 +223,15 @@
           <div class="history-header"><h2>Calculation History</h2></div>
           <div class="history-table-container">
             <table class="history-table">
+              <caption class="visually-hidden">Recent World Athletics score calculations</caption>
               <thead>
-                <tr><th>Gender</th><th>Event</th><th>Performance</th><th>Score</th><th></th></tr>
+                <tr>
+                  <th scope="col">Gender</th>
+                  <th scope="col">Event</th>
+                  <th scope="col">Performance</th>
+                  <th scope="col">Score</th>
+                  <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
               </thead>
               <tbody id="history-table-body"></tbody>
             </table>
@@ -313,12 +308,12 @@
 
     <footer class="footer">
       <p class="footer__links">
-        <a href="/">Home</a> &nbsp;&middot;&nbsp;
-        <a href="/calculators/pace.html">Pace &amp; Speed</a> &nbsp;&middot;&nbsp;
-        <a href="/calculators/score.html">World Athletics Score</a> &nbsp;&middot;&nbsp;
-        <a href="/calculators/combined-events.html">Combined Events</a> &nbsp;&middot;&nbsp;
-        <a href="/calculators/age.html">Age</a> &nbsp;&middot;&nbsp;
-        <a href="/calculators/time.html">Time</a> &nbsp;&middot;&nbsp;
+        <a href="/">Home</a> <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
+        <a href="/calculators/pace.html">Pace &amp; Speed</a> <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
+        <a href="/calculators/score.html">World Athletics Score</a> <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
+        <a href="/calculators/combined-events.html">Combined Events</a> <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
+        <a href="/calculators/age.html">Age</a> <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
+        <a href="/calculators/time.html">Time</a> <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
         <a href="/privacy.html">Privacy</a>
       </p>
     </footer>

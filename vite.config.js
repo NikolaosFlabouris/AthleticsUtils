@@ -1,12 +1,48 @@
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { readFileSync } from 'node:fs';
 import { resolve } from 'path';
+
+/**
+ * Inline theme-bootstrap injector.
+ *
+ * Every HTML page needs a tiny <script> in <head> that sets data-theme
+ * BEFORE the browser paints — otherwise navigating across pages flashes
+ * the wrong theme for one frame. Inlining the policy in seven HTML
+ * files (originally the case) means a policy change becomes a 7-file
+ * find-replace, which is exactly the kind of duplication that drifts.
+ *
+ * This plugin reads the policy from `web/src/js/theme-bootstrap.inline.js`
+ * and replaces a `<!-- THEME_BOOTSTRAP -->` marker comment in each HTML
+ * page with the script. Single source of truth, no module loader
+ * required at runtime.
+ */
+function themeBootstrap() {
+  const sourcePath = resolve(__dirname, 'web/src/js/theme-bootstrap.inline.js');
+  return {
+    name: 'theme-bootstrap',
+    // Vite 7 hook shape: { order: 'pre' | 'post', handler: (html, ctx) => html }.
+    // `order: 'pre'` runs before vite-plugin-pwa or any other plugin adds
+    // <head> content.
+    transformIndexHtml: {
+      order: 'pre',
+      handler(html) {
+        const source = readFileSync(sourcePath, 'utf8');
+        return html.replace(
+          '<!-- THEME_BOOTSTRAP -->',
+          `<script>${source}</script>`
+        );
+      }
+    }
+  };
+}
 
 export default defineConfig({
   base: '/',
   root: 'web',
   publicDir: 'public',
   plugins: [
+    themeBootstrap(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icons/*.png', 'data/*.json', 'favicon.ico'],
@@ -14,8 +50,12 @@ export default defineConfig({
         name: 'Athletics Utilities',
         short_name: 'AthleticsUtils',
         description: 'Calculators for track and field: pace & speed, World Athletics points, and combined events.',
-        theme_color: '#0a0c11',
-        background_color: '#0a0c11',
+        // Splash-screen and installed-app chrome colours track the
+        // site's default theme. Manifest colours can't follow the user's
+        // runtime theme choice — they're baked at install time — so we
+        // use the new light/track values to match first-visit.
+        theme_color: '#f4efe6',
+        background_color: '#f4efe6',
         display: 'standalone',
         start_url: '/',
         scope: '/',

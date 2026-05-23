@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Privacy notice for Athletics Utilities: no tracking, no analytics, no cookies. All data stays on your device.">
-  <meta name="theme-color" content="#0a0c11">
+  <meta name="theme-color" content="#f4efe6">
   <meta name="robots" content="index,follow">
   <title>Privacy - Athletics Utils</title>
   <link rel="canonical" href="https://athleticsutils.com/privacy.html">
@@ -12,19 +12,7 @@
   <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any">
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
 
-  <script>
-    (function () {
-      try {
-        var t = localStorage.getItem('athleticsUtils.theme');
-        if (t !== 'lane' && t !== 'track') t = 'lane';
-        document.documentElement.setAttribute('data-theme', t);
-        var meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.setAttribute('content', t === 'lane' ? '#0a0c11' : '#f4efe6');
-      } catch (e) {
-        document.documentElement.setAttribute('data-theme', 'lane');
-      }
-    })();
-  </script>
+  <!-- THEME_BOOTSTRAP -->
 
   <link rel="stylesheet" href="./src/styles/main.css">
 </head>
@@ -51,7 +39,7 @@
       <div class="header-right">
         <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch theme">
           <span class="tt-icon" aria-hidden="true"></span>
-          <span data-theme-toggle-label>Light</span>
+          <span data-theme-toggle-label>Dark</span>
         </button>
       </div>
     </header>
@@ -105,7 +93,8 @@
 
     <main class="main" id="main-content" tabindex="-1">
 
-      <section class="info-section">
+      <section class="info-section" aria-labelledby="privacy-heading">
+        <h2 id="privacy-heading" class="visually-hidden">Privacy details</h2>
         <p><strong>Short version:</strong> Athletics Utilities does not track you. There are no cookies, no analytics, no advertising, no third-party tracking scripts, and no account or signup. Anything you type into a calculator stays on your device.</p>
 
         <h3>What is stored on your device</h3>
@@ -134,12 +123,12 @@
 
     <footer class="footer">
       <p class="footer__links">
-        <a href="/">Home</a> &nbsp;&middot;&nbsp;
-        <a href="/calculators/pace.html">Pace &amp; Speed</a> &nbsp;&middot;&nbsp;
-        <a href="/calculators/score.html">World Athletics Score</a> &nbsp;&middot;&nbsp;
-        <a href="/calculators/combined-events.html">Combined Events</a> &nbsp;&middot;&nbsp;
-        <a href="/calculators/age.html">Age</a> &nbsp;&middot;&nbsp;
-        <a href="/calculators/time.html">Time</a> &nbsp;&middot;&nbsp;
+        <a href="/">Home</a> <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
+        <a href="/calculators/pace.html">Pace &amp; Speed</a> <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
+        <a href="/calculators/score.html">World Athletics Score</a> <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
+        <a href="/calculators/combined-events.html">Combined Events</a> <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
+        <a href="/calculators/age.html">Age</a> <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
+        <a href="/calculators/time.html">Time</a> <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
         <a href="/privacy.html">Privacy</a>
       </p>
     </footer>

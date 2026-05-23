@@ -16,13 +16,29 @@ Outputs, relative to web/public/:
   icons/og-time.png           1200x630, share image for the time calculator
   icons/github-social-preview.png
                               1280x640, GitHub repo social preview card
-                              (Settings → General → Social preview). Mirrors
-                              og-default.png's copy at GitHub's canvas size.
+                              (Settings → General → Social preview).
+                              Mirrors og-default.png's copy at GitHub's
+                              canvas size.
 
-These match the current site's visual language: the dark "lane" theme — near-black
-panels, a hi-vis yellow accent, and the track-card brand mark from
-web/public/icons/icon.svg (dark card, yellow lane bar, white lane lines).
-The share cards echo the home-page hero's concentric-lane artwork.
+PWA icons remain in the dark "lane" treatment — they're a single mark
+that lives on a phone home screen and the splash colour is already set
+once per install via the manifest.
+
+Share cards, by contrast, render BOTH themes simultaneously with a
+70/30 split: the larger left portion is the light/track palette (cream,
+rust accent) — matching the site's light-by-default policy — and a
+narrower right tab is the dark/lane palette (near-black, hi-vis yellow
+accent). All text sits on the cream half; the dark tab is purely
+decorative, showing the right half of the bridged lane art with a
+yellow-highlighted lane. Concentric lane rings are centred ON the
+seam so the highlighted lane's rust-to-yellow transition lands exactly
+at the dark/light boundary. The design intent is twofold:
+  • the site defaults to light but supports dark via the toggle — a
+    hybrid card honestly represents what the visitor will see, with
+    the larger half reflecting the default;
+  • social previews live inside other apps' UI (Twitter/LinkedIn
+    light, Discord/Slack dark) — a hybrid card always contrasts
+    against whichever feed background it lands on.
 
 Regenerate with:
 
@@ -43,13 +59,21 @@ CARD_BORDER = (42, 48, 64)      # #2A3040 — inner panel hairline
 LANE_YELLOW = (236, 210, 74)    # #ECD24A — lane-1 bar
 LANE_LINE = (237, 237, 232)     # #EDEDE8 — lane lines
 
-# ── Share-card palette (mirrors the dark "lane" theme in theme.css) ──
+# ── Share-card palette: dark "lane" theme half (mirrors theme.css [data-theme="lane"]) ──
 OG_BG = (10, 12, 17)            # --bg     #0a0c11
 OG_INK = (238, 240, 244)        # --ink    #eef0f4
 OG_INK_2 = (185, 191, 202)      # --ink-2  #b9bfca
-OG_MUTED = (110, 117, 133)      # --muted  #6e7585
+OG_MUTED = (130, 137, 154)      # --muted  #82899a (matches Round-2 a11y bump)
 OG_LINE = (44, 51, 64)          # --line-2 #2c3340
 OG_ACCENT = (245, 213, 71)      # --accent #f5d547
+
+# ── Share-card palette: light "track" theme half (mirrors theme.css [data-theme="track"]) ──
+PAPER_BG = (244, 239, 230)      # --paper  #f4efe6
+PAPER_INK = (22, 17, 10)        # --ink    #16110a
+PAPER_INK_2 = (58, 51, 38)      # --ink-2  #3a3326
+PAPER_MUTED = (110, 102, 87)    # --muted  #6e6657 (matches Round-2 a11y bump)
+PAPER_LINE = (201, 194, 176)    # --line-2 #c9c2b0
+PAPER_ACCENT = (210, 74, 37)    # --accent #d24a25
 
 
 def _first_existing(paths: list[str]) -> str:
@@ -156,9 +180,30 @@ def make_apple_touch_icon(size: int = 180) -> Image.Image:
 #   Open Graph / Twitter share cards
 # ============================================================
 
-def _draw_lane_art(draw: ImageDraw.ImageDraw, cx: float, cy: float) -> None:
-    """Concentric track-lane 'stadium' outlines sweeping in from the right,
-    echoing the home-page hero. One lane is picked out in hi-vis yellow."""
+def _draw_lane_art_half(
+    canvas: Image.Image,
+    cx: float,
+    cy: float,
+    stroke: tuple[int, int, int],
+    highlight: tuple[int, int, int],
+    side: str,
+    seam_x: int,
+) -> None:
+    """Concentric track-lane 'stadium' outlines centred at (cx, cy), with
+    the result clipped to one side of the seam.
+
+    Two calls — one per side, each in its own palette — produce the
+    bridged lane art that runs across the dark/light seam: warm strokes
+    on the cream side, cool strokes on the navy side, with one
+    highlighted lane that switches colour exactly at the seam.
+
+    `side` is either 'left' or 'right'; `seam_x` is the canvas x at which
+    the two halves meet (in supersampled pixels).
+    """
+    cw, ch = canvas.size
+    overlay = Image.new("RGBA", (cw, ch), (0, 0, 0, 0))
+    od = ImageDraw.Draw(overlay)
+
     n = 6
     w0, h0 = 980 * SS, 668 * SS
     dw, dh = 128 * SS, 96 * SS  # total shrink per ring
@@ -166,13 +211,23 @@ def _draw_lane_art(draw: ImageDraw.ImageDraw, cx: float, cy: float) -> None:
         w = w0 - i * dw
         h = h0 - i * dh
         x0, y0 = cx - w / 2, cy - h / 2
-        highlight = i == n - 2
-        draw.rounded_rectangle(
+        is_hi = i == n - 2
+        od.rounded_rectangle(
             (x0, y0, x0 + w, y0 + h),
             radius=h / 2,
-            outline=OG_ACCENT if highlight else OG_LINE,
-            width=(5 if highlight else 2) * SS,
+            outline=highlight if is_hi else stroke,
+            width=(5 if is_hi else 2) * SS,
         )
+
+    # Clip the overlay to the requested side by multiplying its alpha
+    # with a rectangle mask that covers only that side of the seam.
+    mask = Image.new("L", (cw, ch), 0)
+    if side == "left":
+        ImageDraw.Draw(mask).rectangle((0, 0, seam_x, ch), fill=255)
+    else:
+        ImageDraw.Draw(mask).rectangle((seam_x, 0, cw, ch), fill=255)
+    overlay.putalpha(ImageChops.multiply(overlay.getchannel("A"), mask))
+    canvas.paste(overlay, (0, 0), overlay)
 
 
 def _wrap(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont,
@@ -196,50 +251,90 @@ def make_og_image(
     title: str,
     subtitle: str,
     canvas: tuple[int, int] = (1200, 630),
+    seam_ratio: float = 0.70,
 ) -> Image.Image:
-    """Branded share card in the dark 'lane' theme.
+    """Branded share card carrying BOTH themes — light/track fills the
+    larger left portion (the site's default), dark/lane the smaller
+    right tab — with concentric track-lane rings bridging the seam in
+    their respective palettes.
 
-    Defaults to 1200x630 (Open Graph / Twitter); pass canvas=(1280, 640) for
-    GitHub's repo social-preview slot. All positions are anchored to the
-    canvas edges or centre, so the layout scales between the two."""
+    Layout (left → right):
+      • light cream (70%): brand mark + URL label, rust accent rule,
+        title in dark ink, subtitle in slightly lighter dark ink. All
+        text sits here so the card reads top-down on the larger half.
+      • dark navy (30%): pure decorative tab — just the right portion of
+        the bridged lane art, with cool strokes and a yellow highlight
+        on this side of the seam.
+      • bridged lane art: 6 concentric stadium outlines centred AT the
+        seam (not the canvas centre) so the highlighted lane crosses
+        exactly at the dark/light boundary — rust on the cream side,
+        yellow on the navy side.
+
+    Defaults to 1200×630 (Open Graph / Twitter); pass canvas=(1280, 640)
+    for GitHub's repo social-preview slot. `seam_ratio` (0.0–1.0) sets
+    where the cream half ends; the default 0.70 matches the site's
+    light-by-default policy."""
     cw, ch = canvas
     width, height = cw * SS, ch * SS
-    img = Image.new("RGB", (width, height), OG_BG)
+    seam_x = int(width * seam_ratio)
+
+    # === Two-tone background: cream left (70%), navy right (30%) ===
+    img = Image.new("RGB", (width, height), PAPER_BG)
+    ImageDraw.Draw(img).rectangle((seam_x, 0, width, height), fill=OG_BG)
+
+    # === Bridged lane art, centred ON the seam ===
+    # Centring at the seam (rather than the canvas centre) keeps the
+    # highlighted-lane colour transition exactly on the boundary, which
+    # is the single strongest visual hook in the design.
+    cx_centre = seam_x
+    cy_centre = height / 2
+    _draw_lane_art_half(img, cx_centre, cy_centre, PAPER_LINE, PAPER_ACCENT,
+                        side="left", seam_x=seam_x)
+    _draw_lane_art_half(img, cx_centre, cy_centre, OG_LINE, OG_ACCENT,
+                        side="right", seam_x=seam_x)
+
     draw = ImageDraw.Draw(img)
 
-    # Decorative track lanes, centred just off the right edge
-    _draw_lane_art(draw, cx=(cw - 10) * SS, cy=(ch // 2 + 1) * SS)
+    # === Text column on the cream half ===
+    margin = 64 * SS         # outer canvas margin
+    mid_gap = 56 * SS        # breathing room before the seam
+    col_x = margin
+    # Available width from the margin to the seam's breathing room. The
+    # text wrap width is then trimmed to 80% so neither the title nor the
+    # subtitle reaches the rust ring's left curve — they stay clear of
+    # the lane art and gain a calmer right-rag at the same time.
+    col_w_full = seam_x - margin - mid_gap
+    col_w = int(col_w_full * 0.80)
 
-    margin = 84 * SS
-    max_w = (cw // 2) * SS  # keep text clear of the lane artwork
-
-    # ── Brand row: track-card badge + wordmark ──
-    badge_size = 60 * SS
-    badge_y = 66 * SS
+    # === Brand row (track-card badge + URL wordmark) ===
+    badge_size = 56 * SS
+    badge_y = 64 * SS
     badge = make_track_card(badge_size)
-    img.paste(badge, (margin, badge_y), badge)
+    img.paste(badge, (col_x, badge_y), badge)
 
-    label = "ATHLETICSUTILS.COM"
-    label_font = mono_font(22 * SS)
-    l_bbox = draw.textbbox((0, 0), label, font=label_font)
-    label_x = margin + badge_size + 22 * SS
-    label_y = badge_y + badge_size / 2 - (l_bbox[3] + l_bbox[1]) / 2
-    draw.text((label_x, label_y), label, font=label_font, fill=OG_MUTED)
+    url_label = "ATHLETICSUTILS.COM"
+    url_font = mono_font(20 * SS)
+    u_bbox = draw.textbbox((0, 0), url_label, font=url_font)
+    url_x = col_x + badge_size + 18 * SS
+    url_y = badge_y + badge_size / 2 - (u_bbox[3] + u_bbox[1]) / 2
+    draw.text((url_x, url_y), url_label, font=url_font, fill=PAPER_MUTED)
 
-    # ── Title (auto-shrink + wrap) ──
+    # === Title (auto-shrink + wrap) ===
     title_size = 78 * SS
     while title_size > 44 * SS:
         title_font = bold_font(title_size)
-        title_lines = _wrap(draw, title, title_font, max_w)
-        if all(draw.textlength(ln, font=title_font) <= max_w for ln in title_lines):
+        title_lines = _wrap(draw, title, title_font, col_w)
+        if all(draw.textlength(ln, font=title_font) <= col_w for ln in title_lines):
             break
         title_size -= 2 * SS
     title_lh = round(title_size * 1.12)
 
+    # === Subtitle (fixed size, wrap) ===
     subtitle_font = bold_font(29 * SS)
-    subtitle_lines = _wrap(draw, subtitle, subtitle_font, max_w)
+    subtitle_lines = _wrap(draw, subtitle, subtitle_font, col_w)
     subtitle_lh = round(29 * SS * 1.34)
 
+    # === Stacked block: rust accent + title + gap + subtitle ===
     accent_h = 6 * SS
     gap_accent = 30 * SS
     gap_subtitle = 28 * SS
@@ -250,24 +345,27 @@ def make_og_image(
         + subtitle_lh * len(subtitle_lines)
     )
 
-    # Centre the block in the area below the brand row
+    # Centre the block in the area below the brand row.
     region_top = 168 * SS
     region_bottom = height - 70 * SS
     y = region_top + (region_bottom - region_top - block_h) / 2
 
-    # Accent rule
-    draw.rectangle((margin, y, margin + 64 * SS, y + accent_h), fill=OG_ACCENT)
+    # Rust accent rule
+    draw.rectangle(
+        (col_x, y, col_x + 64 * SS, y + accent_h),
+        fill=PAPER_ACCENT,
+    )
     y += accent_h + gap_accent
 
     for ln in title_lines:
         l_bbox = draw.textbbox((0, 0), ln, font=title_font)
-        draw.text((margin, y - l_bbox[1]), ln, font=title_font, fill=OG_INK)
+        draw.text((col_x, y - l_bbox[1]), ln, font=title_font, fill=PAPER_INK)
         y += title_lh
     y += gap_subtitle
 
     for ln in subtitle_lines:
         s_bbox = draw.textbbox((0, 0), ln, font=subtitle_font)
-        draw.text((margin, y - s_bbox[1]), ln, font=subtitle_font, fill=OG_INK_2)
+        draw.text((col_x, y - s_bbox[1]), ln, font=subtitle_font, fill=PAPER_INK_2)
         y += subtitle_lh
 
     return img.resize((width // SS, height // SS), Image.LANCZOS)
@@ -331,7 +429,7 @@ def main() -> None:
     save(
         make_og_image(
             "Time Calculator",
-            "Add, subtract, multiply and divide times — with running totals "
+            "Add, subtract, multiply or divide times — running totals "
             "and step-by-step breakdowns.",
         ),
         "og-time.png",
