@@ -635,7 +635,13 @@ class TimeCalculator {
   }
 
   buildHistoryEntry(result, params) {
-    const id = `time-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    // Prefer crypto.randomUUID so the ID isn't predictable; fall back only
+    // for ancient runtimes.
+    const id = `time-${
+      (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+        ? crypto.randomUUID()
+        : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`
+    }`;
     if (result.mode === 'addsub') {
       const expression = this.formatExpressionFromParsedRows(result.parsedRows);
       const resultText = formatTime(result.final);

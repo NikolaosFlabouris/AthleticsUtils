@@ -229,6 +229,5 @@ Target modern browsers with ES6+ support.
 ## Resources
 
 - **README.md** - User-facing documentation
-- **DEPLOYMENT.md** - Deployment instructions
 - **tools/scoring-table-extractor/README.md** - Data extraction tool docs
 - **Vite Documentation** - https://vitejs.dev/

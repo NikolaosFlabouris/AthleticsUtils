@@ -3,6 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--
+    Content-Security-Policy: defence-in-depth against XSS.
+    'unsafe-inline' is currently required for the theme pre-paint <script> in
+    this head and the JSON-LD blocks below; if those move out to external
+    files, 'unsafe-inline' can be removed from script-src.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self'; base-uri 'self'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="description" content="Athletics calculators: pace & speed, World Athletics / IAAF points, and combined events (decathlon, heptathlon, pentathlon). Uses the official 2025 scoring tables.">
   <meta name="theme-color" content="#f4efe6">
   <title>Athletics Utils</title>
@@ -203,7 +211,7 @@
           <p>Chain rows of sums and differences; step-by-step breakdown for multiplication and division.</p>
           <span class="go">Open calculator <span class="arrow">&rarr;</span></span>
         </a>
-        <a class="card" href="https://www.paypal.com/donate/?hosted_button_id=7U6M8TUA354QL" target="_blank" rel="noopener">
+        <a class="card" href="https://www.paypal.com/donate/?hosted_button_id=7U6M8TUA354QL" target="_blank" rel="noopener noreferrer">
           <h3>Support</h3>
           <p>If you find Athletics Utilities useful, consider donating. Feedback always welcome.</p>
           <span class="go">Donate <span class="arrow">&rarr;</span></span>
@@ -242,7 +250,7 @@
           <p>Chain rows of sums and differences; step-by-step breakdown for multiplication and division.</p>
           <span class="cta">Open <span class="arr">&rarr;</span></span>
         </a>
-        <a class="tool span3 dark" href="https://www.paypal.com/donate/?hosted_button_id=7U6M8TUA354QL" target="_blank" rel="noopener">
+        <a class="tool span3 dark" href="https://www.paypal.com/donate/?hosted_button_id=7U6M8TUA354QL" target="_blank" rel="noopener noreferrer">
           <div class="ix">N&deg;06</div>
           <h3>Support</h3>
           <p>If you find Athletics Utilities useful, consider donating. Feedback always welcome.</p>

@@ -176,7 +176,7 @@ The site is deployed automatically by [`.github/workflows/deploy.yml`](.github/w
 
 The custom domain `athleticsutils.com` is configured in **Settings → Pages**, with the apex domain pointing at GitHub's Pages IPs via A records. PWA caching is configured in `vite.config.js`: the per-gender scoring JSON files use a `CacheFirst` strategy with a one-year max age, since the tables only change when World Athletics publishes new ones.
 
-For a one-off manual deploy (e.g. from a non-CI machine), `npm run deploy` builds locally and pushes to the `gh-pages` branch via [`gh-pages`](https://www.npmjs.com/package/gh-pages). For deeper deployment troubleshooting, see [DEPLOYMENT.md](DEPLOYMENT.md).
+For a one-off manual deploy (e.g. from a non-CI machine), `npm run deploy` builds locally and pushes to the `gh-pages` branch via [`gh-pages`](https://www.npmjs.com/package/gh-pages).
 
 ---
 
