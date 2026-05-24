@@ -195,14 +195,14 @@
 
               <div class="form-group">
                 <label for="performance-input" id="input-label">Performance</label>
-                <input type="text" id="performance-input" class="form-input" placeholder="Select an event first" autocomplete="off" spellcheck="false" enterkeyhint="go" aria-describedby="input-help" disabled>
-                <small class="form-help" id="input-help">Select an event to see performance format</small>
-                <div id="hand-timing-container" class="hand-timing-checkbox" style="display: none;">
-                  <label class="checkbox-label">
+                <div class="input-with-controls">
+                  <input type="text" id="performance-input" class="form-input" placeholder="Select an event first" autocomplete="off" spellcheck="false" enterkeyhint="go" aria-describedby="input-help" disabled>
+                  <div id="hand-timing-container" class="hand-timing-wrapper" style="display: none;">
                     <input type="checkbox" id="hand-timing-checkbox">
-                    Hand Timed
-                  </label>
+                    <label for="hand-timing-checkbox" class="hand-timing-label">Hand Timed</label>
+                  </div>
                 </div>
+                <small class="form-help" id="input-help">Select an event to see performance format</small>
               </div>
 
               <button id="calculate-btn" class="btn btn-primary compute" disabled>Calculate <span class="kbd" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></svg></span></button>
@@ -269,10 +269,10 @@
           <li>The Scoring Tables include all standard track and Short Track (formerly indoor) events. Short Track equivalent events are labelled as such to differentiate them from their outdoor counterparts.</li>
           <li>Track events are typically measured in metres (m) and to the hundredth of a second. Road events are typically measured in kilometres (km) and to the second. The 1 Mile event is the outlier and has the same scoring table for Track and Road.</li>
           <li>All scoring tables are for the <strong>Open age group</strong>, which includes the Open aged event specifications (implement weight, hurdle height, or steeple height). Using the Scoring Tables for performances using a different specification can lead to inaccurate results.</li>
-          <li>Hand-timed performances can be used for Score conversion, however additional time is added for:
+          <li>Hand timing refers to manual stopwatch timing, which is considered to typically read faster than fully automatic timing. Tick the Hand Timed checkbox and the calculator adds the official offset before looking up the score:
             <ul>
               <li>Sprint and Hurdle events up to and including 200m: add 0.24 seconds</li>
-              <li>300m, 400m and 400m Hurdles: add 0.14 seconds</li>
+              <li>Sprint and Hurdle events over 200m and up to and including 400m: add 0.14 seconds</li>
             </ul>
           </li>
         </ul>
@@ -284,28 +284,18 @@
           <li><strong>Jumps</strong> use <code>Points = a &times; (Distance &minus; b)<sup>c</sup></code>, where the threshold <em>b</em> represents a nominal zero-point performance.</li>
           <li><strong>Throws</strong> use the same shape as jumps, calibrated for each implement weight.</li>
         </ul>
-        <p>World Athletics republishes the tables periodically (this calculator uses the 2025 edition). Results are rounded down to the nearest whole point, which matches how they are reported for combined events at World Championships and the Olympics.</p>
+        <p>World Athletics republishes the tables periodically (this calculator uses the 2025 edition). Results are rounded down to the nearest whole point.</p>
 
         <h2>Example calculations</h2>
-        <p>A few reference points to sanity-check results. All values come from the official Men's Open tables.</p>
         <ul>
-          <li><strong>100&nbsp;m &mdash; 10.00s</strong> &rarr; 1206 points</li>
-          <li><strong>100&nbsp;m &mdash; 11.00s</strong> &rarr; 886 points</li>
-          <li><strong>400&nbsp;m &mdash; 45.00s</strong> &rarr; 1180 points</li>
-          <li><strong>1500&nbsp;m &mdash; 3:30.01</strong> &rarr; 1245 points</li>
-          <li><strong>Marathon &mdash; 2:04:59</strong> &rarr; 1223 points</li>
-          <li><strong>Long Jump &mdash; 8.00&nbsp;m</strong> &rarr; 1138 points</li>
-          <li><strong>High Jump &mdash; 2.30&nbsp;m</strong> &rarr; 1179 points</li>
-          <li><strong>Shot Put &mdash; 20.00&nbsp;m</strong> &rarr; 1121 points</li>
-        </ul>
-        <p>Around 1000 points is an international-level performance. 1200+ points represents world-class territory and is where the top of the all-time lists sit. The calculator also returns <strong>equivalent performances</strong> &mdash; given your score, what you would need to run, jump, or throw in every other event to match it.</p>
-
-        <h2>Glossary</h2>
-        <ul>
-          <li><strong>Open / age group:</strong> the calculator uses Open-age event specifications (standard implement weight, hurdle height, and steeple barrier height). Using Open tables for U18 or U20 performances will under-score them.</li>
-          <li><strong>Short Track (indoor):</strong> events contested on a banked 200&nbsp;m oval, with their own tables.</li>
-          <li><strong>Hand timing:</strong> manual stopwatch timing, which consistently reads faster than fully automatic timing. Tick the Hand Timed checkbox and the calculator adds the official offset before looking up the score.</li>
-          <li><strong>Mixed events:</strong> currently limited to mixed-gender relays.</li>
+          <li><strong>Men's 100m &mdash; 10.00s</strong> &rarr; 1206 points</li>
+          <li><strong>Men's 100m &mdash; 11.00s</strong> &rarr; 886 points</li>
+          <li><strong>Men's High Jump &mdash; 2.30m</strong> &rarr; 1179 points</li>
+          <li><strong>Men's Discus Throw &mdash; 65.00m</strong> &rarr; 1152 points</li>
+          <li><strong>Women's 100m &mdash; 10.80s</strong> &rarr; 1244 points</li>
+          <li><strong>Women's 100m &mdash; 12.00s</strong> &rarr; 990 points</li>
+          <li><strong>Women's Long Jump &mdash; 7.00m</strong> &rarr; 1218 points</li>
+          <li><strong>Women's Javelin Throw &mdash; 65.00m</strong> &rarr; 1171 points</li>
         </ul>
 
         <h2>Related Calculators</h2>

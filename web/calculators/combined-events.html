@@ -194,7 +194,10 @@
 
             <div id="results-container" class="calculator__results hidden">
               <div class="result-card">
-                <h2 class="result-card__title">Final Score</h2>
+                <div class="result-card__title-row">
+                  <h2 class="result-card__title">Final Score</h2>
+                  <div id="result-actions" class="result-card__title-actions"></div>
+                </div>
                 <div class="result-card__points" id="final-score" aria-live="polite">
                   <span class="points-value">0</span>
                   <span class="points-label">points</span>
@@ -215,6 +218,24 @@
             <div id="error-message" class="error-message hidden" role="alert" aria-live="polite"></div>
           </div>
         </div>
+
+        <section id="history-section" class="history-section hidden">
+          <div class="history-header"><h2>Calculation History</h2></div>
+          <div class="history-table-container">
+            <table class="history-table">
+              <caption class="visually-hidden">Recent combined-event calculations</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Gender</th>
+                  <th scope="col">Event</th>
+                  <th scope="col">Score</th>
+                  <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body"></tbody>
+            </table>
+          </div>
+        </section>
       </section>
 
       <section class="info-section">

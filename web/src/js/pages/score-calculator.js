@@ -118,9 +118,12 @@ class PerformanceCalculator extends BaseCalculator {
     // Call parent method
     super.selectEvent(eventKey, displayName);
 
-    // Show/hide hand timing checkbox based on event support
+    // Show/hide hand timing checkbox based on event support. Clear the
+    // inline `display` rather than setting `'block'` so the container falls
+    // back to its CSS-defined `inline-flex` (matches the input row's flex
+    // layout instead of breaking it with a block child).
     if (eventConfigLoader.supportsHandTiming(eventKey)) {
-      this.handTimingContainer.style.display = 'block';
+      this.handTimingContainer.style.display = '';
       // Maintain checkbox state if switching between hand-timing events
       this.handTimingCheckbox.checked = previousHandTimingState;
       this.isHandTimed = previousHandTimingState;
@@ -721,7 +724,7 @@ class PerformanceCalculator extends BaseCalculator {
     if (params.handTimed === '1' && eventConfigLoader.supportsHandTiming(params.event)) {
       this.handTimingCheckbox.checked = true;
       this.isHandTimed = true;
-      this.handTimingContainer.style.display = 'block';
+      this.handTimingContainer.style.display = '';
     }
 
     // Set input value and enable calculate

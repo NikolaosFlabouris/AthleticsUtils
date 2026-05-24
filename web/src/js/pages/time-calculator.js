@@ -18,6 +18,7 @@ import { createIcon } from '../components/icon.js';
 import {
   parseTimeFlexible,
   formatTime,
+  formatDurationBreakdown,
   runAddSubtract,
   multiplyTime,
   divideTime
@@ -346,7 +347,7 @@ class TimeCalculator {
       this.hideResults();
       if (anyInvalid) {
         this.showError(
-          'Some rows could not be parsed — check for typos.',
+          'Some rows couldn’t be read — check for typos.',
           invalidInputs
         );
       }
@@ -473,16 +474,21 @@ class TimeCalculator {
     titleRow.appendChild(this.createResultActions());
     card.appendChild(titleRow);
 
+    // Use the shared `.result-card__points` / `.result-card__content`
+    // styling so the headline number and subtext match the pace, score
+    // and combined-events result cards in both themes. The `--negative`
+    // modifier still flips the colour to var(--hot) / var(--accent-deep)
+    // when the running total drops below zero.
     const big = document.createElement('div');
-    big.className = 'time-result';
+    big.className = 'result-card__points';
     if (final < 0) big.classList.add('time-result--negative');
     big.textContent = formatTime(final);
     card.appendChild(big);
 
-    const expression = document.createElement('p');
-    expression.className = 'time-result__expression';
-    expression.textContent = this.formatExpressionFromParsedRows(parsedRows);
-    card.appendChild(expression);
+    const breakdown = document.createElement('p');
+    breakdown.className = 'result-card__content';
+    breakdown.textContent = formatDurationBreakdown(final);
+    card.appendChild(breakdown);
 
     this.resultsContent.appendChild(card);
     this.showResults();
@@ -520,16 +526,17 @@ class TimeCalculator {
     titleRow.appendChild(this.createResultActions());
     card.appendChild(titleRow);
 
+    // Match the shared `.result-card__points` / `.result-card__content`
+    // styling — see the add/subtract renderer above.
     const big = document.createElement('div');
-    big.className = 'time-result';
+    big.className = 'result-card__points';
     big.textContent = formatTime(final);
     card.appendChild(big);
 
-    const expression = document.createElement('p');
-    expression.className = 'time-result__expression';
-    const opGlyph = op === 'mul' ? '\u00d7' : '\u00f7';
-    expression.textContent = `${formatTime(timeSeconds)} ${opGlyph} ${number}`;
-    card.appendChild(expression);
+    const breakdown = document.createElement('p');
+    breakdown.className = 'result-card__content';
+    breakdown.textContent = formatDurationBreakdown(final);
+    card.appendChild(breakdown);
 
     // Step list
     const list = document.createElement('ol');

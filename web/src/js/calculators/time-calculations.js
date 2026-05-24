@@ -40,7 +40,18 @@ export function parseTimeFlexible(input) {
   if (parts.length > 3) return null;
 
   // Validate each part is a non-negative number. The seconds slot may be
-  // a decimal; hours/minutes must be whole integers.
+  // a decimal; hours/minutes must be whole integers. Lenient decimal
+  // forms in the seconds slot:
+  //   "4"    → 4         (whole)
+  //   "4."   → 4         (trailing dot, no fraction)
+  //   "4.5"  → 4.5       (standard decimal)
+  //   ".5"   → 0.5       (leading dot, treated as 0.5)
+  //   ".",  "..",  "..5",  ".5.",  "4..",  "4.5.6"  → all rejected
+  // The regex below has two alternatives joined by `|`:
+  //   `\d+(\.\d*)?`  matches "4", "4.", "4.5"  (leading digits, optional dot+digits)
+  //   `\.\d+`        matches ".5"               (leading dot, required digits)
+  // Either alternative must consume the entire string, so stray extra
+  // dots or trailing characters always fail.
   for (let i = 0; i < parts.length; i++) {
     const p = parts[i];
     if (!p.length) return null;
@@ -48,8 +59,7 @@ export function parseTimeFlexible(input) {
       // integer segment (h or m)
       if (!/^\d+$/.test(p)) return null;
     } else {
-      // last segment may be decimal
-      if (!/^\d+(\.\d+)?$/.test(p)) return null;
+      if (!/^(\d+(\.\d*)?|\.\d+)$/.test(p)) return null;
     }
   }
 
@@ -125,6 +135,65 @@ export function formatTime(seconds) {
     core = `${m}:${String(s).padStart(2, '0')}`;
   }
   return (negative ? '\u2212' : '') + core + fracPart;
+}
+
+/**
+ * Decompose a duration in seconds into y/mo/d/h/m/s parts and format as
+ * a human-readable string. Only non-zero parts are included.
+ *
+ * Conventions for the larger units (chosen for simplicity, since the
+ * calculator deals with arbitrary durations rather than civil dates):
+ *   1 year = 365 days, 1 month = 30 days.
+ *
+ * Seconds are kept fractional (rounded to 2 dp, trailing zeros trimmed)
+ * so race-style values like 62.5 → "1 minute 2.5 seconds" survive.
+ *
+ * Examples:
+ *   62      → "1 minute 2 seconds"
+ *   60      → "1 minute"
+ *   62.5    → "1 minute 2.5 seconds"
+ *   3601    → "1 hour 1 second"
+ *   0       → "0 seconds"
+ *   −62     → "−1 minute 2 seconds"
+ *
+ * @param {number} seconds
+ * @returns {string}
+ */
+export function formatDurationBreakdown(seconds) {
+  if (!Number.isFinite(seconds)) return '';
+
+  const sign = seconds < 0 ? '−' : '';
+  let remaining = Math.abs(seconds);
+
+  // Larger units, integer counts, biggest first. Seconds is handled
+  // separately below because it may be fractional.
+  const UNITS = [
+    { secs: 365 * 24 * 3600, singular: 'year',   plural: 'years'   },
+    { secs:  30 * 24 * 3600, singular: 'month',  plural: 'months'  },
+    { secs:       24 * 3600, singular: 'day',    plural: 'days'    },
+    { secs:            3600, singular: 'hour',   plural: 'hours'   },
+    { secs:              60, singular: 'minute', plural: 'minutes' }
+  ];
+
+  const parts = [];
+  for (const u of UNITS) {
+    const count = Math.floor(remaining / u.secs);
+    if (count > 0) {
+      parts.push(`${count} ${count === 1 ? u.singular : u.plural}`);
+      remaining -= count * u.secs;
+    }
+  }
+
+  // Seconds (the remainder after stripping minutes). Two decimals max,
+  // trailing zeros trimmed so "0.50" → "0.5" and "1.00" → "1".
+  if (remaining > 0 || parts.length === 0) {
+    const rounded = Math.round(remaining * 100) / 100;
+    let str = rounded.toFixed(2).replace(/\.?0+$/, '');
+    if (str === '') str = '0';
+    parts.push(`${str} ${rounded === 1 ? 'second' : 'seconds'}`);
+  }
+
+  return sign + parts.join(' ');
 }
 
 /**

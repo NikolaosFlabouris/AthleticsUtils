@@ -684,7 +684,18 @@ select:disabled {
   cursor: not-allowed;
 }
 
-.form-input.input-error {
+/* Error state — selector list mirrors the broader input rule above so the
+   specificity matches. `.form-input.input-error` alone (0,2,0) loses to
+   `input[type="text"]:not(.val):not(.perf-input)` (0,3,1) and the
+   track-theme variant (0,4,1) on the input's own border / background,
+   which silently hid the error highlight on the time-calculator rows.
+   Adding the same `:not()` filters here brings us to (0,4,1), ties the
+   track override and wins by source order. */
+.form-input.input-error,
+input[type="text"].input-error:not(.val):not(.perf-input),
+input[type="number"].input-error:not(.val):not(.perf-input),
+input[type="date"].input-error,
+select.input-error {
   border-color: var(--error);
   background: var(--error-bg);
 }
@@ -1369,6 +1380,14 @@ fieldset.age-parts-group > legend {
   margin-top: 12px;
   font-size: 14px;
 }
+/* When the error sits at the top of the right panel in the dark theme,
+   push it below the absolute-positioned .lane-tag (top:20px) so the
+   "OUTPUT · LANE NN" header and the orange error box don't visually
+   collide. Track theme hides .lane-tag entirely so it keeps the default
+   12px margin. */
+[data-theme="lane"] .panel-r > .error-message {
+  margin-top: 28px;
+}
 
 /* ============================================================
    Info section (educational/SEO copy below calculator)
@@ -1769,6 +1788,15 @@ input[type="checkbox"]:focus-visible {
   background: var(--paper);
   border-radius: 5px;
 }
+/* Restore the orange ":checked" fill in track theme. The base
+   `input[type="checkbox"]:checked` rule and the track unchecked rule above
+   have equal CSS specificity (0,2,1) so source order wins for `background`;
+   without this rule the checked box stays paper-coloured and the white tick
+   (var(--accent-ink) = #fff in track theme) is invisible against it. */
+[data-theme="track"] input[type="checkbox"]:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
 
 /* ============================================================
    Combined events — class names match combined-events-calculator.js
@@ -1872,13 +1900,19 @@ details:not([open]) > summary.day-section__header::after {
   color: var(--ink); font-weight: 500;
 }
 
-/* Input row: input + (optional) hand-timed checkbox + score sit on a single
-   line at every width. Nothing wraps — the input flex-shrinks to give the
-   other items room. */
+/* Input row: input + (optional) hand-timed checkbox + (optional) score sit
+   on a single line at every width. Nothing wraps — the input flex-shrinks
+   to give the other items room. Used by combined-events (input + Hand Timed
+   + score) and by the score calculator (input + Hand Timed). */
 .input-with-controls {
   display: flex; flex-direction: row; align-items: center;
   flex-wrap: nowrap;
   gap: 10px;
+}
+/* Any form-input inside the row grows/shrinks; min-width:0 lets it shrink
+   below its intrinsic min-content so the trailing items always have room. */
+.input-with-controls > .form-input {
+  flex: 1 1 auto; min-width: 0;
 }
 
 .event-performance-input {
@@ -1890,14 +1924,29 @@ details:not([open]) > summary.day-section__header::after {
   flex: 0 0 auto;
   white-space: nowrap;
 }
-/* Sizing/appearance comes from the global input[type="checkbox"] rule. */
-.hand-timing-label {
+/* Sizing/appearance comes from the global input[type="checkbox"] rule.
+   The wrapper-scoped selector (specificity 0,2,0) beats the broader
+   `.form-group label` rule (0,1,1), so the score-calculator instance
+   (which lives inside a .form-group) gets the same Combined Events
+   styling rather than inheriting the form-group's mono-uppercase look. */
+.hand-timing-wrapper > .hand-timing-label {
   cursor: pointer; user-select: none; margin: 0;
   font-family: var(--mono); font-size: 12px;
   letter-spacing: 0.04em;
+  text-transform: none;
+  font-weight: normal;
   color: var(--ink-2);
 }
-[data-theme="track"] .hand-timing-label { font-family: var(--sans); font-size: 12px; }
+[data-theme="track"] .hand-timing-wrapper > .hand-timing-label {
+  font-family: var(--sans); font-size: 12px;
+  /* All four restated because the broader form-group / event-input-group
+     track-theme rules (specificity 0,2,1) would otherwise override them.
+     This rule's 0,3,0 wins, so the same look applies across calculators. */
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--ink);
+  font-weight: 500;
+}
 
 .event-score {
   flex: 0 0 auto;
@@ -2105,31 +2154,13 @@ details:not([open]) > summary.day-section__header::after {
   margin-top: 12px;
 }
 
-/* Time result heading + breakdown */
-.time-result {
-  font-family: var(--mono);
-  font-size: 48px;
-  font-variant-numeric: tabular-nums;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  line-height: 0.95;
-  color: var(--accent);
-  margin: 8px 0;
-}
-[data-theme="track"] .time-result {
-  font-family: var(--sans); font-weight: 900;
-  font-size: 64px; letter-spacing: -0.04em;
-  color: var(--ink);
-}
+/* Time result negative-state modifier — applied to the shared
+   `.result-card__points` element when the running total drops below zero
+   so the headline number flips to the error/accent-deep colour. The
+   base `.time-result` and `.time-result__expression` rules were retired
+   when the time-calculator switched to the shared result-card classes. */
 .time-result--negative { color: var(--hot); }
 [data-theme="track"] .time-result--negative { color: var(--accent-deep); }
-
-.time-result__expression {
-  font-family: var(--mono); font-size: 12px;
-  color: var(--muted);
-  word-break: break-word;
-  margin-top: 4px;
-}
 
 .time-steps {
   list-style: none; padding: 0;
@@ -2188,7 +2219,9 @@ details:not([open]) > summary.day-section__header::after {
 [data-theme="track"] .age-result {
   font-family: var(--sans); font-weight: 900;
   font-size: 64px; letter-spacing: -0.04em;
-  color: var(--ink);
+  /* Match the other calculators' track-theme result colour
+     (pace / score / combined / time all render headline in --accent). */
+  color: var(--accent);
 }
 .age-result__subtext {
   font-family: var(--mono); font-size: 12px;
