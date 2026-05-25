@@ -1172,6 +1172,16 @@ fieldset.age-parts-group > legend {
   margin-top: 14px;
 }
 .result-card:first-child { margin-top: 8px; }
+/* When a result-card sits at the very top of `.calculator__results`
+   (combined-events does this — pace/score/age/time put a "Result" H2
+   header above the cards which already buffers the lane-tag) the title
+   row's action buttons collide vertically with the absolute-positioned
+   .lane-tag at top:20px. Push the first card down in dark theme so the
+   buttons clear the "OUTPUT · LANE NN" label. Track theme hides the
+   lane-tag entirely so the default 8px stays in effect. */
+[data-theme="lane"] .calculator__results > .result-card:first-child {
+  margin-top: 28px;
+}
 
 .result-card__title-row {
   display: flex; align-items: center; justify-content: space-between;
