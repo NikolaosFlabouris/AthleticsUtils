@@ -263,16 +263,16 @@
           <li><code>1:23:45.5</code> &mdash; full HH:MM:SS with decimal</li>
           <li><code>-1:52</code> &mdash; leading minus for a negative time</li>
         </ul>
-        <p>Values beyond 59 in the seconds slot (e.g. <code>1:75</code>) are rejected because they're almost always user error &mdash; type <code>2:15</code> instead. Unlimited hours are allowed so you can add up training weeks and race programs without hitting a ceiling.</p>
+        <p>Values beyond 59 in the seconds slot (e.g. <code>1:75</code>) are rejected &mdash; type <code>2:15</code> instead.</p>
 
         <h2>Negative totals</h2>
-        <p>If a subtraction takes the running total below zero the calculator shows it with a leading minus (e.g. <code>&minus;2:00</code>). This is intentional &mdash; it's useful for working out "how far ahead / behind the target" sessions and for checking negative split plans.</p>
+        <p>If a subtraction takes the running total below zero the calculator shows it with a leading minus (e.g. <code>&minus;2:00</code>).</p>
 
         <h2>Add / Subtract running totals</h2>
-        <p>The running-total column on the right of every row shows the value of the expression up to and including that row. That makes it easy to see which specific row flips the total past some threshold, which is handy when chaining together race splits, interval sets, or training week totals.</p>
+        <p>The running-total column on the right of every row shows the value of the expression up to and including that row.</p>
 
         <h2>Multiply / Divide step breakdown</h2>
-        <p>Rather than just spitting out a final number, the calculator renders each integer step of a multiplication or division:</p>
+        <p>The calculator renders each integer step of a multiplication or division:</p>
         <ul>
           <li><code>1:15 &times; 4</code> &rarr; <code>1:15, 2:30, 3:45, 5:00</code></li>
           <li><code>1:15 &times; 1.5</code> &rarr; <code>1:15, 1:52.5</code> (whole multiple, then final)</li>

@@ -41,6 +41,17 @@ const TIME_PARAM_MAP = {
   number: 'n'     // mul/div: the multiplier/divisor
 };
 
+const COMBINED_EVENTS_PARAM_MAP = {
+  gender: 'g',        // 'men' | 'women'
+  event: 'e',         // combined-event key, e.g. 'decathlon', 'heptathlon sh'
+  performances: 'pf'  // packed: `eventKey,value[,1]|eventKey,value[,1]|...`
+                      // where the optional trailing `,1` flags hand timing.
+                      // `|` between events and `,` within an event are safe —
+                      // neither appears in event keys or performance values.
+                      // Time values like "4:30" pass through untouched because
+                      // we never split on `:`.
+};
+
 /**
  * Build a shareable URL from calculator params.
  * @param {string} calculatorPath - e.g., '/calculators/score.html'
@@ -117,4 +128,4 @@ export async function copyToClipboard(text) {
   }
 }
 
-export { SCORE_PARAM_MAP, PACE_PARAM_MAP, AGE_PARAM_MAP, TIME_PARAM_MAP };
+export { SCORE_PARAM_MAP, PACE_PARAM_MAP, AGE_PARAM_MAP, TIME_PARAM_MAP, COMBINED_EVENTS_PARAM_MAP };

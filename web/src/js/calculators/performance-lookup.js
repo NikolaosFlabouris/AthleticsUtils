@@ -299,11 +299,18 @@ export function findEquivalentPerformances(gender, points) {
     }
   }
 
-  // Filter to only include primary events
-  const primaryEvents = eventConfigLoader.getPrimaryEvents();
-  const filteredEquivalents = equivalents.filter(equiv =>
-    primaryEvents.includes(equiv.event)
-  );
+  // Filter to only include primary events. The mixed catalog is small
+  // (relay events only) and every entry is a distinct event worth surfacing,
+  // so we skip the primary-events filter for that gender.
+  let filteredEquivalents;
+  if (gender === 'mixed') {
+    filteredEquivalents = equivalents;
+  } else {
+    const primaryEvents = eventConfigLoader.getPrimaryEvents();
+    filteredEquivalents = equivalents.filter(equiv =>
+      primaryEvents.includes(equiv.event)
+    );
+  }
 
   // Group by category
   const byCategory = {};
