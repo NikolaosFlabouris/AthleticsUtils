@@ -2034,7 +2034,10 @@ details:not([open]) > summary.day-section__header::after {
 }
 [data-theme="track"] .result-card__points {
   font-family: var(--sans); font-weight: 900;
-  font-size: 72px;
+  font-size: 56px; /* step up to 72px at ≥900px, matching the dark-theme pair */
+}
+@media (min-width: 900px) {
+  [data-theme="track"] .result-card__points { font-size: 72px; }
 }
 
 
