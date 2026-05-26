@@ -372,6 +372,11 @@ class CombinedEventsCalculator {
     input.setAttribute('data-event', eventKey);
     input.setAttribute('aria-label', `Performance for ${eventParams.displayName}`);
     input.placeholder = this.getPlaceholder(eventParams.measurement);
+    // Track times can contain ':' (e.g. 1:23.4) so they need the text keyboard;
+    // jumps/throws are pure decimals.
+    input.inputMode = eventParams.measurement === 'time' ? 'text' : 'decimal';
+    input.autocomplete = 'off';
+    input.spellcheck = false;
 
     // Input event listener with debounce
     input.addEventListener('input', () => this.handlePerformanceInput(eventKey));
