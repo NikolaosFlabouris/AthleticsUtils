@@ -93,6 +93,7 @@ class PerformanceCalculator extends BaseCalculator {
     if (!this.currentEvent) {
       this.performanceInput.placeholder = 'Select an event first';
       this.inputHelp.textContent = 'Select an event to see format';
+      this.performanceInput.inputMode = 'text';
       return;
     }
 
@@ -105,9 +106,14 @@ class PerformanceCalculator extends BaseCalculator {
         this.performanceInput.placeholder = 'e.g., 10.5';
         this.inputHelp.textContent = 'Enter performance value';
       }
+      // Track times can be entered as MM:SS.ss so they need the text keyboard
+      // (':' is not on the numeric/decimal keypad). Jumps/throws are pure decimals.
+      const measurementFormat = eventInfo && eventInfo.measurementFormat;
+      this.performanceInput.inputMode = measurementFormat === 'distance' ? 'decimal' : 'text';
     } else {
       this.performanceInput.placeholder = 'e.g., 1200';
       this.inputHelp.textContent = 'Enter World Athletics score (whole number)';
+      this.performanceInput.inputMode = 'numeric';
     }
   }
 
