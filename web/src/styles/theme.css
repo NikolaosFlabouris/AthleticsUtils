@@ -1497,7 +1497,14 @@ fieldset.age-parts-group > legend {
 .footer .footer__links a {
   color: var(--ink-2);
   text-decoration: none;
-  padding: 0 4px;
+  /* inline-block + vertical padding lifts the hit area to ~31px tall so each
+     link clears WCAG 2.2 SC 2.5.8 (Target Size, Minimum ≥ 24px). The existing
+     4px horizontal padding is kept as-is, so the mid-dot separator rhythm is
+     unchanged — no negative margin (it would cancel that padding and visibly
+     tighten the gaps). vertical-align stays baseline so the separators remain
+     aligned with the link baselines. */
+  display: inline-block;
+  padding: 6px 4px;
 }
 .footer .footer__links a:hover { color: var(--accent); }
 
