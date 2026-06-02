@@ -63,8 +63,11 @@ If you find a barrier I haven't covered, please open an issue.
   calculator. Auto-recalculating calculators (age, time) wrap their input
   handlers in a 300 ms debounce so the live region announces one final
   result per pause rather than one per keystroke.
-- **Errors** — error blocks carry `role="alert" aria-live="polite"`; invalid
-  inputs gain `aria-invalid="true"`.
+- **Errors** — general/system error blocks carry `role="alert"
+  aria-live="polite"`. Field-level validation failures render an inline
+  `<small class="form-error" role="alert">` next to the offending input
+  (see Forms below); the failing input gains `aria-invalid="true"` and the
+  red `.input-error` border.
 - **Loading indicators** — `role="status" aria-live="polite"`, with the
   spinner glyph itself marked `aria-hidden="true"`.
 - **Share / Add-to-History toasts** — created with `role="status"
@@ -78,6 +81,12 @@ If you find a barrier I haven't covered, please open an issue.
 - Every input has an associated `<label>` or `aria-label`.
 - Format hints and equivalent-distance readouts use `<small class="form-help">`
   with explicit `id` and `aria-describedby` on the input.
+- Per-field validation errors use a sibling `<small id="<input-id>-error"
+  class="form-error" role="alert" hidden>`. On failure the shared
+  `utils/field-error.js` helper fills its text, removes `hidden`, and extends
+  the input's `aria-describedby` to include the `-error` id alongside the
+  `-help` id; it reverts on the next valid input or a successful submit
+  (WCAG 2.1 SC 3.3.1 — identified, associated, announced).
 - Numeric inputs declare `inputmode="decimal"` or `"numeric"`; time-format
   text inputs declare `inputmode="numeric" spellcheck="false"` so mobile
   keyboards open the right pad and avoid red-underlining `1:23:45`.

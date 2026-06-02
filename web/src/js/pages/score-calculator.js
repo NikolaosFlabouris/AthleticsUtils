@@ -11,6 +11,7 @@ import { HistoryManager } from '../utils/history-manager.js';
 import { makeCollapsible } from '../utils/collapsible-section.js';
 import { createIcon } from '../components/icon.js';
 import { buildShareUrl, parseUrlParams, clearUrlParams, copyToClipboard, SCORE_PARAM_MAP } from '../utils/url-params.js';
+import { clearFieldError } from '../utils/field-error.js';
 
 class PerformanceCalculator extends BaseCalculator {
   constructor(selectors) {
@@ -81,7 +82,7 @@ class PerformanceCalculator extends BaseCalculator {
 
     // Clear input and hide results
     this.performanceInput.value = '';
-    this.performanceInput.classList.remove('input-error');
+    clearFieldError(this.performanceInput);
     this.hideResults();
     this.hideError();
 
@@ -149,7 +150,6 @@ class PerformanceCalculator extends BaseCalculator {
     // Check if empty or no event selected
     if (!this.currentGender || !this.currentEvent || !inputValue) {
       if (!inputValue) {
-        this.performanceInput.classList.add('input-error');
         const errorMsg = this.calculationMode === 'performance'
           ? 'Please enter a performance value.'
           : 'Please enter a score.';
@@ -160,7 +160,7 @@ class PerformanceCalculator extends BaseCalculator {
 
     try {
       this.hideError();
-      this.performanceInput.classList.remove('input-error');
+      clearFieldError(this.performanceInput);
 
       if (this.calculationMode === 'performance') {
         // Performance → Score mode
@@ -172,7 +172,6 @@ class PerformanceCalculator extends BaseCalculator {
 
     } catch (error) {
       console.error('Calculation error:', error);
-      this.performanceInput.classList.add('input-error');
       this.showError('An error occurred during calculation. Please try again.', this.performanceInput);
     }
   }
@@ -181,7 +180,6 @@ class PerformanceCalculator extends BaseCalculator {
     const normalizedPerformance = parsePerformance(performanceValue, this.currentEvent);
 
     if (!normalizedPerformance) {
-      this.performanceInput.classList.add('input-error');
       this.showError('Invalid performance format. Please enter a valid number (e.g., 10.5 or 1:30.5)', this.performanceInput);
       return;
     }
@@ -189,7 +187,6 @@ class PerformanceCalculator extends BaseCalculator {
     const result = lookupPoints(this.currentGender, this.currentEvent, normalizedPerformance, this.isHandTimed);
 
     if (!result) {
-      this.performanceInput.classList.add('input-error');
       this.showError('Could not find points for this performance. Please check your input.', this.performanceInput);
       return;
     }
@@ -202,7 +199,6 @@ class PerformanceCalculator extends BaseCalculator {
     const score = parseFloat(scoreValue);
 
     if (isNaN(score) || score <= 0) {
-      this.performanceInput.classList.add('input-error');
       this.showError('Invalid score. Please enter a positive number.', this.performanceInput);
       return;
     }
@@ -210,7 +206,6 @@ class PerformanceCalculator extends BaseCalculator {
     const result = lookupPerformance(this.currentGender, this.currentEvent, score, this.isHandTimed);
 
     if (!result) {
-      this.performanceInput.classList.add('input-error');
       this.showError('Could not find performance for this score. Please check your input.', this.performanceInput);
       return;
     }

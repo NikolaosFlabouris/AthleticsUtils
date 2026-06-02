@@ -719,6 +719,23 @@ textarea::placeholder {
   margin-top: 6px;
 }
 
+/* Inline per-field validation error, sibling to .form-help. Mirrors the
+   form-help layout but in the theme's --error colour (≥ 4.5:1 on both the
+   track #f4efe6 and lane #0a0c11 backgrounds). Visibility is driven by the
+   `hidden` attribute on the span, so the `display: block` is scoped to the
+   visible state — an unscoped author `display` would beat the UA
+   `[hidden] { display: none }` rule and leak the empty span at rest. */
+.form-error {
+  font-family: var(--mono); font-size: 12px;
+  color: var(--error);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-top: 6px;
+}
+.form-error:not([hidden]) {
+  display: block;
+}
+
 /* form-group containers */
 .form-group {
   display: flex; flex-direction: column;

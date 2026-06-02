@@ -7,7 +7,7 @@ import { scoringDataLoader } from '../data/scoring-data-loader.js';
 import { eventConfigLoader } from '../data/event-config-loader.js';
 import { getPerformancePlaceholder } from '../utils/performance-parser.js';
 import { createIcon } from './icon.js';
-import { linkDescribedBy, unlinkDescribedBy } from '../utils/aria-describedby.js';
+import { showFieldError, clearFieldError } from '../utils/field-error.js';
 
 export class BaseCalculator {
   constructor(selectors) {
@@ -530,9 +530,10 @@ export class BaseCalculator {
   handlePerformanceInput(e) {
     const value = e.target.value.trim();
     this.calculateBtn.disabled = !value;
+    // Clear error state when user starts typing (empties + re-hides the
+    // inline error span, drops the border and resets aria-invalid).
     this.hideError();
-    // Clear error state when user starts typing
-    this.performanceInput?.classList.remove('input-error');
+    clearFieldError(this.performanceInput);
   }
 
   handleKeyPress(e) {
@@ -555,28 +556,36 @@ export class BaseCalculator {
   }
 
   /**
-   * Display an error in the central error panel. If `inputs` are passed,
-   * link them to the panel via aria-describedby + aria-invalid so a
-   * screen-reader user tabbing back to the bad field hears the error
-   * description rather than just "invalid". The tracked set is unlinked
+   * Surface an error. When `inputs` are passed it's a field-level validation
+   * failure: the message is rendered inline next to each offending field (in
+   * a `role="alert"` span) and the field is flagged invalid — this both
+   * identifies the error in text and announces it, satisfying WCAG SC 3.3.1.
+   * With no inputs it's a general/system error (e.g. a failed data load) and
+   * the central error panel is used instead. The tracked field set is cleared
    * again in hideError.
    *
    * @param {string} message
    * @param {HTMLElement|HTMLElement[]} [inputs]
    */
   showError(message, inputs = []) {
+    const list = (Array.isArray(inputs) ? inputs : [inputs]).filter(Boolean);
+    this._clearErroredInputs();
+
+    if (list.length) {
+      // Field error → inline spans only; keep the central panel quiet so the
+      // message isn't announced twice.
+      if (this.errorMessage) {
+        this.errorMessage.textContent = '';
+        this.errorMessage.classList.add('hidden');
+      }
+      list.forEach(input => showFieldError(input, message));
+      this._erroredInputs = list;
+      return;
+    }
+
     if (!this.errorMessage) return;
     this.errorMessage.textContent = message;
     this.errorMessage.classList.remove('hidden');
-
-    this._clearErroredInputs();
-    const list = (Array.isArray(inputs) ? inputs : [inputs]).filter(Boolean);
-    if (!this.errorMessage.id) return;
-    list.forEach(input => {
-      linkDescribedBy(input, this.errorMessage.id);
-      input.setAttribute('aria-invalid', 'true');
-    });
-    this._erroredInputs = list;
   }
 
   hideError() {
@@ -586,11 +595,7 @@ export class BaseCalculator {
 
   _clearErroredInputs() {
     if (!this._erroredInputs?.length) return;
-    const errorId = this.errorMessage?.id;
-    this._erroredInputs.forEach(input => {
-      if (errorId) unlinkDescribedBy(input, errorId);
-      input.setAttribute('aria-invalid', 'false');
-    });
+    this._erroredInputs.forEach(input => clearFieldError(input));
     this._erroredInputs = [];
   }
 

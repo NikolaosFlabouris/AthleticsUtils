@@ -25,7 +25,12 @@ import {
 } from '../calculators/time-calculations.js';
 import { buildShareUrl, parseUrlParams, clearUrlParams, copyToClipboard, TIME_PARAM_MAP } from '../utils/url-params.js';
 import { debounce } from '../utils/debounce.js';
-import { linkDescribedBy, unlinkDescribedBy } from '../utils/aria-describedby.js';
+import { showFieldError, clearFieldError } from '../utils/field-error.js';
+
+// Failure-voice validation messages, mirroring the `-help` wording.
+const ERR_MULDIV_TIME = 'Time must be MM:SS, HH:MM:SS, or seconds.';
+const ERR_MULDIV_NUMBER = 'Number must be a valid number (e.g. 4 or 1.5).';
+const ERR_ADDSUB_ROW = 'Time must be MM:SS, HH:MM:SS, or seconds.';
 
 const HISTORY_KEY = 'athleticsUtils.timeHistory';
 const MAX_HISTORY = 10;
@@ -198,6 +203,7 @@ class TimeCalculator {
       // Time input
       const input = document.createElement('input');
       input.type = 'text';
+      input.id = `time-addsub-input-${index}`;
       input.className = 'form-input time-row__input';
       input.placeholder = 'e.g., 1:52';
       input.autocomplete = 'off';
@@ -322,35 +328,25 @@ class TimeCalculator {
     this.updateAddSubTotals(runningTotals);
 
     const validCount = parsedRows.filter(r => r.valid).length;
-    const anyInvalid = parsedRows.some(r => !r.valid && !r.empty);
 
-    // Flag inputs with parse errors so the user can see what's wrong,
-    // but don't block the running total display for the valid rows.
-    // Collect the invalid inputs so showError can link them to the
-    // central message via aria-describedby; aria-invalid is then set
-    // by showError itself, keeping the source of truth in one place.
-    const invalidInputs = [];
+    // Flag rows with parse errors so the user can see what's wrong, but
+    // don't block the running total display for the valid rows. Each bad
+    // row gets its own inline `role="alert"` message (identified + announced
+    // next to the field); valid/empty rows are cleared.
     this.timeRowsContainer.querySelectorAll('.time-row').forEach((rowEl, i) => {
       const input = rowEl.querySelector('.time-row__input');
       if (!input) return;
       const row = parsedRows[i];
       if (!row.valid && !row.empty) {
-        input.classList.add('input-error');
-        invalidInputs.push(input);
+        showFieldError(input, ERR_ADDSUB_ROW);
       } else {
-        input.classList.remove('input-error');
+        clearFieldError(input);
       }
     });
 
     if (validCount < 2) {
       // Need at least two valid rows to show a meaningful result card.
       this.hideResults();
-      if (anyInvalid) {
-        this.showError(
-          'Some rows couldn’t be read — check for typos.',
-          invalidInputs
-        );
-      }
       return;
     }
 
@@ -378,29 +374,25 @@ class TimeCalculator {
 
     const seconds = parseTimeFlexible(timeStr);
     if (seconds == null) {
-      this.muldivTimeInput.classList.add('input-error');
-      this.muldivTimeInput.setAttribute('aria-invalid', 'true');
+      showFieldError(this.muldivTimeInput, ERR_MULDIV_TIME);
       this.hideResults();
       return;
     }
-    this.muldivTimeInput.classList.remove('input-error');
-    this.muldivTimeInput.setAttribute('aria-invalid', 'false');
+    clearFieldError(this.muldivTimeInput);
 
     const num = parseFloat(numberStr);
     if (!Number.isFinite(num)) {
-      this.muldivNumberInput.classList.add('input-error');
+      showFieldError(this.muldivNumberInput, ERR_MULDIV_NUMBER);
       this.hideResults();
       return;
     }
     if (this.muldivOp === 'div' && num === 0) {
-      this.muldivNumberInput.classList.add('input-error');
-      // showError handles aria-invalid + aria-describedby linking.
+      // showError routes to the inline span (aria-invalid + describedby).
       this.showError('Cannot divide by zero.', this.muldivNumberInput);
       this.hideResults();
       return;
     }
-    this.muldivNumberInput.classList.remove('input-error');
-    this.muldivNumberInput.setAttribute('aria-invalid', 'false');
+    clearFieldError(this.muldivNumberInput);
 
     let breakdown;
     if (this.muldivOp === 'mul') {
@@ -432,10 +424,8 @@ class TimeCalculator {
   }
 
   clearMuldivErrors() {
-    this.muldivTimeInput.classList.remove('input-error');
-    this.muldivNumberInput.classList.remove('input-error');
-    this.muldivTimeInput.setAttribute('aria-invalid', 'false');
-    this.muldivNumberInput.setAttribute('aria-invalid', 'false');
+    clearFieldError(this.muldivTimeInput);
+    clearFieldError(this.muldivNumberInput);
   }
 
   // ---------- serialisation for share URL ----------
@@ -911,28 +901,36 @@ class TimeCalculator {
   // ---------- helpers ----------
 
   /**
-   * Display an error in the central error panel and, if any inputs are
-   * passed in, link them to the panel via aria-describedby + flip
-   * aria-invalid. The tracked set is unlinked again in hideError so the
-   * inputs return to their pre-error a11y state (their form-help link
-   * stays intact thanks to linkDescribedBy / unlinkDescribedBy).
+   * Surface an error. With offending `inputs` it's a field-level validation
+   * failure: the message is rendered inline next to each field in a
+   * `role="alert"` span (identified in text + announced) and the field is
+   * flagged invalid. With no inputs it's a general error and the central
+   * panel is used. The tracked field set is cleared again in hideError.
    */
   showError(message, inputs = []) {
+    const list = (Array.isArray(inputs) ? inputs : [inputs]).filter(Boolean);
+
+    // Clear any previously-flagged inputs first so a different error
+    // doesn't leave the old set stranded.
+    this._clearErroredInputs();
+
+    if (list.length) {
+      // Field-level error: render the message inline next to each offending
+      // field (role="alert" → identified + announced). Keep the central
+      // panel quiet so the message isn't announced twice.
+      if (this.errorEl) {
+        this.errorEl.textContent = '';
+        this.errorEl.classList.add('hidden');
+      }
+      list.forEach(input => showFieldError(input, message));
+      this._erroredInputs = list;
+      return;
+    }
+
+    // General error with no specific field → central panel.
     if (!this.errorEl) return;
     this.errorEl.textContent = message;
     this.errorEl.classList.remove('hidden');
-
-    // Clear any previously-flagged inputs first so a different error
-    // doesn't leave the old set stranded with describedby pointing at
-    // the new message.
-    this._clearErroredInputs();
-    const list = (Array.isArray(inputs) ? inputs : [inputs]).filter(Boolean);
-    if (!this.errorEl.id) return;
-    list.forEach(input => {
-      linkDescribedBy(input, this.errorEl.id);
-      input.setAttribute('aria-invalid', 'true');
-    });
-    this._erroredInputs = list;
   }
 
   hideError() {
@@ -942,11 +940,7 @@ class TimeCalculator {
 
   _clearErroredInputs() {
     if (!this._erroredInputs?.length) return;
-    const errorId = this.errorEl?.id;
-    this._erroredInputs.forEach(input => {
-      if (errorId) unlinkDescribedBy(input, errorId);
-      input.setAttribute('aria-invalid', 'false');
-    });
+    this._erroredInputs.forEach(input => clearFieldError(input));
     this._erroredInputs = [];
   }
 

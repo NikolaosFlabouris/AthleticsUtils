@@ -28,7 +28,7 @@ import {
 } from '../calculators/age-calculations.js';
 import { buildShareUrl, parseUrlParams, clearUrlParams, copyToClipboard, AGE_PARAM_MAP } from '../utils/url-params.js';
 import { debounce } from '../utils/debounce.js';
-import { linkDescribedBy, unlinkDescribedBy } from '../utils/aria-describedby.js';
+import { showFieldError, clearFieldError } from '../utils/field-error.js';
 
 const HISTORY_KEY = 'athleticsUtils.ageHistory';
 const MAX_HISTORY = 10;
@@ -277,7 +277,7 @@ class AgeCalculator {
     if (!Number.isFinite(months) || months < 0) ageInvalid.push(this.reverseMonthsInput);
     if (!Number.isFinite(days) || days < 0) ageInvalid.push(this.reverseDaysInput);
     if (ageInvalid.length > 0) {
-      this.showError('Age components must be zero or positive.', ageInvalid);
+      this.showError('Age components must be zero or positive.', ageInvalid, 'age-reverse-error');
       this.hideResults();
       return;
     }
@@ -740,24 +740,35 @@ class AgeCalculator {
   // ---------- small helpers ----------
 
   /**
-   * Show an error in the central error panel and link any offending
-   * inputs to it via aria-describedby (so a screen-reader user tabbing
-   * back to the bad field hears the error description) and aria-invalid.
-   * Tracked inputs are unlinked again in hideError.
+   * Surface an error. With offending `inputs` it's a field-level validation
+   * failure: the message is rendered inline next to each field in a
+   * `role="alert"` span (identified in text + announced) and the field is
+   * flagged invalid. `errorId` lets several fields share one span — the age
+   * composite (years/months/days) points all three at a single message.
+   * With no inputs it's a general error and the central panel is used.
+   * The tracked field set is cleared again in hideError.
    */
-  showError(message, inputs = []) {
+  showError(message, inputs = [], errorId) {
+    const list = (Array.isArray(inputs) ? inputs : [inputs]).filter(Boolean);
+    this._clearErroredInputs();
+
+    if (list.length) {
+      if (this.errorEl) {
+        this.errorEl.textContent = '';
+        this.errorEl.classList.add('hidden');
+      }
+      const opts = errorId ? { errorId } : undefined;
+      list.forEach(input => showFieldError(input, message, opts));
+      this._erroredInputs = list.map(input => ({
+        input,
+        errorId: errorId || `${input.id}-error`
+      }));
+      return;
+    }
+
     if (!this.errorEl) return;
     this.errorEl.textContent = message;
     this.errorEl.classList.remove('hidden');
-
-    this._clearErroredInputs();
-    const list = (Array.isArray(inputs) ? inputs : [inputs]).filter(Boolean);
-    if (!this.errorEl.id) return;
-    list.forEach(input => {
-      linkDescribedBy(input, this.errorEl.id);
-      input.setAttribute('aria-invalid', 'true');
-    });
-    this._erroredInputs = list;
   }
 
   hideError() {
@@ -767,11 +778,7 @@ class AgeCalculator {
 
   _clearErroredInputs() {
     if (!this._erroredInputs?.length) return;
-    const errorId = this.errorEl?.id;
-    this._erroredInputs.forEach(input => {
-      if (errorId) unlinkDescribedBy(input, errorId);
-      input.setAttribute('aria-invalid', 'false');
-    });
+    this._erroredInputs.forEach(({ input, errorId }) => clearFieldError(input, { errorId }));
     this._erroredInputs = [];
   }
 

@@ -19,6 +19,7 @@ import {
   copyToClipboard,
   COMBINED_EVENTS_PARAM_MAP
 } from '../utils/url-params.js';
+import { showFieldError, clearFieldError } from '../utils/field-error.js';
 
 // Per-calculator localStorage key (matches age/time/pace per-calc convention).
 const HISTORY_KEY = 'athleticsUtils.combinedEventsHistory';
@@ -474,7 +475,7 @@ class CombinedEventsCalculator {
       delete this.performances[eventKey];
       scoreDisplay.textContent = '0 points';
       scoreDisplay.classList.remove('has-value');
-      input.classList.remove('input-error');
+      clearFieldError(input);
       this.calculateTotals();
       return;
     }
@@ -496,7 +497,10 @@ class CombinedEventsCalculator {
       );
 
       if (performanceValue === null || !validatePerformance(performanceValue)) {
-        input.classList.add('input-error');
+        const message = eventParams.measurement === 'time'
+          ? 'Performance must be a valid time (e.g. 12.34 or 1:23.4).'
+          : 'Performance must be a valid number (e.g. 7.85).';
+        showFieldError(input, message);
         scoreDisplay.textContent = 'Invalid input';
         scoreDisplay.classList.remove('has-value');
         delete this.performances[eventKey];
@@ -527,7 +531,7 @@ class CombinedEventsCalculator {
       };
 
       // Update UI
-      input.classList.remove('input-error');
+      clearFieldError(input);
       scoreDisplay.textContent = `${score.toLocaleString()} points`;
       scoreDisplay.classList.add('has-value');
 
@@ -535,7 +539,7 @@ class CombinedEventsCalculator {
       this.calculateTotals();
     } catch (error) {
       console.error('Error processing performance:', error);
-      input.classList.add('input-error');
+      showFieldError(input, 'Could not score this performance. Please check your input.');
       scoreDisplay.textContent = 'Error';
       scoreDisplay.classList.remove('has-value');
     }
@@ -658,7 +662,7 @@ class CombinedEventsCalculator {
     const inputs = this.daysContainer.querySelectorAll('.event-performance-input');
     inputs.forEach(input => {
       input.value = '';
-      input.classList.remove('input-error');
+      clearFieldError(input);
     });
 
     // Clear all checkboxes
