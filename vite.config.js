@@ -178,7 +178,8 @@ export default defineConfig({
         combinedEvents: resolve(__dirname, 'web/calculators/combined-events.html'),
         age: resolve(__dirname, 'web/calculators/age.html'),
         time: resolve(__dirname, 'web/calculators/time.html'),
-        privacy: resolve(__dirname, 'web/privacy.html')
+        privacy: resolve(__dirname, 'web/privacy.html'),
+        notFound: resolve(__dirname, 'web/404.html')
       }
     }
   }
