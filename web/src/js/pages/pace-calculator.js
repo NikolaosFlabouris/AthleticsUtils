@@ -36,6 +36,15 @@ import {
 } from '../utils/pace-formatter.js';
 import { makeCollapsible } from '../utils/collapsible-section.js';
 import { buildShareUrl, parseUrlParams, clearUrlParams, copyToClipboard, PACE_PARAM_MAP } from '../utils/url-params.js';
+import { showFieldError, clearFieldError } from '../utils/field-error.js';
+
+// Specific, failure-voice validation messages — mirror the `-help` wording but
+// state the requirement ("must be") so the error reads as a correction.
+const ERR_TIME = 'Time must be in HH:MM:SS or MM:SS format';
+const ERR_PACE = 'Pace must be in MM:SS format or seconds';
+const ERR_SPEED = 'Speed must be a positive number';
+const ERR_DISTANCE = 'Distance must be a positive number';
+const ERR_PACE_INTERVAL = 'Pace interval must be a positive number';
 
 class PaceCalculator extends PaceCalculatorBase {
   constructor() {
@@ -604,25 +613,22 @@ class PaceCalculator extends PaceCalculatorBase {
   }
 
   /**
-   * Clear error state from input field
+   * Clear error state from input field — empties and re-hides its inline
+   * error span, drops the red border and resets aria-invalid.
    * @param {HTMLElement} input - Input element to clear error from
    */
   clearInputError(input) {
-    if (input) {
-      input.classList.remove('input-error');
-      input.setAttribute('aria-invalid', 'false');
-    }
+    clearFieldError(input);
   }
 
   /**
-   * Set error state on input field
+   * Set error state on input field — renders a specific, announced error
+   * message in the field's inline `role="alert"` span and flags the field.
    * @param {HTMLElement} input - Input element to mark as invalid
+   * @param {string} message - Specific, failure-voice error message
    */
-  setInputError(input) {
-    if (input) {
-      input.classList.add('input-error');
-      input.setAttribute('aria-invalid', 'true');
-    }
+  setInputError(input, message) {
+    showFieldError(input, message);
   }
 
   /**
@@ -971,7 +977,7 @@ class PaceCalculator extends PaceCalculatorBase {
 
         const totalTimeSeconds = parseTimeInput(timeInputValue);
         if (!this.validateTime(totalTimeSeconds)) {
-          this.setInputError(timeInput);
+          this.setInputError(timeInput, ERR_TIME);
           this.hideResults();
           return;
         }
@@ -1018,14 +1024,14 @@ class PaceCalculator extends PaceCalculatorBase {
 
         // Validate distance
         if (!this.validateDistance(distanceValue)) {
-          this.setInputError(distanceInput);
+          this.setInputError(distanceInput, ERR_DISTANCE);
           this.hideResults();
           error = true;
         }
 
         // Validate pace interval
         if (!this.validateDistance(paceIntervalValue)) {
-          this.setInputError(paceIntervalInput);
+          this.setInputError(paceIntervalInput, ERR_PACE_INTERVAL);
           this.hideResults();
           error = true;
         }
@@ -1033,7 +1039,7 @@ class PaceCalculator extends PaceCalculatorBase {
         // Validate time
         const totalTimeSeconds = parseTimeInput(timeInputValue);
         if (!this.validateTime(totalTimeSeconds)) {
-          this.setInputError(timeInput);
+          this.setInputError(timeInput, ERR_TIME);
           this.hideResults();
           error = true;
         }
@@ -1115,7 +1121,7 @@ class PaceCalculator extends PaceCalculatorBase {
 
         const paceSeconds = parsePaceInput(paceInputValue);
         if (!this.validatePace(paceSeconds)) {
-          this.setInputError(paceInput);
+          this.setInputError(paceInput, ERR_PACE);
           this.hideResults();
           error = true;
           console.log('Invalid pace input');
@@ -1165,14 +1171,14 @@ class PaceCalculator extends PaceCalculatorBase {
 
         // Validate distance
         if (!this.validateDistance(distanceValue)) {
-          this.setInputError(distanceInput);
+          this.setInputError(distanceInput, ERR_DISTANCE);
           this.hideResults();
           error = true;
         }
 
         // Validate pace interval
         if (!this.validateDistance(paceIntervalValue)) {
-          this.setInputError(paceIntervalInput);
+          this.setInputError(paceIntervalInput, ERR_PACE_INTERVAL);
           this.hideResults();
           error = true;
         }
@@ -1180,7 +1186,7 @@ class PaceCalculator extends PaceCalculatorBase {
         // Validate pace
         const paceSeconds = parsePaceInput(paceInputValue);
         if (!this.validatePace(paceSeconds)) {
-          this.setInputError(paceInput);
+          this.setInputError(paceInput, ERR_PACE);
           this.hideResults();
           error = true;
         }
@@ -1260,7 +1266,7 @@ class PaceCalculator extends PaceCalculatorBase {
 
         const totalTimeSeconds = parseTimeInput(timeInputValue);
         if (!this.validateTime(totalTimeSeconds)) {
-          this.setInputError(timeInput);
+          this.setInputError(timeInput, ERR_TIME);
           this.hideResults();
           return;
         }
@@ -1306,7 +1312,7 @@ class PaceCalculator extends PaceCalculatorBase {
 
         // Validate distance
         if (!this.validateDistance(distanceValue)) {
-          this.setInputError(distanceInput);
+          this.setInputError(distanceInput, ERR_DISTANCE);
           this.hideResults();
           error = true;
         }
@@ -1314,7 +1320,7 @@ class PaceCalculator extends PaceCalculatorBase {
         // Validate time
         const totalTimeSeconds = parseTimeInput(timeInputValue);
         if (!this.validateTime(totalTimeSeconds)) {
-          this.setInputError(timeInput);
+          this.setInputError(timeInput, ERR_TIME);
           this.hideResults();
           error = true;
         }
@@ -1384,7 +1390,7 @@ class PaceCalculator extends PaceCalculatorBase {
 
         const speed = parseSpeedInput(speedInputValue);
         if (speed === null || speed <= 0) {
-          this.setInputError(speedInput);
+          this.setInputError(speedInput, ERR_SPEED);
           this.hideResults();
           return;
         }
@@ -1430,7 +1436,7 @@ class PaceCalculator extends PaceCalculatorBase {
 
         // Validate distance
         if (!this.validateDistance(distanceValue)) {
-          this.setInputError(distanceInput);
+          this.setInputError(distanceInput, ERR_DISTANCE);
           this.hideResults();
           error = true;
         }
@@ -1438,7 +1444,7 @@ class PaceCalculator extends PaceCalculatorBase {
         // Validate speed
         const speed = parseSpeedInput(speedInputValue);
         if (speed === null || speed <= 0) {
-          this.setInputError(speedInput);
+          this.setInputError(speedInput, ERR_SPEED);
           this.hideResults();
           error = true;
         }

@@ -183,10 +183,12 @@
                   <label for="age-from-date">From date</label>
                   <input type="date" id="age-from-date" class="form-input" aria-describedby="age-from-date-help">
                   <small class="form-help" id="age-from-date-help">Usually a date of birth.</small>
+                  <small id="age-from-date-error" class="form-error" role="alert" hidden></small>
                 </div>
                 <div class="form-group">
                   <label for="age-target-date">Target date</label>
                   <input type="date" id="age-target-date" class="form-input">
+                  <small id="age-target-date-error" class="form-error" role="alert" hidden></small>
                 </div>
               </div>
 
@@ -212,6 +214,7 @@
                       <span class="age-parts__unit">days</span>
                     </div>
                   </div>
+                  <small id="age-reverse-error" class="form-error" role="alert" hidden></small>
                 </fieldset>
               </div>
 

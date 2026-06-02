@@ -184,6 +184,7 @@
                   <label for="time-muldiv-time">Time</label>
                   <input type="text" id="time-muldiv-time" class="form-input" placeholder="e.g., 1:15" autocomplete="off" inputmode="text" spellcheck="false" enterkeyhint="done" aria-describedby="time-muldiv-time-help">
                   <small class="form-help" id="time-muldiv-time-help">MM:SS, HH:MM:SS, or seconds (decimals allowed).</small>
+                  <small id="time-muldiv-time-error" class="form-error" role="alert" hidden></small>
                 </div>
 
                 <div class="form-group">
@@ -198,6 +199,7 @@
                   <label for="time-muldiv-number">Number</label>
                   <input type="number" id="time-muldiv-number" class="form-input" placeholder="e.g., 4 or 1.5" step="any" min="0" inputmode="decimal" autocomplete="off" aria-describedby="time-muldiv-number-help">
                   <small class="form-help" id="time-muldiv-number-help">Decimals allowed for multiply; whole numbers give cleaner step lists.</small>
+                  <small id="time-muldiv-number-error" class="form-error" role="alert" hidden></small>
                 </div>
               </div>
             </div>
